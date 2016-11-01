@@ -64,8 +64,8 @@ const Int64 WaveView::RESET_TIMEOUT;// elapsed time of inactivity before we rese
 const Int64 WaveView::DELAY_INCREMENT; // increment per wave while tracking motion
 const Int64 WaveView::DELAY_INCREMENT2; // increment per wave while not tracking
 const Int64 WaveView::WAVE_DELAY; // initial propagation delay
-const Float WaveView::GRAB_HANDLE_RADIUS_SCALE_ACCESSIBILITY_DISABLED;
-const Float WaveView::GRAB_HANDLE_RADIUS_SCALE_ACCESSIBILITY_ENABLED;
+const Float WaveView::GRAB_HANDLE_RADIUS_SCALE_ACCESSIBILITY_DISABLED = 0.5f;
+const Float WaveView::GRAB_HANDLE_RADIUS_SCALE_ACCESSIBILITY_ENABLED = 1.0f;
 const AutoPtr<IAudioAttributes> WaveView::VIBRATION_ATTRIBUTES = WaveView::MiddleInitVibrationAttributes();
 
 CAR_INTERFACE_IMPL(WaveView::InnerLockTimerRunnable, Object, IRunnable)

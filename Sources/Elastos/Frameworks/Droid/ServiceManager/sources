@@ -1,10 +1,11 @@
 TARGET_NAME= elservicemanager
 TARGET_TYPE= exe
 
+CPP_FLAGS += -std=c++11
+
 SOURCES += ServiceManager.cpp
 SOURCES += main.cpp
 
 LIBRARIES += $(XDK_USER_LIB)/Elastos.Runtime.lib
 LIBRARIES += $(XDK_TARGETS)/Elastos.Runtime.eco
-LIBRARIES += $(XDK_USER_LIB)/crt0.lib
 LIBRARIES += -llog -lm -lutils -lbinder

@@ -182,12 +182,8 @@ ECode SecuritySettings::SecuritySearchIndexProvider::GetXmlResourcesToIndex(
     AutoPtr<ILockPatternUtils> lockPatternUtils;
     CLockPatternUtils::New(context, (ILockPatternUtils**)&lockPatternUtils);
     // Add options for lock/unlock screen
-    Int32 resId = GetResIdForLockUnlockScreen(context, lockPatternUtils);
-
+    Int32 resId = 0;
     AutoPtr<ISearchIndexableResource> sir;
-    CSearchIndexableResource::New(context, (ISearchIndexableResource**)&sir);
-    sir->SetXmlResId(resId);
-    result->Add(sir);
 
     if (mIsPrimary) {
         AutoPtr<IInterface> obj;
@@ -207,7 +203,6 @@ ECode SecuritySettings::SecuritySearchIndexProvider::GetXmlResourcesToIndex(
                 break;
         }
 
-        sir = NULL;
         CSearchIndexableResource::New(context, (ISearchIndexableResource**)&sir);
         sir->SetXmlResId(resId);
         result->Add(sir);
@@ -271,16 +266,16 @@ ECode SecuritySettings::SecuritySearchIndexProvider::GetRawDataToIndex(
     IUserManager* um = IUserManager::Probe(obj);
 
     if (um->HasUserRestriction(IUserManager::DISALLOW_CONFIG_CREDENTIALS, &res), !res) {
-        assert(0 && "TODO");
+        // assert(0 && "TODO");
         AutoPtr<IKeyStoreHelper> helper;
         // CKeyStoreHelper::AcquireSingleton((IKeyStoreHelper**)&helper);
         AutoPtr<IKeyStore> keyStore;
         // helper->GetInstance((IKeyStore**)&keyStore);
 
         Int32 storageSummaryRes = R::string::credential_storage_type_software;
-        if (keyStore->IsHardwareBacked(&res), res) {
-            storageSummaryRes = R::string::credential_storage_type_hardware;
-        }
+        // if (keyStore->IsHardwareBacked(&res), res) {
+        //     storageSummaryRes = R::string::credential_storage_type_hardware;
+        // }
 
         data = NULL;
         data = new SearchIndexableRaw();

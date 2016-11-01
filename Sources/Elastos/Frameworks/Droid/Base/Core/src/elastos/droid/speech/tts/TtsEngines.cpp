@@ -71,9 +71,9 @@ ECode TtsEngines::EngineInfoComparator::Compare(
     /* [in] */ IInterface* object2,
     /* [out] */ Int32* result)
 {
-#if 0
-    AutoPtr<TextToSpeech::TextToSpeechEngineInfo> lhs = (TextToSpeech::TextToSpeechEngineInfo*)object1;
-    AutoPtr<TextToSpeech::TextToSpeechEngineInfo> rhs = (TextToSpeech::TextToSpeechEngineInfo*)object2;
+
+    AutoPtr<TextToSpeech::TextToSpeechEngineInfo> lhs = (TextToSpeech::TextToSpeechEngineInfo*)IObject::Probe(object1);
+    AutoPtr<TextToSpeech::TextToSpeechEngineInfo> rhs = (TextToSpeech::TextToSpeechEngineInfo*)IObject::Probe(object2);
     if (lhs->system && !rhs->system) {
         *result = -1;
     } else if (rhs->system && !lhs->system) {
@@ -86,7 +86,7 @@ ECode TtsEngines::EngineInfoComparator::Compare(
         // higher priority, but are "lower" in the sort order.
         *result = rhs->priority - lhs->priority;
     }
-#endif
+
     return NOERROR;
 }
 
@@ -280,8 +280,8 @@ ECode TtsEngines::GetEngines(
         }
     }
 
-    assert(0 && "TODO");
-    // c->Sort(*ppRet, (IComparator*)EngineInfoComparator::Comparator);
+    AutoPtr<IComparator> comparator = new EngineInfoComparator();
+    c->Sort(*ppRet, comparator);
 
     return NOERROR;
 }

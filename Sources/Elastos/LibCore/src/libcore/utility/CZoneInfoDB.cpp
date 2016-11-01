@@ -35,7 +35,7 @@ static AutoPtr<TzData> InitDATA()
     String data, root;
     system->GetEnv(String("ANDROID_DATA"), &data);
     system->GetEnv(String("ANDROID_ROOT"), &root);
-    data += "/misc/zoneinfo/tzdata";
+    data += "/misc/zoneinfo/current/tzdata";
     root += "/usr/share/zoneinfo/tzdata";
 
     AutoPtr<ArrayOf<String> > paths = ArrayOf<String>::Alloc(2);

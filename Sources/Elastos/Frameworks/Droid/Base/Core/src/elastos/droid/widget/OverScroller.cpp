@@ -479,11 +479,11 @@ static AutoPtr<ArrayOf<Float> > InitSPLINE_TIME()
     return times;
 }
 
-const Float SplineOverScroller::GRAVITY;
+const Float SplineOverScroller::GRAVITY = 2000.0f;
 Float SplineOverScroller::DECELERATION_RATE = InitDECELERATION_RATE();
-const Float SplineOverScroller::INFLEXION;
-const Float SplineOverScroller::START_TENSION;
-const Float SplineOverScroller::END_TENSION;
+const Float SplineOverScroller::INFLEXION = 0.35f; // Tension lines cross at (INFLEXION, 1)
+const Float SplineOverScroller::START_TENSION = 0.5f;
+const Float SplineOverScroller::END_TENSION = 1.0f;
 const Float SplineOverScroller::P1 = 0.5f * 0.35f; //START_TENSION * INFLEXION;
 const Float SplineOverScroller::P2 = 1.0f - 1.0f * (1.0f - 0.35f); //1.0f - END_TENSION * (1.0f - INFLEXION);
 const Int32 SplineOverScroller::NB_SAMPLES;

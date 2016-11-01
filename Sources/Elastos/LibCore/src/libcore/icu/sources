@@ -4,6 +4,8 @@ TARGET_TYPE= lib
 
 C_DEFINES += -DELASTOS_CORELIBRARY
 
+CPP_FLAGS += -std=c++11
+
 include $(MAKEDIR)/../../sources.inc
 
 INCLUDES += $(PREBUILD_INC)/sys;

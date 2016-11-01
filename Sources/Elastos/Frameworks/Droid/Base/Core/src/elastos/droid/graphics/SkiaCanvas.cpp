@@ -23,7 +23,6 @@
 #include <SkDeque.h>
 #include <SkDrawFilter.h>
 #include <SkGraphics.h>
-#include <SkPorterDuff.h>
 #include <SkShader.h>
 #include <SkTArray.h>
 #include <SkTemplates.h>
@@ -562,7 +561,9 @@ void SkiaCanvas::drawBitmap(const SkBitmap& bitmap, float left, float top, const
 }
 
 void SkiaCanvas::drawBitmap(const SkBitmap& bitmap, const SkMatrix& matrix, const SkPaint* paint) {
-    mCanvas->drawBitmapMatrix(bitmap, matrix, paint);
+    SkAutoCanvasRestore acr(mCanvas, true);
+    mCanvas->concat(matrix);
+    mCanvas->drawBitmap(bitmap, 0, 0, paint);
 }
 
 void SkiaCanvas::drawBitmap(const SkBitmap& bitmap, float srcLeft, float srcTop,

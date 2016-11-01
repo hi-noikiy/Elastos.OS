@@ -451,7 +451,7 @@ ECode CMediaMetadataRetriever::NativeGetFrameAtTime(
             videoFrame->mDisplayHeight,
             videoFrame->mSize);
 
-    BitmapConfig config = CBitmap::NativeToConfig(SkBitmap::kRGB_565_Config);
+    BitmapConfig config = CBitmap::NativeToConfig(kRGB_565_SkColorType);
 
     size_t width, height;
     Boolean swapWidthAndHeight = FALSE;

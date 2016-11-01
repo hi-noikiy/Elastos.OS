@@ -123,7 +123,7 @@ const Float CAssetAtlasService::PACKING_THRESHOLD = 0.8f;
 // Defines the number of Int32 fields used to represent a single entry
 // in the atlas map. This number defines the size of the array returned
 // by the GetMap(). See the mAtlasMap field for more information
-const Int32 CAssetAtlasService::ATLAS_MAP_ENTRY_FIELD_COUNT = 4;
+const Int32 CAssetAtlasService::ATLAS_MAP_ENTRY_FIELD_COUNT = 3;
 
 // Specifies how our GraphicBuffer will be used. To get proper swizzling
 // the buffer will be written to using OpenGL (from JNI) so we can leave
@@ -247,7 +247,6 @@ Boolean CAssetAtlasService::Renderer::RenderAtlas(
             atlasMap->Set(mapIndex++, bmp);
             atlasMap->Set(mapIndex++, x);
             atlasMap->Set(mapIndex++, y);
-            atlasMap->Set(mapIndex++, rotated ? 1 : 0);
         }
         else {
             if (DEBUG_ATLAS) Logger::W(TAG, " RenderAtlas: pack bitmap at %d failed, bitmap:%s, w:h=(%d, %d)",

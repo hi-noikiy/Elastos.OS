@@ -277,7 +277,7 @@ ECode HardwareLayer::nGetTexName(
     /* [out] */ Int32* res)
 {
     DeferredLayerUpdater* layer = reinterpret_cast<DeferredLayerUpdater*>(layerUpdaterPtr);
-    *res = layer->backingLayer()->getTexture();
+    *res = layer->backingLayer()->getTextureId();
     return NOERROR;
 }
 

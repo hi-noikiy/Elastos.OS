@@ -22,7 +22,7 @@
 #include <Elastos.Droid.Provider.h>
 #include <Elastos.Droid.Hardware.h>
 #include <Elastos.Droid.Internal.h>
-#include <hardware_legacy/vibrator.h>
+#include <hardware/vibrator.h>
 
 using Elastos::Droid::Manifest;
 using Elastos::Droid::Os::Binder;
@@ -352,6 +352,10 @@ ECode CVibratorService::IntentReceiver::OnReceive(
 //====================================================================
 // CVibratorService
 //====================================================================
+
+static hw_module_t *gVibraModule = NULL;
+static vibrator_device_t *gVibraDevice = NULL;
+
 CAR_INTERFACE_IMPL_3(CVibratorService, Object, IIVibratorService, IInputDeviceListener, IBinder)
 
 CAR_OBJECT_IMPL(CVibratorService)
@@ -372,6 +376,8 @@ ECode CVibratorService::constructor(
     mIntentReceiver = new IntentReceiver(this);
 
     mVibrationRunnable = new VibrationRunnable(this);
+
+    VibratorInit();
 
     // Reset the hardware to a default state, in case this is a runtime
     // restart instead of a fresh boot.
@@ -403,27 +409,59 @@ ECode CVibratorService::constructor(
     return NOERROR;
 }
 
+void CVibratorService::VibratorInit()
+{
+    if (gVibraModule != NULL) {
+        return;
+    }
+
+    int err = hw_get_module(VIBRATOR_HARDWARE_MODULE_ID, (hw_module_t const**)&gVibraModule);
+
+    if (err) {
+        Slogger::E(TAG, "Couldn't load %s module (%s)", VIBRATOR_HARDWARE_MODULE_ID, strerror(-err));
+    }
+    else {
+        if (gVibraModule) {
+            vibrator_open(gVibraModule, &gVibraDevice);
+        }
+    }
+}
+
 Boolean CVibratorService::VibratorExists()
 {
-    return vibrator_exists() > 0 ? TRUE : FALSE;
+    if (gVibraModule && gVibraDevice) {
+        return TRUE;
+    }
+    else {
+        return FALSE;
+    }
 }
 
 void CVibratorService::VibratorOn(
-    /* [in] */ Int64 milliseconds)
+    /* [in] */ Int64 timeout_ms)
 {
-    if (DBG) {
-        Slogger::D(TAG, "Turning vibrator on for %lld ms.", milliseconds);
+    if (gVibraDevice) {
+        int err = gVibraDevice->vibrator_on(gVibraDevice, timeout_ms);
+        if (err != 0) {
+            Slogger::E(TAG, "The hw module failed in vibrator_on: %s", strerror(-err));
+        }
     }
-
-    vibrator_on(milliseconds);
+    else {
+        Slogger::W(TAG, "Tried to vibrate but there is no vibrator device.");
+    }
 }
 
 void CVibratorService::VibratorOff()
 {
-    if (DBG) {
-        Slogger::D(TAG, "Turning vibrator off.");
+    if (gVibraDevice) {
+        int err = gVibraDevice->vibrator_off(gVibraDevice);
+        if (err != 0) {
+            Slogger::E(TAG, "The hw module failed in vibrator_off(): %s", strerror(-err));
+        }
     }
-    vibrator_off();
+    else {
+        Slogger::W(TAG, "Tried to stop vibrating but there is no vibrator device.");
+    }
 }
 
 ECode CVibratorService::SystemReady()

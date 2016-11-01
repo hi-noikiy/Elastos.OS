@@ -65,7 +65,7 @@ public:
     // Set a flag and its value.
     void setOption(int flag, int value);
     // Set audio return channel status.
-    void setAudioReturnChannel(bool flag);
+    void setAudioReturnChannel(int port, bool flag);
     // Whether to hdmi device is connected to the given port.
     bool isConnected(int port);
 
@@ -249,8 +249,8 @@ void HdmiCecController::setOption(int flag, int value) {
 }
 
 // Set audio return channel status.
-void HdmiCecController::setAudioReturnChannel(bool enabled) {
-    mDevice->set_audio_return_channel(mDevice, enabled ? 1 : 0);
+void HdmiCecController::setAudioReturnChannel(int port, bool enabled) {
+    mDevice->set_audio_return_channel(mDevice, port, enabled ? 1 : 0);
 }
 
 // Whether to hdmi device is connected to the given port.
@@ -355,9 +355,9 @@ static void nativeSetOption(Int64 controllerPtr, Int32 flag, Int32 value) {
 }
 
 static void nativeSetAudioReturnChannel(Int64 controllerPtr,
-        Boolean enabled) {
+    Int32 port, Boolean enabled) {
     HdmiCecController* controller = reinterpret_cast<HdmiCecController*>(controllerPtr);
-    controller->setAudioReturnChannel(enabled == TRUE);
+    controller->setAudioReturnChannel(port, enabled == TRUE);
 }
 
 static Boolean nativeIsConnected(Int64 controllerPtr, Int32 port) {
@@ -786,10 +786,11 @@ ECode HdmiCecController::SetOption(
 }
 
 ECode HdmiCecController::SetAudioReturnChannel(
+    /* [in] */ Int32 port,
     /* [in] */ Boolean enabled)
 {
     AssertRunOnServiceThread();
-    NativeSetAudioReturnChannel(mNativePtr, enabled);
+    NativeSetAudioReturnChannel(mNativePtr, port, enabled);
     return NOERROR;
 }
 
@@ -1197,9 +1198,10 @@ ECode HdmiCecController::NativeSetOption(
 
 ECode HdmiCecController::NativeSetAudioReturnChannel(
     /* [in] */ Int64 controllerPtr,
+    /* [in] */ Int32 port,
     /* [in] */ Boolean flag)
 {
-    android::nativeSetAudioReturnChannel(controllerPtr, flag);
+    android::nativeSetAudioReturnChannel(controllerPtr, port, flag);
     return NOERROR;
 }
 

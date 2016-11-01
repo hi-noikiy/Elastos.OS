@@ -64,7 +64,7 @@ const Char32 StaticLayout::CHAR_TAB;
 const Char32 StaticLayout::CHAR_SPACE;
 const Char32 StaticLayout::CHAR_ZWSP;
 
-const Double StaticLayout::EXTRA_ROUNDING;
+const Double StaticLayout::EXTRA_ROUNDING = 0.5;
 
 const Int32 StaticLayout::CHAR_FIRST_HIGH_SURROGATE;
 const Int32 StaticLayout::CHAR_LAST_LOW_SURROGATE;

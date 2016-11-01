@@ -4,7 +4,6 @@
 #include "CArrayList.h"
 #include <Math.h>
 #include <cutils/atomic.h>
-#include <cutils/atomic-inline.h>
 
 using Elastos::Core::Math;
 using Elastos::IO::IObjectInput;

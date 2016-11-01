@@ -5,6 +5,8 @@ TARGET_TYPE = lib
 C_DEFINES+=-D_CAR_RUNTIME
 C_DEFINES+=-DHAVE_PTHREADS
 
+CPP_FLAGS += -std=c++11
+
 SOURCES += rot.cpp
 SOURCES += mshproc.cpp
 SOURCES += imarshal.cpp

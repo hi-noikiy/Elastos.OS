@@ -197,7 +197,7 @@ Notifier::Notifier(
 
     // Initialize interactive state for battery stats.
     // try {
-    mBatteryStats->NoteInteractive(TRUE);
+    // mBatteryStats->NoteInteractive(TRUE);
     // } catch (RemoteException ex) { }
 }
 
@@ -220,12 +220,12 @@ void Notifier::OnWakeLockAcquired(
     Boolean unimportantForLogging = (flags & IPowerManager::UNIMPORTANT_FOR_LOGGING) != 0
             && ownerUid == IProcess::SYSTEM_UID;
     if (workSource != NULL) {
-        mBatteryStats->NoteStartWakelockFromSource(workSource, ownerPid,
-                tag, historyTag, monitorType, unimportantForLogging);
+        // mBatteryStats->NoteStartWakelockFromSource(workSource, ownerPid,
+        //         tag, historyTag, monitorType, unimportantForLogging);
     }
     else {
-        mBatteryStats->NoteStartWakelock(ownerUid, ownerPid, tag,
-                historyTag, monitorType, unimportantForLogging);
+        // mBatteryStats->NoteStartWakelock(ownerUid, ownerPid, tag,
+        //         historyTag, monitorType, unimportantForLogging);
         // XXX need to deal with disabled operations.
         AutoPtr<IBinder> binder;
         AutoPtr<IAppOpsManagerHelper> aomHelper;
@@ -266,9 +266,9 @@ void Notifier::OnWakeLockChanging(
                     newFlags, newTag.string(), newPackageName.string(), newOwnerUid, newOwnerPid, newWorkSource);
         }
         // try {
-        mBatteryStats->NoteChangeWakelockFromSource(workSource, ownerPid, tag, historyTag,
-                monitorType, newWorkSource, newOwnerPid, newTag, newHistoryTag,
-                newMonitorType, unimportantForLogging);
+        // mBatteryStats->NoteChangeWakelockFromSource(workSource, ownerPid, tag, historyTag,
+        //         monitorType, newWorkSource, newOwnerPid, newTag, newHistoryTag,
+        //         newMonitorType, unimportantForLogging);
         // } catch (RemoteException ex) {
         //     // Ignore
         // }
@@ -297,10 +297,10 @@ void Notifier::OnWakeLockReleased(
     // try {
     Int32 monitorType = GetBatteryStatsWakeLockMonitorType(flags);
     if (workSource != NULL) {
-        mBatteryStats->NoteStopWakelockFromSource(workSource, ownerPid, tag, historyTag, monitorType);
+        // mBatteryStats->NoteStopWakelockFromSource(workSource, ownerPid, tag, historyTag, monitorType);
     }
     else {
-        mBatteryStats->NoteStopWakelock(ownerUid, ownerPid, tag, historyTag, monitorType);
+        // mBatteryStats->NoteStopWakelock(ownerUid, ownerPid, tag, historyTag, monitorType);
         AutoPtr<IBinder> binder;
         AutoPtr<IAppOpsManagerHelper> aomHelper;
         CAppOpsManagerHelper::AcquireSingleton((IAppOpsManagerHelper**)&aomHelper);
@@ -357,7 +357,7 @@ void Notifier::OnInteractiveStateChangeStarted(
 
     if (interactive) {
         // try {
-        mBatteryStats->NoteInteractive(TRUE);
+        // mBatteryStats->NoteInteractive(TRUE);
         // } catch (RemoteException ex) { }
     }
 }
@@ -394,7 +394,7 @@ void Notifier::OnInteractiveStateChangeFinished(
 
     if (!interactive) {
         // try {
-        mBatteryStats->NoteInteractive(FALSE);
+        // mBatteryStats->NoteInteractive(FALSE);
         // } catch (RemoteException ex) { }
     }
 }
@@ -408,7 +408,7 @@ void Notifier::OnUserActivity(
     }
 
     // try {
-    mBatteryStats->NoteUserActivity(uid, event);
+    // mBatteryStats->NoteUserActivity(uid, event);
     // } catch (RemoteException ex) {
     //     // Ignore
     // }

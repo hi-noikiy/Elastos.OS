@@ -675,9 +675,10 @@ ECode CMediaRecorder::Start()
 ECode CMediaRecorder::Pause()
 {
     // ALOGV("pause");
-    android::sp<android::MediaRecorder> mr = getMediaRecorder(this);
-    return process_media_recorder_call(mr->pause(),
-        E_RUNTIME_EXCEPTION, "pause failed.");
+    // android::sp<android::MediaRecorder> mr = getMediaRecorder(this);
+    // return process_media_recorder_call(mr->pause(),
+    //     E_RUNTIME_EXCEPTION, "pause failed.");
+    assert(0);
 }
 
 ECode CMediaRecorder::Stop()
@@ -744,7 +745,8 @@ ECode CMediaRecorder::NativeSetup(
     /* [in] */ const String& packageName)
 {
     //ALOGV("setup");
-    android::sp<android::MediaRecorder> mr = new android::MediaRecorder();
+    android::sp<android::MediaRecorder> mr = new android::MediaRecorder(
+        android::String16(packageName.string())); //opPackageName
     if (mr == NULL) {
         Logger::E(TAG, "Out of memory.");
         return E_RUNTIME_EXCEPTION;

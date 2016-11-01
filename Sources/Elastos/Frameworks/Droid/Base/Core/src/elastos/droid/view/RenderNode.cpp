@@ -21,7 +21,6 @@
 
 #include <hwui/RenderNode.h>
 #include <hwui/Animator.h>
-#include <hwui/DisplayListRenderer.h>
 
 using Elastos::Droid::Graphics::COutline;
 using Elastos::Droid::Graphics::CPath;

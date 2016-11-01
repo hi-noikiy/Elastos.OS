@@ -64,7 +64,7 @@ static inline SkImageInfo convertPixelFormat(const ANativeWindow_Buffer& buffer)
             info.fAlphaType = kOpaque_SkAlphaType;
         default:
             info.fColorType = kUnknown_SkColorType;
-            info.fAlphaType = kIgnore_SkAlphaType;
+            info.fAlphaType = kOpaque_SkAlphaType;
             break;
     }
     return info;

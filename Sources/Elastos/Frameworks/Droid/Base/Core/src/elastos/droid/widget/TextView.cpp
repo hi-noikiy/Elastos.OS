@@ -773,6 +773,15 @@ ECode Marquee::RestartCallback::DoFrame(
 //          Marquee
 //==============================================================================
 
+const Float Marquee::MARQUEE_DELTA_MAX = 0.07f;
+const Int32 Marquee::MARQUEE_DELAY = 1200;
+const Int32 Marquee::MARQUEE_RESTART_DELAY = 1200;
+const Int32 Marquee::MARQUEE_DP_PER_SECOND = 30;
+
+const Byte Marquee::MARQUEE_STOPPED = 0x0;
+const Byte Marquee::MARQUEE_STARTING = 0x1;
+const Byte Marquee::MARQUEE_RUNNING = 0x2;
+
 Marquee::Marquee(
     /* [in] */ ITextView* v)
     : mStatus(0x0)
@@ -5809,7 +5818,7 @@ ECode TextView::OnAttachedToWindow()
     if (mPreDrawListenerDetached) {
         AutoPtr<IViewTreeObserver> observer;
         GetViewTreeObserver((IViewTreeObserver**)&observer);
-        observer->AddOnPreDrawListener(this);
+        observer->AddOnPreDrawListener(mPreDrawListener);
         mPreDrawListenerDetached = FALSE;
     }
     return NOERROR;
@@ -5820,7 +5829,7 @@ ECode TextView::OnDetachedFromWindowInternal()
     if (mPreDrawRegistered) {
         AutoPtr<IViewTreeObserver> observer;
         GetViewTreeObserver((IViewTreeObserver**)&observer);
-        observer->RemoveOnPreDrawListener(this);
+        observer->RemoveOnPreDrawListener(mPreDrawListener);
         mPreDrawListenerDetached = TRUE;
     }
 

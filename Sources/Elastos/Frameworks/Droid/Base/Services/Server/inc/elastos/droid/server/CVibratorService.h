@@ -213,6 +213,8 @@ public:
     CARAPI constructor(
         /* [in] */ IContext* context);
 
+    static CARAPI_(void) VibratorInit();
+
     static CARAPI_(Boolean) VibratorExists();
 
     static CARAPI_(void) VibratorOn(

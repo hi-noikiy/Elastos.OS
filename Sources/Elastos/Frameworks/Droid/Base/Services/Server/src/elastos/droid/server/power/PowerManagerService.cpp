@@ -4257,18 +4257,18 @@ void PowerManagerService::NativeCpuBoost(
     /* [in] */ Int32 duration)
 {
     // Tell the Power HAL to boost the CPU
-    if (sPowerModule && sPowerModule->powerHint) {
-        sPowerModule->powerHint(sPowerModule, POWER_HINT_CPU_BOOST, (void *)(static_cast<int64_t>(duration)));
-    }
+    // if (sPowerModule && sPowerModule->powerHint) {
+    //     sPowerModule->powerHint(sPowerModule, POWER_HINT_CPU_BOOST, (void *)(static_cast<int64_t>(duration)));
+    // }
 }
 
 void PowerManagerService::NativeSetPowerProfile(
     /* [in] */ Int32 profile)
 {
     // Tell the Power HAL to select a power profile
-    if (sPowerModule && sPowerModule->powerHint) {
-        sPowerModule->powerHint(sPowerModule, POWER_HINT_SET_PROFILE, (void *)(static_cast<int64_t>(profile)));
-    }
+    // if (sPowerModule && sPowerModule->powerHint) {
+    //     sPowerModule->powerHint(sPowerModule, POWER_HINT_SET_PROFILE, (void *)(static_cast<int64_t>(profile)));
+    // }
 }
 
 void PowerManagerService::CleanupProximity()

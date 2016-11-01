@@ -1,6 +1,8 @@
 TARGET_NAME= Elastos.DroidRuntime
 TARGET_TYPE= lib
 
+CPP_FLAGS += -std=c++11
+
 C_DEFINES += -DHAVE_ENDIAN_H
 
 EXPORT_HEADERS = elastos/droid/DroidRuntime.h

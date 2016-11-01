@@ -57,7 +57,7 @@ Object SurfaceControl::sLock;
 const String SurfaceControl::TAG("SurfaceControl");
 
 static void assert_premultiplied(const SkBitmap& bitmap, bool isPremultiplied) {
-    // kOpaque_SkAlphaType and kIgnore_SkAlphaType mean that isPremultiplied is
+    // kOpaque_SkAlphaType and kOpaque_SkAlphaType mean that isPremultiplied is
     // irrelevant. This just tests to ensure that the SkAlphaType is not
     // opposite of isPremultiplied.
     if (isPremultiplied) {
@@ -831,7 +831,7 @@ AutoPtr<IBitmap> SurfaceControl::NativeScreenshot(
     switch (screenshot->getFormat()) {
         case android::PIXEL_FORMAT_RGBX_8888: {
             screenshotInfo.fColorType = kRGBA_8888_SkColorType;
-            screenshotInfo.fAlphaType = kIgnore_SkAlphaType;
+            screenshotInfo.fAlphaType = kOpaque_SkAlphaType;
             break;
         }
         case android::PIXEL_FORMAT_RGBA_8888: {
@@ -841,7 +841,7 @@ AutoPtr<IBitmap> SurfaceControl::NativeScreenshot(
         }
         case android::PIXEL_FORMAT_RGB_565: {
             screenshotInfo.fColorType = kRGB_565_SkColorType;
-            screenshotInfo.fAlphaType = kIgnore_SkAlphaType;
+            screenshotInfo.fAlphaType = kOpaque_SkAlphaType;
             break;
         }
         default: {

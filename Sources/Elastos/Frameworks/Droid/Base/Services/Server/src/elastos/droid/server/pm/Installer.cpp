@@ -49,6 +49,8 @@ Int32 Installer::Install(
 {
     StringBuilder builder("install");
     builder.AppendChar(' ');
+    builder.AppendChar('!');
+    builder.AppendChar(' ');
     builder.Append(name);
     builder.AppendChar(' ');
     builder.Append(uid);
@@ -239,6 +241,8 @@ Int32 Installer::Remove(
     /* [in] */ Int32 userId)
 {
     StringBuilder builder("remove");
+    builder.AppendChar(' ');
+    builder.AppendChar('!');
     builder.AppendChar(' ');
     builder.Append(name);
     builder.AppendChar(' ');

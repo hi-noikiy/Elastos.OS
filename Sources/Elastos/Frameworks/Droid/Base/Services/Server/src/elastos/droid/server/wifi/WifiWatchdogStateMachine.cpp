@@ -56,12 +56,12 @@ const Int32 WifiWatchdogStateMachine::BSSID_STAT_RANGE_LOW_DBM;
 const Int32 WifiWatchdogStateMachine::BSSID_STAT_RANGE_HIGH_DBM;
 const Int32 WifiWatchdogStateMachine::BSSID_STAT_EMPTY_COUNT;
 const Int64 WifiWatchdogStateMachine::LINK_SAMPLING_INTERVAL_MS;
-const Double WifiWatchdogStateMachine::EXP_COEFFICIENT_RECORD;
-const Double WifiWatchdogStateMachine::EXP_COEFFICIENT_MONITOR;
-const Double WifiWatchdogStateMachine::POOR_LINK_LOSS_THRESHOLD;
-const Double WifiWatchdogStateMachine::GOOD_LINK_LOSS_THRESHOLD;
+const Double WifiWatchdogStateMachine::EXP_COEFFICIENT_RECORD = 0.1;
+const Double WifiWatchdogStateMachine::EXP_COEFFICIENT_MONITOR = 0.5;
+const Double WifiWatchdogStateMachine::POOR_LINK_LOSS_THRESHOLD = 0.5;
+const Double WifiWatchdogStateMachine::GOOD_LINK_LOSS_THRESHOLD = 0.1;
 const Int32 WifiWatchdogStateMachine::POOR_LINK_SAMPLE_COUNT;
-const Double WifiWatchdogStateMachine::POOR_LINK_MIN_VOLUME;
+const Double WifiWatchdogStateMachine::POOR_LINK_MIN_VOLUME = 2.0 * LINK_SAMPLING_INTERVAL_MS / 1000.0;
 const Int32 WifiWatchdogStateMachine::GOOD_LINK_RSSI_RANGE_MIN;
 const Int32 WifiWatchdogStateMachine::GOOD_LINK_RSSI_RANGE_MAX;
 AutoPtr<WifiWatchdogStateMachine::GoodLinkTarget> WifiWatchdogStateMachine::GOOD_LINK_TARGET[4] = {

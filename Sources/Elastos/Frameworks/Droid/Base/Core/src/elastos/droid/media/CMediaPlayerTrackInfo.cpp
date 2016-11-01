@@ -53,7 +53,7 @@ ECode CMediaPlayerTrackInfo::GetLanguage(
 {
     VALIDATE_NOT_NULL(result);
     String language;
-    mFormat->GetString(IMediaFormat::KEY_LANGUAGE, &language);
+    mFormat->GetString(IMediaFormat::_KEY_LANGUAGE, &language);
     *result = language == NULL ? String("und") : language;
     return NOERROR;
 }

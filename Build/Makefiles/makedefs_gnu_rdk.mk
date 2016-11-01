@@ -190,7 +190,7 @@ else # "$(XDK_TARGET_FORMAT)" "elf"
   endif
 
   ifneq "$(findstring .def,$(SOURCES))" ""
-    DEF_FLAGS := -Wl,--retain-symbols-file,__$(DEF_FILE_NAME).sym  -Wl,--version-script,__$(DEF_FILE_NAME).vs
+    DEF_FLAGS := -Wl,--retain-symbols-file,__$(DEF_FILE_NAME).sym
   endif
 
     ifeq "$(XDK_TARGET_PLATFORM)" "linux"
@@ -214,7 +214,7 @@ else # "$(XDK_TARGET_FORMAT)" "elf"
           DLL_CRT_END=$(GCC_LIB_PATH)/32/libgcc.a
     endif
     ifeq "$(XDK_TARGET_PLATFORM)" "android"
-          DLL_FLAGS := $(DLL_FLAGS) $(LIBC_FLAGS) -nostdlib -shared -fPIC -Wl,--gc-sections -Wl,--no-undefined,--no-undefined-version
+          DLL_FLAGS := $(DLL_FLAGS) -nostdlib -shared -fPIC -Wl,--gc-sections -Wl,--no-undefined,--no-undefined-version
           ifeq "$(EXPORT_ALL_SYMBOLS)" ""
               DLL_FLAGS := $(DLL_FLAGS) $(DEF_FLAGS)
           else
@@ -335,7 +335,6 @@ ifeq "$(XDK_TARGET_CPU)" "arm"
     C_FLAGS:= -msoft-float -fPIC -mthumb-interwork -ffunction-sections -fdata-sections -funwind-tables -fstack-protector $(C_FLAGS)
   endif
 endif
-
 # -fno-rtti only valid for C++ but not for C/ObjC since 3.3.3
 CPP_FLAGS := -fno-rtti -fcheck-new -Wno-psabi $(CPP_FLAGS)
 

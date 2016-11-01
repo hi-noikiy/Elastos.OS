@@ -8,6 +8,8 @@ INCLUDES += $(MAKEDIR)/../../../../../inc/
 
 C_DEFINES += -DDROID_CORE
 
+CPP_FLAGS += -std=c++11
+
 SOURCES = CNativeLibraryHelper.cpp
 SOURCES += CNativeLibraryHelperHandle.cpp
 SOURCES += CNativeLibraryHelperHandleHelper.cpp

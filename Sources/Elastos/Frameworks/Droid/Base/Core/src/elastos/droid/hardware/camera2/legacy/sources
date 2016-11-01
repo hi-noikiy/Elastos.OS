@@ -2,6 +2,8 @@
 TARGET_NAME= legacy
 TARGET_TYPE= lib
 
+CPP_FLAGS += -std=c++11
+
 include $(MAKEDIR)/../../../../../../../../sources.inc
 
 INCLUDES += ../../../

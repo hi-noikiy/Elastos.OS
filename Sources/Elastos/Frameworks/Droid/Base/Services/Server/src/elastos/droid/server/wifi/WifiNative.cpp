@@ -1525,7 +1525,8 @@ Boolean WifiNative::FetchAnqp(
 Boolean WifiNative::SetMode(
     /* [in] */ Int32 mode)
 {
-    return (::wifi_set_mode(mode) == 0);
+    // return (::wifi_set_mode(mode) == 0);
+    return TRUE;
 }
 
 Boolean WifiNative::StartHalNative()
@@ -1700,7 +1701,7 @@ Boolean WifiNative::GetScanCapabilitiesNative(
     capabilities->max_ap_cache_per_scan = c.max_ap_cache_per_scan;
     capabilities->max_rssi_sample_size = c.max_rssi_sample_size;
     capabilities->max_scan_reporting_threshold = c.max_scan_reporting_threshold;
-    capabilities->max_hotlist_aps = c.max_hotlist_aps;
+    capabilities->max_hotlist_aps = c.max_hotlist_bssids;
     capabilities->max_significant_wifi_change_aps = c.max_significant_wifi_change_aps;
 
     return TRUE;
@@ -1770,10 +1771,11 @@ Boolean WifiNative::StartScanNative(
 
     params.base_period = settings->base_period_ms;
     params.max_ap_per_scan = settings->max_ap_per_scan;
-    params.report_threshold = settings->report_threshold;
+    params.report_threshold_percent = settings->report_threshold_percent;
+    params.report_threshold_num_scans = settings->report_threshold_num_scans;
 
-    Logger::D(TAG, "Initialized common fields %d, %d, %d", params.base_period,
-            params.max_ap_per_scan, params.report_threshold);
+    Logger::D(TAG, "Initialized common fields %d, %d, %d, %d", params.base_period,
+            params.max_ap_per_scan, params.report_threshold_percent, params.report_threshold_num_scans);
 
     AutoPtr<ArrayOf<BucketSettings*> > buckets = settings->buckets;
     params.num_buckets = settings->num_buckets;
@@ -1834,39 +1836,59 @@ Boolean WifiNative::StopScanNative(
     return wifi_stop_gscan(id, handle)  == WIFI_SUCCESS;
 }
 
+static int compare_scan_result_timestamp(const void *v1, const void *v2) {
+    const wifi_scan_result *result1 = static_cast<const wifi_scan_result *>(v1);
+    const wifi_scan_result *result2 = static_cast<const wifi_scan_result *>(v2);
+    return result1->ts - result2->ts;
+}
+
 AutoPtr<ArrayOf<IScanResult*> > WifiNative::GetScanResultsNative(
     /* [in] */ Int32 iface,
     /* [in] */ Boolean flush)
 {
-    wifi_scan_result results[256];
-    Int32 num_results = 256;
+
+    wifi_cached_scan_results scan_data[64];
+    int num_scan_data = 64;
 
     wifi_interface_handle handle = (wifi_interface_handle)((*sWifiIfaceHandles)[iface]);
     Logger::D(TAG, "getting scan results on interface[%d] = %p", iface, handle);
 
-    Int32 result = wifi_get_cached_gscan_results(handle, 1, num_results, results, &num_results);
+    byte b = flush ? 0xFF : 0;
+    Int32 result = wifi_get_cached_gscan_results(handle, b, num_scan_data, scan_data, &num_scan_data);
     if (result == WIFI_SUCCESS) {
+        Int32 num_results = 0;
+        for (int i = 0; i < num_scan_data; i++) {
+            num_results += scan_data[i].num_results;
+        }
+
         AutoPtr<ArrayOf<IScanResult*> > scanResults = ArrayOf<IScanResult*>::Alloc(num_results);
+        int index = 0;
+        for (int i = 0; i < num_scan_data; i++) {
+            /* sort all scan results by timestamp */
+            qsort(scan_data[i].results, scan_data[i].num_results,
+                    sizeof(wifi_scan_result), compare_scan_result_timestamp);
 
-        for (Int32 i = 0; i < num_results; i++) {
+            wifi_scan_result *results = scan_data[i].results;
+            for (int j = 0; j < scan_data[i].num_results; j++) {
 
-            AutoPtr<IScanResult> scanResult;
-            CScanResult::New((IScanResult**)&scanResult);
+                AutoPtr<IScanResult> scanResult;
+                CScanResult::New((IScanResult**)&scanResult);
 
-            scanResult->SetSSID(String(results[i].ssid));
+                scanResult->SetSSID(String(results[j].ssid));
 
-            char bssid[32];
-            snprintf(bssid, 32, "%02x:%02x:%02x:%02x:%02x:%02x", results[i].bssid[0],
-                    results[i].bssid[1], results[i].bssid[2], results[i].bssid[3],
-                    results[i].bssid[4], results[i].bssid[5]);
+                char bssid[32];
+                snprintf(bssid, 32, "%02x:%02x:%02x:%02x:%02x:%02x", results[j].bssid[0],
+                        results[j].bssid[1], results[j].bssid[2], results[j].bssid[3],
+                        results[j].bssid[4], results[j].bssid[5]);
 
-            scanResult->SetBSSID(String(bssid));
+                scanResult->SetBSSID(String(bssid));
 
-            scanResult->SetLevel(results[i].rssi);
-            scanResult->SetFrequency(results[i].channel);
-            scanResult->SetTimestamp(results[i].ts);
+                scanResult->SetLevel(results[j].rssi);
+                scanResult->SetFrequency(results[j].channel);
+                scanResult->SetTimestamp(results[j].ts);
 
-            scanResults->Set(i, scanResult);
+                scanResults->Set(index++, scanResult);
+            }
         }
 
         return scanResults;
@@ -2172,14 +2194,14 @@ Boolean WifiNative::SetHotlistNative(
 
     AutoPtr<ArrayOf<IWifiScannerBssidInfo*> > array;
     settings->GetBssidInfos((ArrayOf<IWifiScannerBssidInfo*>**)&array);
-    params.num_ap = array->GetLength();
+    params.num_bssid = array->GetLength();
 
-    if (params.num_ap == 0) {
+    if (params.num_bssid == 0) {
         Logger::E(TAG, "Error in accesing array");
         return FALSE;
     }
 
-    for (Int32 i = 0; i < params.num_ap; i++) {
+    for (Int32 i = 0; i < params.num_bssid; i++) {
         AutoPtr<IWifiScannerBssidInfo> objAp = (*array)[i];
 
         String macAddrString;
@@ -2340,17 +2362,17 @@ Boolean WifiNative::TrackSignificantWifiChangeNative(
 
     AutoPtr<ArrayOf<IWifiScannerBssidInfo*> > bssids;
     settings->GetBssidInfos((ArrayOf<IWifiScannerBssidInfo*>**)&bssids);
-    params.num_ap = bssids->GetLength();
+    params.num_bssid = bssids->GetLength();
 
-    if (params.num_ap == 0) {
+    if (params.num_bssid == 0) {
         Logger::E(TAG, "Error in accessing array");
         return FALSE;
     }
 
     Logger::D(TAG, "Initialized common fields %d, %d, %d, %d", params.rssi_sample_size,
-            params.lost_ap_sample_size, params.min_breaching, params.num_ap);
+            params.lost_ap_sample_size, params.min_breaching, params.num_bssid);
 
-    for (Int32 i = 0; i < params.num_ap; i++) {
+    for (Int32 i = 0; i < params.num_bssid; i++) {
         AutoPtr<IWifiScannerBssidInfo> objAp = (*bssids)[i];
 
         String macAddrString;
@@ -2384,7 +2406,7 @@ Boolean WifiNative::TrackSignificantWifiChangeNative(
         Logger::D(TAG, "Added bssid %s, [%04d, %04d]", bssidOut, params.ap[i].low, params.ap[i].high);
     }
 
-    Logger::D(TAG, "Added %d bssids", params.num_ap);
+    Logger::D(TAG, "Added %d bssids", params.num_bssid);
 
     wifi_significant_change_handler handler;
     memset(&handler, 0, sizeof(handler));
@@ -2552,7 +2574,7 @@ void WifiNative::OnRttResults(
 
 const static Int32 MaxRttConfigs = 16;
 
-static void onRttResults(wifi_request_id id, unsigned num_results, wifi_rtt_result results[]) {
+static void onRttResults(wifi_request_id id, unsigned num_results, wifi_rtt_result* results[]) {
 
     AutoPtr<ArrayOf<IRttManagerRttResult*> > rttResults = ArrayOf<IRttManagerRttResult*>::Alloc(num_results);
     if (rttResults == NULL) {
@@ -2562,7 +2584,7 @@ static void onRttResults(wifi_request_id id, unsigned num_results, wifi_rtt_resu
 
     for (unsigned i = 0; i < num_results; i++) {
 
-        wifi_rtt_result& result = results[i];
+        wifi_rtt_result* result = results[i];
 
         AutoPtr<IRttManagerRttResult> rttResult;
         CRttManagerRttResult::New((IRttManagerRttResult**)&rttResult);
@@ -2572,22 +2594,22 @@ static void onRttResults(wifi_request_id id, unsigned num_results, wifi_rtt_resu
         }
 
         char bssid[32];
-        snprintf(bssid, 32, "%02x:%02x:%02x:%02x:%02x:%02x", result.addr[0], result.addr[1],
-                result.addr[2], result.addr[3], result.addr[4], result.addr[5]);
+        snprintf(bssid, 32, "%02x:%02x:%02x:%02x:%02x:%02x", result->addr[0], result->addr[1],
+                result->addr[2], result->addr[3], result->addr[4], result->addr[5]);
 
         rttResult->SetBssid(String(bssid));
-        rttResult->SetStatus(result.status);
-        rttResult->SetRequestType(result.type);
-        rttResult->SetTs(result.ts);
-        rttResult->SetRssi(result.rssi);
-        rttResult->SetRssi_spread(result.rssi_spread);
-        rttResult->SetTx_rate(result.tx_rate.bitrate);
-        rttResult->SetRtt_ns(result.rtt);
-        rttResult->SetRtt_sd_ns(result.rtt_sd);
-        rttResult->SetRtt_spread_ns(result.rtt_spread);
-        rttResult->SetDistance_cm(result.distance);
-        rttResult->SetDistance_sd_cm(result.distance_sd);
-        rttResult->SetDistance_spread_cm(result.distance_spread);
+        rttResult->SetStatus(result->status);
+        rttResult->SetRequestType(result->type);
+        rttResult->SetTs(result->ts);
+        rttResult->SetRssi(result->rssi);
+        rttResult->SetRssi_spread(result->rssi_spread);
+        rttResult->SetTx_rate(result->tx_rate.bitrate);
+        rttResult->SetRtt_ns(result->rtt);
+        rttResult->SetRtt_sd_ns(result->rtt_sd);
+        rttResult->SetRtt_spread_ns(result->rtt_spread);
+        rttResult->SetDistance_cm(result->distance);
+        rttResult->SetDistance_sd_cm(result->distance_sd);
+        rttResult->SetDistance_spread_cm(result->distance_spread);
 
         rttResults->Set(i, rttResult);
     }
@@ -2631,7 +2653,7 @@ Boolean WifiNative::RequestRangeNative(
         config.type = (wifi_rtt_type)requestType;
         Int32 deviceType;
         param->GetDeviceType(&deviceType);
-        config.peer = (wifi_peer_type)deviceType ;
+        config.peer = (rtt_peer_type)deviceType ;
         Int32 frequency;
         param->GetFrequency(&frequency);
         config.channel.center_freq = frequency;
@@ -2640,10 +2662,10 @@ Boolean WifiNative::RequestRangeNative(
         config.channel.width = (wifi_channel_width)channelWidth;
         Int32 num_samples;
         param->GetNum_samples(&num_samples);
-        config.num_samples_per_measurement = num_samples;
+        config.num_frames_per_burst = num_samples;
         Int32 num_retries;
         param->GetNum_retries(&num_retries);
-        config.num_retries_per_measurement = num_retries;
+        config.num_retries_per_rtt_frame = num_retries;
     }
 
     wifi_rtt_event_handler handler;

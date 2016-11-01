@@ -234,7 +234,7 @@ JMediaCodec::~JMediaCodec() {
 status_t JMediaCodec::setCallback(IMediaCodecCallback* cb) {
     if (cb != NULL) {
         if (mCallbackNotification == NULL) {
-            mCallbackNotification = new AMessage(kWhatCallbackNotify, id());
+            mCallbackNotification = new AMessage(kWhatCallbackNotify, this);
         }
     }
     else {

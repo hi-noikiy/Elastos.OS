@@ -68,7 +68,8 @@ public:
     public:
         Int32 base_period_ms;
         Int32 max_ap_per_scan;
-        Int32 report_threshold;
+        Int32 report_threshold_percent;
+        Int32 report_threshold_num_scans;
         Int32 num_buckets;
         AutoPtr<ArrayOf<BucketSettings*> > buckets;
     };

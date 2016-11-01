@@ -261,8 +261,6 @@ void NativeInputManager::getReaderConfiguration(
         outConfig->pointerGesturesEnabled = mLocked.mPointerGesturesEnabled;
 
         outConfig->showTouches = mLocked.mShowTouches;
-        outConfig->stylusIconEnabled = mLocked.mStylusIconEnabled;
-        outConfig->volumeKeysRotationMode = mLocked.mVolumeKeysRotationMode;
 
         outConfig->setDisplayInfo(false /*external*/, mLocked.mInternalViewport);
         outConfig->setDisplayInfo(true /*external*/, mLocked.mExternalViewport);
@@ -726,8 +724,8 @@ void NativeInputManager::setStylusIconEnabled(
         mLocked.mStylusIconEnabled = enabled;
     } // release lock
 
-    mInputManager->getReader()->requestRefreshConfiguration(
-            android::InputReaderConfiguration::CHANGE_STYLUS_ICON_ENABLED);
+    // mInputManager->getReader()->requestRefreshConfiguration(
+    //         android::InputReaderConfiguration::CHANGE_STYLUS_ICON_ENABLED);
 }
 
 void NativeInputManager::setVolumeKeysRotation(
@@ -744,8 +742,8 @@ void NativeInputManager::setVolumeKeysRotation(
         mLocked.mVolumeKeysRotationMode = mode;
     } // release lock
 
-    mInputManager->getReader()->requestRefreshConfiguration(
-            android::InputReaderConfiguration::CHANGE_VOLUME_KEYS_ROTATION);
+    // mInputManager->getReader()->requestRefreshConfiguration(
+    //         android::InputReaderConfiguration::CHANGE_VOLUME_KEYS_ROTATION);
 }
 
 void NativeInputManager::setInteractive(
@@ -757,7 +755,7 @@ void NativeInputManager::setInteractive(
 void NativeInputManager::reloadCalibration()
 {
     mInputManager->getReader()->requestRefreshConfiguration(
-            android::InputReaderConfiguration::TOUCH_AFFINE_TRANSFORMATION);
+            android::InputReaderConfiguration::CHANGE_TOUCH_AFFINE_TRANSFORMATION);
 }
 
 android::TouchAffineTransformation NativeInputManager::getTouchAffineTransformation(

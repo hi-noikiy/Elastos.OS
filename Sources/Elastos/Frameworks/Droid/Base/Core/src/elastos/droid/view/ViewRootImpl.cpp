@@ -2920,6 +2920,12 @@ void ViewRootImpl::PerformTraversals()
                         HandleOutOfResourcesException(ec);
                         return;
                     }
+                    if (hwInitialized && (host->mPrivateFlags
+                            & View::PFLAG_REQUEST_TRANSPARENT_REGIONS) == 0) {
+                        // Don't pre-allocate if transparent regions
+                        // are requested as they may not be needed
+                        mSurface->AllocateBuffers();
+                    }
                 }
             }
         }

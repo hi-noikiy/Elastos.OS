@@ -1,11 +1,13 @@
 TARGET_NAME= am
 TARGET_TYPE= lib
 
+CPP_FLAGS += -std=c++11
+
 INCLUDES += ../
 #INCLUDES += $(MAKEDIR)/../../../../../../../Core/inc
 INCLUDES += $(MAKEDIR)/../../../../../inc
 #INCLUDES += $(PREBUILD_INC)/skia/utils
-#INCLUDES += $(PREBUILD_INC)/skia/core
+INCLUDES += $(PREBUILD_INC)/skia/core
 
 include $(MAKEDIR)/../../../../../../../../sources.inc
 

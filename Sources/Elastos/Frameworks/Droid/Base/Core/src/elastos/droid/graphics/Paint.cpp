@@ -450,7 +450,8 @@ ECode Paint::SetFilterBitmap(
     /* [in] */ Boolean filterBitmap)
 {
     NativePaint* paint = reinterpret_cast<NativePaint*>(mNativePaint);
-    paint->setFilterBitmap(filterBitmap);
+    paint->setFilterQuality(
+            filterBitmap ? kLow_SkFilterQuality : kNone_SkFilterQuality);
     return NOERROR;
 }
 
@@ -2012,7 +2013,7 @@ static int breakText(
     /* [in] */ float maxWidth,
     /* [in] */ Int32 bidiFlags,
     /* [in] */ ArrayOf<Float>* measuredArray,
-    /* [in] */ NativePaint::TextBufferDirection textBufferDirection)
+    /* [in] */ Boolean forwardScan)
 {
     size_t measuredCount = 0;
     float measured = 0;
@@ -2021,7 +2022,6 @@ static int breakText(
     MinikinUtils::doLayout(&layout, &paint, bidiFlags, typeface, text, 0, count, count);
     float* advances = new float[count];
     layout.getAdvances(advances);
-    const bool forwardScan = (textBufferDirection == NativePaint::kForward_TextBufferDirection);
     for (int i = 0; i < count; i++) {
         // traverse in the given direction
         int index = forwardScan ? i : (count - i - 1);
@@ -2058,13 +2058,13 @@ Int32 Paint::NativeBreakText(
     NativePaint* paint = reinterpret_cast<NativePaint*>(paintHandle);
     TypefaceImpl* typeface = reinterpret_cast<TypefaceImpl*>(typefaceHandle);
 
-    NativePaint::TextBufferDirection tbd;
+    Boolean forwardTextDirection;
     if (count < 0) {
-        tbd = NativePaint::kBackward_TextBufferDirection;
+        forwardTextDirection = FALSE;
         count = -count;
     }
     else {
-        tbd = NativePaint::kForward_TextBufferDirection;
+        forwardTextDirection = TRUE;
     }
 
     if ((index < 0) || (index + count > text->GetLength())) {
@@ -2076,7 +2076,7 @@ Int32 Paint::NativeBreakText(
     AutoPtr< ArrayOf<Char16> > char16Array = ArrayUtils::ToChar16Array(text, index, count);
 
     count = breakText(*paint, typeface, char16Array->GetPayload(),
-        count, maxWidth, bidiFlags, measuredWidth, tbd);
+        count, maxWidth, bidiFlags, measuredWidth, forwardTextDirection);
     return count;
 }
 
@@ -2092,14 +2092,10 @@ Int32 Paint::NativeBreakText(
     NativePaint* paint = reinterpret_cast<NativePaint*>(paintHandle);
     TypefaceImpl* typeface = reinterpret_cast<TypefaceImpl*>(typefaceHandle);
 
-    NativePaint::TextBufferDirection tbd = forwards ?
-                                    NativePaint::kForward_TextBufferDirection :
-                                    NativePaint::kBackward_TextBufferDirection;
-
     int count = text.GetLength();
     AutoPtr< ArrayOf<Char16> > char16Array = text.GetChar16s();
     count = breakText(*paint, typeface, char16Array->GetPayload(),
-        count, maxWidth, bidiFlags, measuredWidth, tbd);
+        count, maxWidth, bidiFlags, measuredWidth, forwards);
     // env->ReleaseStringChars(jtext, text);
     return count;
 }

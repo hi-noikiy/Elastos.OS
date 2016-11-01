@@ -14,7 +14,7 @@ namespace Server {
 namespace Wm {
 
 const Int32 StackTapPointerEventListener::TAP_TIMEOUT_MSEC;
-const Float StackTapPointerEventListener::TAP_MOTION_SLOP_INCHES;
+const Float StackTapPointerEventListener::TAP_MOTION_SLOP_INCHES = 0.125f;
 
 StackTapPointerEventListener::StackTapPointerEventListener(
     /* [in] */ CWindowManagerService* service,

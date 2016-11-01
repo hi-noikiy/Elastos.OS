@@ -1448,7 +1448,7 @@ Int64 LegacyCameraDevice::NativeGetSurfaceId(
                 "from surface.", __FUNCTION__);
         return 0;
     }
-    android::sp<android::IBinder> b = gbp->asBinder();
+    android::sp<android::IBinder> b = android::IInterface::asBinder(gbp);
     if (b == NULL) {
         Slogger::E("LegacyCameraDevice", "%s: Could not retrieve IBinder from "
                 "surface.", __FUNCTION__);

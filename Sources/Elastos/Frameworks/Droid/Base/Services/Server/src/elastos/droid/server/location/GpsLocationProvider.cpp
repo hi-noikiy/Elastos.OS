@@ -1775,22 +1775,6 @@ Boolean GpsLocationProvider::DeleteAidingData(
         if (extras->GetBoolean(String("rti"), &v),v) flags |= GPS_DELETE_RTI;
         if (extras->GetBoolean(String("celldb-info"), &v),v) flags |= GPS_DELETE_CELLDB_INFO;
         if (extras->GetBoolean(String("all"), &v),v) flags |= GPS_DELETE_ALL;
-        if (extras->GetBoolean(String("almanac-corr"), &v),v) flags |= GPS_DELETE_ALMANAC_CORR;
-        if (extras->GetBoolean(String("freq-bias-est"), &v),v) flags |= GPS_DELETE_FREQ_BIAS_EST;
-        if (extras->GetBoolean(String("ephemeris-GLO"), &v),v) flags |= GLO_DELETE_EPHEMERIS;
-        if (extras->GetBoolean(String("almanac-GLO"), &v),v) flags |= GLO_DELETE_ALMANAC;
-        if (extras->GetBoolean(String("svdir-GLO"), &v),v) flags |= GLO_DELETE_SVDIR;
-        if (extras->GetBoolean(String("svsteer-GLO"), &v),v) flags |= GLO_DELETE_SVSTEER;
-        if (extras->GetBoolean(String("almanac-corr-GLO"), &v),v) flags |= GLO_DELETE_ALMANAC_CORR;
-        if (extras->GetBoolean(String("time-gps"), &v),v) flags |= GPS_DELETE_TIME_GPS;
-        if (extras->GetBoolean(String("time-GLO"), &v),v) flags |= GLO_DELETE_TIME;
-        if (extras->GetBoolean(String("ephemeris-BDS"), &v),v) flags |= BDS_DELETE_EPHEMERIS;
-        if (extras->GetBoolean(String("almanac-BDS"), &v),v) flags |= BDS_DELETE_ALMANAC;
-        if (extras->GetBoolean(String("svdir-BDS"), &v),v) flags |= BDS_DELETE_SVDIR;
-        if (extras->GetBoolean(String("svsteer-BDS"), &v),v) flags |= BDS_DELETE_SVSTEER;
-        if (extras->GetBoolean(String("almanac-corr-BDS"), &v),v) flags |= BDS_DELETE_ALMANAC_CORR;
-        if (extras->GetBoolean(String("time-BDS"), &v),v) flags |= BDS_DELETE_TIME;
-        if (extras->GetBoolean(String("all"), &v),v) flags |= GPS_DELETE_ALL;
     }
 
     if (flags != 0) {

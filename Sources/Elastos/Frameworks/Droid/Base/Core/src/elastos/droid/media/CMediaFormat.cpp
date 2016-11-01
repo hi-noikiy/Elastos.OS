@@ -283,7 +283,7 @@ ECode CMediaFormat::CreateSubtitleFormat(
     AutoPtr<IMediaFormat> format;
     CMediaFormat::New((IMediaFormat**)&format);
     format->SetString(KEY_MIME, mime);
-    format->SetString(KEY_LANGUAGE, language);
+    format->SetString(_KEY_LANGUAGE, language);
 
     *result = format;
     REFCOUNT_ADD(*result)

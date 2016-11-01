@@ -653,11 +653,11 @@ const Int32 StackView::INVALID_POINTER;
 const Int32 StackView::NUM_ACTIVE_VIEWS;
 const Int32 StackView::FRAME_PADDING;
 const Int32 StackView::MIN_TIME_BETWEEN_INTERACTION_AND_AUTOADVANCE;
-const Float StackView::PERSPECTIVE_SHIFT_FACTOR_Y;
-const Float StackView::PERSPECTIVE_SHIFT_FACTOR_X;
-const Float StackView::PERSPECTIVE_SCALE_FACTOR;
-const Float StackView::SWIPE_THRESHOLD_RATIO;
-const Float StackView::SLIDE_UP_RATIO;
+const Float StackView::PERSPECTIVE_SHIFT_FACTOR_Y = 0.1f;
+const Float StackView::PERSPECTIVE_SHIFT_FACTOR_X = 0.1f;
+const Float StackView::PERSPECTIVE_SCALE_FACTOR = 0.0f;
+const Float StackView::SWIPE_THRESHOLD_RATIO = 0.2f;
+const Float StackView::SLIDE_UP_RATIO = 0.7f;
 const Int64 StackView::MIN_TIME_BETWEEN_SCROLLS;
 
 AutoPtr<IRect> InitStatic()

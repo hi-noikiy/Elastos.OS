@@ -340,7 +340,7 @@ ECode DisplayPowerController::constructor(
     mHandler = new DisplayControllerHandler(looper, this);
     mCallbacks = callbacks;
 
-    mBatteryStats = BatteryStatsService::GetService();
+    // mBatteryStats = BatteryStatsService::GetService();
     mLights = ILightsManager::Probe(LocalServices::GetService(EIID_ILightsManager));
     mSensorManager = sensorManager;
     mWindowManagerPolicy = IWindowManagerPolicy::Probe(LocalServices::GetService(EIID_IWindowManagerPolicy));
@@ -572,8 +572,8 @@ void DisplayPowerController::Initialize()
 
     // Initialize screen state for battery stats.
     // try {
-    mBatteryStats->NoteScreenState(mPowerState->GetScreenState());
-    mBatteryStats->NoteScreenBrightness(mPowerState->GetScreenBrightness());
+    // mBatteryStats->NoteScreenState(mPowerState->GetScreenState());
+    // mBatteryStats->NoteScreenBrightness(mPowerState->GetScreenBrightness());
     // } catch (RemoteException ex) {
     //     // same process
     // }
@@ -874,7 +874,7 @@ Boolean DisplayPowerController::SetScreenState(
 
         // Tell battery stats about the transition.
         // try {
-        mBatteryStats->NoteScreenState(state);
+        // mBatteryStats->NoteScreenState(state);
         // } catch (RemoteException ex) {
         //     // same process
         // }
@@ -917,7 +917,7 @@ void DisplayPowerController::AnimateScreenBrightness(
     }
     if (mScreenBrightnessRampAnimator->AnimateTo(target, rate)) {
         // try {
-        mBatteryStats->NoteScreenBrightness(target);
+        // mBatteryStats->NoteScreenBrightness(target);
         // } catch (RemoteException ex) {
         //     // same process
         // }

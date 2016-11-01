@@ -1,6 +1,8 @@
 TARGET_NAME= display
 TARGET_TYPE= lib
 
+CPP_FLAGS += -std=c++11
+
 INCLUDES += ../
 INCLUDES += $(MAKEDIR)/../../../../../inc
 INCLUDES += $(MAKEDIR)/../../../../../../../Core/inc/

@@ -10,9 +10,6 @@ namespace Elastos {
 namespace Droid {
 namespace Test {
 
-EcoFile::ClassInfo::ClassInfo(
-    /* [in] */ IClassInfo* classInfo);
-
 CAR_INTERFACE_IMPL(EcoFile::ClassInfo, Object, IComparable)
 
 ECode EcoFile::ClassInfo::CompareTo(

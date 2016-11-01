@@ -489,8 +489,10 @@ Int32 CSoundPool::SoundPoolImpl::_Load(
     /* [in] */ const String& uri,
     /* [in] */ Int32 priority)
 {
-    android::SoundPool* ap = reinterpret_cast<android::SoundPool*>(mNativeContext);
-    return ap->load(uri.string(), priority);
+    // android::SoundPool* ap = reinterpret_cast<android::SoundPool*>(mNativeContext);
+    // return ap->load(uri.string(), priority);
+    assert(0);
+    return 0;
 }
 
 Int32 CSoundPool::SoundPoolImpl::_Load(

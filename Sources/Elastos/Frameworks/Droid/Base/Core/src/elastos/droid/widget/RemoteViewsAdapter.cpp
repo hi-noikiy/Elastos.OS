@@ -667,7 +667,7 @@ ECode RemoteViewsAdapter::RemoteViewsIndexMetaData::Set(
 
 /*--------------------------------FixedSizeRemoteViewsCache--------------------------------*/
 const String RemoteViewsAdapter::FixedSizeRemoteViewsCache::TAG("RemoteViewsAdapter::FixedSizeRemoteViewsCache");
-const Float RemoteViewsAdapter::FixedSizeRemoteViewsCache::sMaxCountSlackPercent;
+const Float RemoteViewsAdapter::FixedSizeRemoteViewsCache::sMaxCountSlackPercent = 0.75f;
 const Int32 RemoteViewsAdapter::FixedSizeRemoteViewsCache::sMaxMemoryLimitInBytes;
 
 RemoteViewsAdapter::FixedSizeRemoteViewsCache::FixedSizeRemoteViewsCache(

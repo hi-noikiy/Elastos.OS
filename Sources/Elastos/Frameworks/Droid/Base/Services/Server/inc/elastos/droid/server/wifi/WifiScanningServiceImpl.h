@@ -504,7 +504,8 @@ public:
         static const Int32 MAX_BUCKETS = 8;
         static const Int32 MAX_CHANNELS = 8;
         static const Int32 DEFAULT_MAX_AP_PER_SCAN = 10;
-        static const Int32 DEFAULT_REPORT_THRESHOLD = 10;
+        static const Int32 DEFAULT_REPORT_THRESHOLD_NUM_SCANS = 10;
+        static const Int32 DEFAULT_REPORT_THRESHOLD_PERCENT = 100;
         static const Int32 DEFAULT_BASE_PERIOD_MS = 5000;
         AutoPtr<WifiNative::ScanSettings> mSettings;
     };

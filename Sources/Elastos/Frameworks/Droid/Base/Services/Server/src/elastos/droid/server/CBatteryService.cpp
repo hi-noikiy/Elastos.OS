@@ -653,14 +653,14 @@ public:
         void registerListener(const android::sp<android::IBatteryPropertiesListener>& listener) {
             android::Parcel data;
             data.writeInterfaceToken(IBatteryPropertiesRegistrar::getInterfaceDescriptor());
-            data.writeStrongBinder(listener->asBinder());
+            data.writeStrongBinder(android::IInterface::asBinder(listener));
             remote()->transact(android::REGISTER_LISTENER, data, NULL);
         }
 
         void unregisterListener(const android::sp<android::IBatteryPropertiesListener>& listener) {
             android::Parcel data;
             data.writeInterfaceToken(IBatteryPropertiesRegistrar::getInterfaceDescriptor());
-            data.writeStrongBinder(listener->asBinder());
+            data.writeStrongBinder(android::IInterface::asBinder(listener));
             remote()->transact(android::UNREGISTER_LISTENER, data, NULL);
         }
 
@@ -846,6 +846,9 @@ void CBatteryService::Update(
 void CBatteryService::ProcessValuesLocked(
     /* [in] */ Boolean force)
 {
+    // TODO: caojing
+    return;
+
     Boolean logOutlier = FALSE;
     Int64 dischargeDuration = 0;
 

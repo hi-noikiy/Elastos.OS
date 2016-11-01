@@ -2418,7 +2418,7 @@ ECode PhoneWindowManager::Init(
         //         path,
         //         null,
         //         ClassLoader.getSystemClassLoader());
-        Logger::I(TAG, "deviceKeyHandlerLib:%s, deviceKeyHandlerClass:%s, cacheDir:%s",
+        Logger::D(TAG, "deviceKeyHandlerLib:%s, deviceKeyHandlerClass:%s, cacheDir:%s",
             deviceKeyHandlerLib.string(), deviceKeyHandlerClass.string(), path.string());
         assert(0 && "TODO");
         const String constructorSignature("ctx");

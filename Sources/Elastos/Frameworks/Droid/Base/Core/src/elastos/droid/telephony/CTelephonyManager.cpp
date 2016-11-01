@@ -560,8 +560,11 @@ ECode CTelephonyManager::HasIccCard(
     /* [out] */ Boolean* res)
 {
     VALIDATE_NOT_NULL(res)
-
+    *res = FALSE;
     // try {
+    if (GetITelephony() == NULL) {
+        return NOERROR;
+    }
     return GetITelephony()->HasIccCardUsingSlotId(slotId, res);
     // } catch (RemoteException ex) {
     //     // Assume no ICC card if remote exception which shouldn't happen

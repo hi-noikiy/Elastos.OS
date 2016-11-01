@@ -744,9 +744,9 @@ ECode CMediaDrm::GetKeyRequest(
 
     Vector<uint8_t> request;
     String8 defaultUrl;
-
+    android::DrmPlugin::KeyRequestType keyRequestType;
     status_t err = drm->getKeyRequest(sessionId, initData, mimeType,
-                                          keyType, optParams, request, defaultUrl);
+                      keyType, optParams, request, defaultUrl, &keyRequestType);
 
     // if (throwExceptionAsNecessary(env, err, "Failed to get key request")) {
     if (err != android::OK) {

@@ -17,5 +17,4 @@ SOURCES += splparser.cpp
 SOURCES += utf16char.cpp
 SOURCES += utf16reader.cpp
 
-LIBRARIES += $(XDK_USER_LIB)/crt0.lib
 LIBRARIES += -lm -licuuc -llog -lcutils -lutils

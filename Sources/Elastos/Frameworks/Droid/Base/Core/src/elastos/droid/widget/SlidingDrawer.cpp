@@ -25,16 +25,16 @@ namespace Droid {
 namespace Widget {
 
 const String SlidingDrawer::TAG("SlidingDrawer");
-const Int32 SlidingDrawer::TAP_THRESHOLD;
-const Float SlidingDrawer::MAXIMUM_TAP_VELOCITY;
-const Float SlidingDrawer::MAXIMUM_MINOR_VELOCITY;
-const Float SlidingDrawer::MAXIMUM_MAJOR_VELOCITY;
-const Float SlidingDrawer::MAXIMUM_ACCELERATION;
-const Int32 SlidingDrawer::VELOCITY_UNITS;
-const Int32 SlidingDrawer::MSG_ANIMATE;
-const Int32 SlidingDrawer::ANIMATION_FRAME_DURATION;
-const Int32 SlidingDrawer::EXPANDED_FULL_OPEN;
-const Int32 SlidingDrawer::COLLAPSED_FULL_CLOSED;
+const Int32 SlidingDrawer::TAP_THRESHOLD = 6;
+const Float SlidingDrawer::MAXIMUM_TAP_VELOCITY = 100.0f;
+const Float SlidingDrawer::MAXIMUM_MINOR_VELOCITY = 150.0f;
+const Float SlidingDrawer::MAXIMUM_MAJOR_VELOCITY = 200.0f;
+const Float SlidingDrawer::MAXIMUM_ACCELERATION = 2000.0f;
+const Int32 SlidingDrawer::VELOCITY_UNITS = 1000;
+const Int32 SlidingDrawer::MSG_ANIMATE = 1000;
+const Int32 SlidingDrawer::ANIMATION_FRAME_DURATION = 1000 / 60;
+const Int32 SlidingDrawer::EXPANDED_FULL_OPEN = -10001;
+const Int32 SlidingDrawer::COLLAPSED_FULL_CLOSED = -10002;
 
 CAR_INTERFACE_IMPL(SlidingDrawer::DrawerToggler, Object, IViewOnClickListener)
 

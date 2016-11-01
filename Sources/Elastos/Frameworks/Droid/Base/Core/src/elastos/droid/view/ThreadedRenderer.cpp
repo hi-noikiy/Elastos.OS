@@ -147,9 +147,9 @@ ECode ThreadedRenderer::constructor(
     AutoPtr<IChoreographerHelper> cghlp;
     CChoreographerHelper::AcquireSingleton((IChoreographerHelper**)&cghlp);
     cghlp->GetInstance((IChoreographer**)&mChoreographer);
-    Int64 n = 0;
-    mChoreographer->GetFrameIntervalNanos(&n);
-    NativeSetFrameInterval(mNativeProxy, n);
+    // Int64 n = 0;
+    // mChoreographer->GetFrameIntervalNanos(&n);
+    // NativeSetFrameInterval(mNativeProxy, n);
 
     Boolean tmp;
     LoadSystemProperties(&tmp);
@@ -186,7 +186,7 @@ ECode ThreadedRenderer::Initialize(
     mInitialized = TRUE;
     UpdateEnabledState(surface);
     Boolean status = NativeInitialize(mNativeProxy, surface);
-    FAIL_RETURN(surface->AllocateBuffers());
+    // FAIL_RETURN(surface->AllocateBuffers());
     *res = status;
     return NOERROR;
 }
@@ -603,7 +603,7 @@ void ThreadedRenderer::AtlasInitializer::Init(
             atlas->GetMap((ArrayOf<Int64>**)&map);
             if (map != NULL) {
                 // TODO Remove after fixing b/15425820
-                ValidateMap(context, map);
+                // ValidateMap(context, map);
                 NativeSetAtlas(renderProxy, buffer, map);
                 mInitialized = TRUE;
             }
@@ -885,8 +885,9 @@ void ThreadedRenderer::NativeSetFrameInterval(
     /* [in] */ Int64 nativeProxy,
     /* [in] */ Int64 frameIntervalNanos)
 {
-    RenderProxy* proxy = reinterpret_cast<RenderProxy*>(nativeProxy);
-    proxy->setFrameInterval(frameIntervalNanos);
+    assert(0);
+    // RenderProxy* proxy = reinterpret_cast<RenderProxy*>(nativeProxy);
+    // proxy->setFrameInterval(frameIntervalNanos);
 }
 
 Boolean ThreadedRenderer::NativeLoadSystemProperties(
@@ -904,7 +905,8 @@ Boolean ThreadedRenderer::NativeInitialize(
     Int64 nativeSurf;
     window->GetNativeSurface(&nativeSurf);
     sp<ANativeWindow> nWindow = (ANativeWindow*)reinterpret_cast<android::Surface*>(nativeSurf);
-    return proxy->initialize(nWindow);
+    proxy->initialize(nWindow);
+    return TRUE;
 }
 
 void ThreadedRenderer::NativeUpdateSurface(
@@ -947,7 +949,7 @@ void ThreadedRenderer::NativeSetup(
     /* [in] */ Int32 spotShadowAlpha)
 {
     RenderProxy* proxy = reinterpret_cast<RenderProxy*>(nativeProxy);
-    proxy->setup(width, height, (Vector3){lightX, lightY, lightZ}, lightRadius,
+    proxy->setup(width, height, lightRadius,
             ambientShadowAlpha, spotShadowAlpha);
 }
 
@@ -966,7 +968,8 @@ Int32 ThreadedRenderer::NativeSyncAndDrawFrame(
     /* [in] */ Float density)
 {
     RenderProxy* proxy = reinterpret_cast<RenderProxy*>(nativeProxy);
-    return proxy->syncAndDrawFrame(frameTimeNanos, recordDuration, density);
+    //env->GetLongArrayRegion(frameInfo, 0, frameInfoSize, proxy->frameInfo());
+    return proxy->syncAndDrawFrame();
 }
 
 void ThreadedRenderer::NativeDestroy(
@@ -1018,7 +1021,7 @@ Boolean ThreadedRenderer::NativeCopyLayerInto(
     RenderProxy* proxy = reinterpret_cast<RenderProxy*>(nativeProxy);
     DeferredLayerUpdater* layer = reinterpret_cast<DeferredLayerUpdater*>(layerPtr);
     SkBitmap* bitmap = reinterpret_cast<SkBitmap*>(bitmapPtr);
-    return proxy->copyLayerInto(layer, bitmap);
+    return proxy->copyLayerInto(layer, *bitmap);
 }
 
 void ThreadedRenderer::NativePushLayerUpdate(
@@ -1089,7 +1092,7 @@ void ThreadedRenderer::NativeDumpProfileInfo(
     RenderProxy* proxy = reinterpret_cast<RenderProxy*>(proxyPtr);
     Int32 fd;
     pFd->GetDescriptor(&fd);
-    proxy->dumpProfileInfo(fd);
+    proxy->dumpProfileInfo(fd, 0);
 }
 
 } // namespace View

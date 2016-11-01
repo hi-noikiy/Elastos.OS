@@ -418,10 +418,11 @@ ECode CStrictJarFile::NativeStartIteration(
     int32_t error = 0;
     if (prefix.GetLength() == 0) {
         error = StartIteration(reinterpret_cast<ZipArchiveHandle>(nativeHandle),
-                    handle->CookieAddress(), NULL);
+                    handle->CookieAddress(), NULL, NULL);
     } else {
+        ZipString entry_name(handle->Prefix());
         error = StartIteration(reinterpret_cast<ZipArchiveHandle>(nativeHandle),
-                    handle->CookieAddress(), handle->Prefix());
+                    handle->CookieAddress(), &entry_name, NULL);
     }
 
     if (error) {
@@ -473,7 +474,7 @@ ECode CStrictJarFile::NativeNextEntry(
     *ze = NULL;
 
     ZipEntry data;
-    ZipEntryName entryName;
+    ZipString entryName;
 
     IterationHandle* handle = reinterpret_cast<IterationHandle*>(iterationHandle);
     const int32_t error = Next(*handle->CookieAddress(), &data, &entryName);
@@ -500,7 +501,7 @@ ECode CStrictJarFile::NativeFindEntry(
 
     ZipEntry data;
     const int32_t error = ::FindEntry(reinterpret_cast<ZipArchiveHandle>(nativeHandle),
-                            entryName.string(), &data);
+                            ZipString(entryName.string()), &data);
     if (error) {
         return NOERROR;
     }

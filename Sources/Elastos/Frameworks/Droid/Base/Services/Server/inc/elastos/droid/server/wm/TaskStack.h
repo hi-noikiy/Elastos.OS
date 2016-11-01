@@ -161,7 +161,7 @@ private:
      * when no window animation is driving it. */
     static const Int32 DEFAULT_DIM_DURATION = 200;
     static const Int32 DEFAULT_BLUR_DURATION = 50;
-    static const Float MAX_BLUR_AMOUNT = 1.0;
+    static const Float MAX_BLUR_AMOUNT;
 
     /** The service */
     AutoPtr<CWindowManagerService> mService;

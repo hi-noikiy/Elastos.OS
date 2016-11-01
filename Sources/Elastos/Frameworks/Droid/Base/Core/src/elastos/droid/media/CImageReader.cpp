@@ -611,7 +611,7 @@ public:
 
     virtual ~JNIImageReaderContext();
 
-    virtual void onFrameAvailable();
+    virtual void onFrameAvailable(const android::BufferItem& item);
 
     android::CpuConsumer::LockedBuffer* getLockedBuffer();
 
@@ -679,7 +679,7 @@ JNIImageReaderContext::~JNIImageReaderContext()
     mConsumer.clear();
 }
 
-void JNIImageReaderContext::onFrameAvailable()
+void JNIImageReaderContext::onFrameAvailable(const android::BufferItem& item)
 {
     ALOGV("%s: frame available", __FUNCTION__);
     CImageReader::PostEventFromNative(mWeakThiz);

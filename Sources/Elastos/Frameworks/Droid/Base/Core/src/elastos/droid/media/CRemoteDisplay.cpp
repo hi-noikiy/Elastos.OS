@@ -1,5 +1,6 @@
 
 #include "elastos/droid/media/CRemoteDisplay.h"
+#include "elastos/droid/app/CActivityThread.h"
 #include "elastos/droid/view/CSurface.h"
 #include <elastos/utility/logging/Logger.h>
 #include <binder/IServiceManager.h>
@@ -264,8 +265,10 @@ Handle32 CRemoteDisplay::NativeListen(
         return 0;
     }
 
+    String opPackageName = Elastos::Droid::App::CActivityThread::GetCurrentPackageName();//GetCurrentOpPackageName
     android::sp<NativeRemoteDisplayClient> client = new NativeRemoteDisplayClient(this);
-    android::sp<android::IRemoteDisplay> display = service->listenForRemoteDisplay(client, android::String8(iface.string()));
+    android::sp<android::IRemoteDisplay> display = service->listenForRemoteDisplay(
+        android::String16(opPackageName.string()), client, android::String8(iface.string()));
     if (display == NULL) {
          Logger::E("RemoteDisplay", "Media player service rejected request to listen for remote display '%s'.", iface.string());
          return 0;

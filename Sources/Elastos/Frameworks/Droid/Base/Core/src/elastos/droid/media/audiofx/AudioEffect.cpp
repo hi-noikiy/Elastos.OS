@@ -1,5 +1,6 @@
 #include <Elastos.CoreLibrary.IO.h>
 #include <Elastos.CoreLibrary.Utility.h>
+#include "elastos/droid/app/CActivityThread.h"
 #include "elastos/droid/os/CLooperHelper.h"
 #include "elastos/droid/media/audiofx/AudioEffect.h"
 #include "elastos/droid/media/audiofx/CAudioEffectDescriptor.h"
@@ -28,6 +29,7 @@ using Elastos::IO::IByteBuffer;
 using Elastos::IO::IByteBufferHelper;
 using Elastos::IO::CByteBufferHelper;
 using Elastos::IO::CByteOrderHelper;
+using Elastos::Droid::App::CActivityThread;
 using Elastos::Droid::Os::ILooperHelper;
 using Elastos::Droid::Os::CLooperHelper;
 using Elastos::Droid::Media::Audiofx::CAudioEffectDescriptor;
@@ -904,6 +906,7 @@ Int32 AudioEffect::NativeSetup(
     android::AudioEffect* lpAudioEffect = NULL;
     const char *typeStr = NULL;
     const char *uuidStr = NULL;
+    String opPackageNameStr = CActivityThread::GetCurrentPackageName();//GetCurrentOpPackageName();
     effect_descriptor_t desc;
     AutoPtr<IAudioEffectDescriptor> jdesc;
     char str[EFFECT_STRING_LEN_MAX];
@@ -944,8 +947,8 @@ Int32 AudioEffect::NativeSetup(
         goto setup_failure;
     }
 
-    lpAudioEffect = new android::AudioEffect(typeStr, uuidStr, priority,
-        effectCallback, &lpJniStorage->mCallbackData, sessionId, 0);
+    lpAudioEffect = new android::AudioEffect(typeStr, android::String16(opPackageNameStr.string()),
+        uuidStr, priority, effectCallback, &lpJniStorage->mCallbackData, sessionId, 0);
 
     if (lpAudioEffect == NULL) {
         goto setup_failure;

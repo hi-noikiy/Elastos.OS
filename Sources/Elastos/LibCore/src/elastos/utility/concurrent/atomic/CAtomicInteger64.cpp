@@ -1,7 +1,6 @@
 
 #include "CAtomicInteger64.h"
 #include <cutils/atomic.h>
-#include <cutils/atomic-inline.h>
 
 using Elastos::IO::EIID_ISerializable;
 

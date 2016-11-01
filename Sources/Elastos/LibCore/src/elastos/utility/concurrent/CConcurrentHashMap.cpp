@@ -12,7 +12,6 @@
 #include <elastos/core/AutoLock.h>
 #include <elastos/core/Thread.h>
 #include <cutils/atomic.h>
-#include <cutils/atomic-inline.h>
 
 using Elastos::Core::AutoLock;
 using Elastos::Core::IBoolean;

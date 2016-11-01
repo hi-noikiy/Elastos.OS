@@ -1641,7 +1641,8 @@ AutoPtr< ArrayOf<WifiScanningServiceImpl::SettingsComputer::TimeBucket*> > WifiS
 const Int32 WifiScanningServiceImpl::SettingsComputer::MAX_BUCKETS;
 const Int32 WifiScanningServiceImpl::SettingsComputer::MAX_CHANNELS;
 const Int32 WifiScanningServiceImpl::SettingsComputer::DEFAULT_MAX_AP_PER_SCAN;
-const Int32 WifiScanningServiceImpl::SettingsComputer::DEFAULT_REPORT_THRESHOLD;
+const Int32 WifiScanningServiceImpl::SettingsComputer::DEFAULT_REPORT_THRESHOLD_NUM_SCANS;
+const Int32 WifiScanningServiceImpl::SettingsComputer::DEFAULT_REPORT_THRESHOLD_PERCENT;
 const Int32 WifiScanningServiceImpl::SettingsComputer::DEFAULT_BASE_PERIOD_MS;
 
 WifiScanningServiceImpl::SettingsComputer::SettingsComputer()
@@ -1651,7 +1652,8 @@ WifiScanningServiceImpl::SettingsComputer::SettingsComputer()
         mSettings = new WifiNative::ScanSettings();
         mSettings->max_ap_per_scan = DEFAULT_MAX_AP_PER_SCAN;
         mSettings->base_period_ms = DEFAULT_BASE_PERIOD_MS;
-        mSettings->report_threshold = DEFAULT_REPORT_THRESHOLD;
+        mSettings->report_threshold_percent = DEFAULT_REPORT_THRESHOLD_PERCENT;
+        mSettings->report_threshold_num_scans = DEFAULT_REPORT_THRESHOLD_NUM_SCANS;
 
         mSettings->buckets = ArrayOf<WifiNative::BucketSettings*>::Alloc(MAX_BUCKETS);
         for (Int32 i = 0; i < mSettings->buckets->GetLength(); ++i) {

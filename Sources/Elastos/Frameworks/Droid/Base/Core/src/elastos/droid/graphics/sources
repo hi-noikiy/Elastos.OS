@@ -6,6 +6,8 @@ include $(MAKEDIR)/../../../../../../sources.inc
 C_DEFINES += -DDROID_CORE
 C_DEFINES += -DSK_BUILD_FOR_ELASTOS_FRAMEWORK
 
+CPP_FLAGS += -std=c++11
+
 INCLUDES += ../
 INCLUDES += $(MAKEDIR)/../../../../inc/
 
@@ -24,6 +26,7 @@ INCLUDES += $(PREBUILD_INC)/pdfium/fpdfsdk/include
 
 SOURCES += graphics.cpp
 SOURCES += Xfermode.cpp
+SOURCES += AvoidXfermode.cpp
 SOURCES += CAvoidXfermode.cpp
 SOURCES += CAtlas.cpp
 SOURCES += CAtlasEntry.cpp

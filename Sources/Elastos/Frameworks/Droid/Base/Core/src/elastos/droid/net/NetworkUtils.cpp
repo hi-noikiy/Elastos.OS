@@ -32,27 +32,18 @@ int ifc_enable(const char *ifname);
 int ifc_disable(const char *ifname);
 int ifc_reset_connections(const char *ifname, int reset_mask);
 
-int dhcp_do_request(const char * const ifname,
-                    const char *ipaddr,
-                    const char *gateway,
-                    uint32_t *prefixLength,
-                    const char *dns[],
-                    const char *server,
-                    uint32_t *lease,
-                    const char *vendorInfo,
-                    const char *domains,
-                    const char *mtu);
-
-int dhcp_do_request_renew(const char * const ifname,
-                    const char *ipaddr,
-                    const char *gateway,
-                    uint32_t *prefixLength,
-                    const char *dns[],
-                    const char *server,
-                    uint32_t *lease,
-                    const char *vendorInfo,
-                    const char *domains,
-                    const char *mtu);
+int dhcp_start(const char * const ifname);
+int dhcp_start_renew(const char * const ifname);
+int dhcp_get_results(const char * const ifname,
+                     const char *ipaddr,
+                     const char *gateway,
+                     uint32_t *prefixLength,
+                     const char *dns[],
+                     const char *server,
+                     uint32_t *lease,
+                     const char *vendorInfo,
+                     const char *domains,
+                     const char *mtu);
 
 int dhcp_stop(const char *ifname);
 int dhcp_release_lease(const char *ifname);
@@ -508,15 +499,19 @@ Boolean NetworkUtils::NativeRunDhcpCommon(
         return FALSE;
     }
     if (renew) {
-        num = ::dhcp_do_request_renew(nameStr, ipaddr, gateway, &prefixLength,
-                dns, server, &lease, vendorInfo, domains, mtu);
+        num = ::dhcp_start_renew(nameStr);
     }
     else {
-        num = ::dhcp_do_request(nameStr, ipaddr, gateway, &prefixLength,
-                dns, server, &lease, vendorInfo, domains, mtu);
+        num = ::dhcp_start(nameStr);
     }
     if (num != 0) {
-        ALOGD("dhcp_do_request failed : %s (%s)", nameStr, renew ? "renew" : "new");
+        ALOGD("dhcp_start failed : %s (%s)", nameStr, renew ? "renew" : "new");
+    }
+
+    num = ::dhcp_get_results(nameStr, ipaddr, gateway, &prefixLength,
+        dns, server, &lease, vendorInfo, domains, mtu);
+    if (num != 0) {
+        ALOGD("dhcp_get_results failed : %s (%s)", nameStr, ::dhcp_get_errmsg());
     }
 
     Boolean b;

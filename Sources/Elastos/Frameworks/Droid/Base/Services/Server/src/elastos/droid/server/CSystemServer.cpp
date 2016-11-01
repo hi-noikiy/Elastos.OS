@@ -37,7 +37,7 @@
 #include "elastos/droid/server/wm/InputMonitor.h"
 #include "elastos/droid/server/wm/CWindowManagerService.h"
 #include "elastos/droid/server/dreams/CDreamManagerService.h"
-
+#include "elastos/droid/server/ethernet/EthernetService.h"
 
 #include <Elastos.Droid.Os.h>
 #include <Elastos.Droid.App.h>
@@ -123,6 +123,7 @@ using Elastos::Droid::Server::Webkit::WebViewUpdateService;
 using Elastos::Droid::Server::Wm::InputMonitor;
 using Elastos::Droid::Server::DevicePolicy::CDevicePolicyManagerService;
 using Elastos::Droid::Server::Dreams::CDreamManagerService;
+using Elastos::Droid::Server::Ethernet::EthernetService;
 
 using Elastos::Core::ISystem;
 using Elastos::Core::CSystem;
@@ -580,12 +581,12 @@ ECode SystemServer::StartOtherServices()
     ec = mActivityManagerService->InstallSystemProviders();
     if (FAILED(ec)) Slogger::E(TAG, "failed to isntall System Content Providers");
 
-    Slogger::I(TAG, "Vibrator Service");
-    AutoPtr<IIVibratorService> vs;
-    ec = CVibratorService::New(context, (IIVibratorService**)&vs);
-    if (FAILED(ec)) ReportWtf("starting Vibrator service", ec);
-    ServiceManager::AddService(String("vibrator"), vs.Get());
-    vibrator = (CVibratorService*)vs.Get();
+    // Slogger::I(TAG, "Vibrator Service");
+    // AutoPtr<IIVibratorService> vs;
+    // ec = CVibratorService::New(context, (IIVibratorService**)&vs);
+    // if (FAILED(ec)) ReportWtf("starting Vibrator service", ec);
+    // ServiceManager::AddService(String("vibrator"), vs.Get());
+    // vibrator = (CVibratorService*)vs.Get();
 
     Slogger::I(TAG, "Consumer IR Service");
     AutoPtr<IIConsumerIrService> cirs;
@@ -810,8 +811,10 @@ ECode SystemServer::StartOtherServices()
 
             bval = FALSE;
             if (mPackageManager->HasSystemFeature(IPackageManager::FEATURE_ETHERNET, &bval), bval) {
-                Slogger::I(TAG, "leliang_debug EthernetService not ok ????????");
-    //          mSystemServiceManager->StartService(ETHERNET_SERVICE_CLASS);
+                Slogger::I(TAG, "EthernetService");
+                AutoPtr<EthernetService> ehternetService = new EthernetService();
+                ehternetService->constructor(context);
+                mSystemServiceManager->StartService(ehternetService);
             }
 
             Slogger::I(TAG, "Connectivity Service");
@@ -1218,8 +1221,8 @@ ECode SystemServer::StartOtherServices()
 
     // It is now time to start up the app processes...
 
-    ec = vibrator->SystemReady();
-    if (FAILED(ec)) Slogger::E(TAG, "failed to making vibrator Service ready");
+    // ec = vibrator->SystemReady();
+    // if (FAILED(ec)) Slogger::E(TAG, "failed to making vibrator Service ready");
 
     if (lockSettings != NULL) {
         // ec = lockSettings->SystemReady();

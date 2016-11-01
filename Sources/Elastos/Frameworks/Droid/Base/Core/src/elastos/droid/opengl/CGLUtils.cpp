@@ -303,9 +303,8 @@ Int32  CGLUtils::Native_texImage2D(
         if (data) {
             void* const pixels = (char*)data + palette_size;
             SkColorTable* ctable = skBitmap.getColorTable();
-            memcpy(data, ctable->lockColors(), ctable->count() * sizeof(SkPMColor));
+            memcpy(data, ctable->readColors(), ctable->count() * sizeof(SkPMColor));
             memcpy(pixels, p, size);
-            ctable->unlockColors();
             glCompressedTexImage2D(target, level, internalformat, w, h, border, imageSize, data);
             free(data);
         } else {

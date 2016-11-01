@@ -7,9 +7,14 @@
 #include <elastos/droid/system/OsConstants.h>
 #include <elastos/core/Mutex.h>
 #include <elastos/utility/logging/Logger.h>
-#include <fpdfview.h>
-#include <fpdfedit.h>
-#include <fpdfsave.h>
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdelete-non-virtual-dtor"
+#include "fpdfview.h"
+#include "pdfium/public/fpdf_edit.h"
+#include "pdfium/public/fpdf_save.h"
+#include "pdfium/fpdfsdk/include/fsdk_rendercontext.h"
+#include "pdfium/public/fpdf_transformpage.h"
+#pragma GCC diagnostic pop
 #include <utils/Log.h>
 #include <unistd.h>
 #include <sys/types.h>
@@ -163,7 +168,7 @@ static void InitializeLibraryIfNeeded()
 {
     Mutex::AutoLock _l(sLock);
     if (sUnmatchedInitRequestCount == 0) {
-        FPDF_InitLibrary(NULL);
+        FPDF_InitLibrary();
     }
     sUnmatchedInitRequestCount++;
 }

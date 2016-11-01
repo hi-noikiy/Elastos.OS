@@ -906,8 +906,9 @@ Int32 CAudioRecord::NativeSetup(
 
     Int32 sessionId = (*session)[0];
 
+    String opPackageNameStr = CActivityThread::GetCurrentPackageName();//GetCurrentOpPackageName();
     // create an uninitialized AudioRecord object
-    android::sp<android::AudioRecord> lpRecorder = new android::AudioRecord();
+    android::sp<android::AudioRecord> lpRecorder = new android::AudioRecord(android::String16(opPackageNameStr.string()));
 
     AutoPtr<CAudioAttributes> attr = (CAudioAttributes*)attributes;
     audio_attributes_t *paa = NULL;

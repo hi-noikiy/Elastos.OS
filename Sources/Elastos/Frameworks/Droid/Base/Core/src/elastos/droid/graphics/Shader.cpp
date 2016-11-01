@@ -94,16 +94,29 @@ void Shader::NativeSetLocalMatrix(
     /* [in] */ Int64 shaderHandle,
     /* [in] */ Int64 matrixHandle)
 {
-    SkShader* shader       = reinterpret_cast<SkShader*>(shaderHandle);
-    if (shader) {
-        SkMatrix* matrix = reinterpret_cast<SkMatrix*>(matrixHandle);
-        if (matrix) {
-            shader->setLocalMatrix(*matrix);
-        } else {
-            shader->resetLocalMatrix();
-        }
-        shader->setGenerationID(shader->getGenerationID() + 1);
+    // ensure we have a valid matrix to use
+    const SkMatrix* matrix = reinterpret_cast<SkMatrix*>(matrixHandle);
+    if (NULL == matrix) {
+        matrix = &SkMatrix::I();
     }
+
+    // The current shader will no longer need a direct reference owned by Shader.java
+    // as all the data needed is contained within the newly created LocalMatrixShader.
+    SkASSERT(shaderHandle);
+    SkAutoTUnref<SkShader> currentShader(reinterpret_cast<SkShader*>(shaderHandle));
+
+    SkMatrix currentMatrix;
+    SkAutoTUnref<SkShader> baseShader(currentShader->refAsALocalMatrixShader(&currentMatrix));
+    if (baseShader.get()) {
+        // if the matrices are same then there is no need to allocate a new
+        // shader that is identical to the existing one.
+        if (currentMatrix == *matrix) {
+            currentShader.detach();
+        }
+        SkShader::CreateLocalMatrixShader(baseShader, *matrix);
+    }
+
+    SkShader::CreateLocalMatrixShader(currentShader, *matrix);
 }
 
 } // namespace Graphics

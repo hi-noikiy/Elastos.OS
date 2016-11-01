@@ -335,6 +335,7 @@ public:
      */
     // @ServiceThreadOnly
     CARAPI SetAudioReturnChannel(
+        /* [in] */ Int32 port,
         /* [in] */ Boolean enabled);
 
     /**
@@ -514,6 +515,7 @@ private:
 
     static CARAPI NativeSetAudioReturnChannel(
         /* [in] */ Int64 controllerPtr,
+        /* [in] */ Int32 port,
         /* [in] */ Boolean flag);
 
     static CARAPI NativeIsConnected(

@@ -263,7 +263,7 @@ ECode SubtitleController::GetDefaultTrack(
             AutoPtr<IMediaFormat> format;
             track->GetFormat((IMediaFormat**)&format);
             String language;
-            format->GetString(IMediaFormat::KEY_LANGUAGE, &language);
+            format->GetString(IMediaFormat::_KEY_LANGUAGE, &language);
 
             Boolean forced = FALSE;
             Int32 iRet;

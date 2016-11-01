@@ -1014,6 +1014,7 @@ public:
         /* [out] */ Boolean* result);
 
     CARAPI SetAudioReturnChannel(
+        /* [in] */ Int32 port,
         /* [in] */ Boolean enabled);
 
     /**

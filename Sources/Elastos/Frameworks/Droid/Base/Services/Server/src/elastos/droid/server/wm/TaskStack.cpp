@@ -27,7 +27,7 @@ namespace Wm {
 
 const Int32 TaskStack::DEFAULT_DIM_DURATION;
 const Int32 TaskStack::DEFAULT_BLUR_DURATION;
-const Float TaskStack::MAX_BLUR_AMOUNT;
+const Float TaskStack::MAX_BLUR_AMOUNT = 1.0;
 
 TaskStack::TaskStack(
     /* [in] */ CWindowManagerService* service,
@@ -108,7 +108,8 @@ Boolean TaskStack::SetBounds(
 
     mDimLayer->SetBounds(bounds);
     mAnimationBackgroundSurface->SetBounds(bounds);
-    mBlurLayer->SetBounds(bounds);
+    // todo: caojing
+    // mBlurLayer->SetBounds(bounds);
     mBounds->Set(bounds);
 
     return TRUE;
@@ -241,7 +242,8 @@ ECode TaskStack::AttachDisplayContent(
     mDisplayContent = displayContent;
     mDimLayer = new DimLayer(mService, this, displayContent);
     mAnimationBackgroundSurface = new DimLayer(mService, this, displayContent);
-    mBlurLayer = new BlurLayer(mService, this, displayContent);
+    // todo: caojing
+    // mBlurLayer = new BlurLayer(mService, this, displayContent);
     UpdateDisplayInfo();
     return NOERROR;
 }
@@ -277,7 +279,8 @@ void TaskStack::DetachDisplay()
         mService->RequestTraversalLocked();
     }
 
-    mBlurLayer->DestroySurface();
+    // todo: caojing
+    // mBlurLayer->DestroySurface();
     mBlurLayer = NULL;
     mAnimationBackgroundSurface->DestroySurface();
     mAnimationBackgroundSurface = NULL;
@@ -429,6 +432,9 @@ void TaskStack::SetAnimationBackground(
 
 Boolean TaskStack::AnimateBlurLayers()
 {
+    // todo: caojing
+    return FALSE;
+
     Boolean result = FALSE;
     Int32 blurLayer;
     Float blurAmount;
@@ -490,12 +496,18 @@ Boolean TaskStack::TestBlurringTag()
 
 Boolean TaskStack::IsBlurring()
 {
+    // todo: caojing
+    return FALSE;
+
     return mBlurLayer->IsBlurring();
 }
 
 Boolean TaskStack::IsBlurring(
     /* [in] */ WindowStateAnimator* winAnimator)
 {
+    // todo: caojing
+    return FALSE;
+
     return mBlurWinAnimator.Get() == winAnimator && mBlurLayer->IsBlurring();
 }
 
@@ -537,7 +549,8 @@ void TaskStack::SwitchUser(
 
 void TaskStack::Close()
 {
-    mBlurLayer->mBlurSurface->Destroy();
+    // todo: caojing
+    // mBlurLayer->mBlurSurface->Destroy();
     mDimLayer->mDimSurface->Destroy();
     mAnimationBackgroundSurface->mDimSurface->Destroy();
 }

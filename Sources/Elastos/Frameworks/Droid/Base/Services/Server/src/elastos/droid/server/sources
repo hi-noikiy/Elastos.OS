@@ -3,6 +3,8 @@ TARGET_TYPE= eco
 
 EXPORT_ALL_SYMBOLS=1
 
+CPP_FLAGS += -std=c++11
+
 C_DEFINES += -DDROID_SERVER
 
 VPATH := $(MAKEDIR)/../../../../../../Core/src/elastos/droid/
@@ -118,6 +120,7 @@ ELASTOS_LIBS += content/content.lib
 ELASTOS_LIBS += devicepolicy/devicepolicy.lib
 ELASTOS_LIBS += display/display.lib
 ELASTOS_LIBS += dreams/dreams.lib
+ELASTOS_LIBS += ethernet/ethernet.lib
 ELASTOS_LIBS += hdmi/hdmi.lib
 ELASTOS_LIBS += input/input.lib
 ELASTOS_LIBS += lights/lights.lib
@@ -146,7 +149,6 @@ LIBRARIES += $(XDK_USER_LIB)/Elastos.Runtime.lib
 LIBRARIES += $(XDK_TARGETS)/Elastos.Runtime.eco
 LIBRARIES += $(XDK_TARGETS)/Elastos.CoreLibrary.eco
 LIBRARIES += $(XDK_TARGETS)/Elastos.Droid.Core.eco
-LIBRARIES += $(XDK_USER_LIB)/crt0.lib
 LIBRARIES += $(PREBUILD_LIB)/libm.a
 LIBRARIES += $(PREBUILD_LIB)/libinputservice.so
 LIBRARIES += $(PREBUILD_LIB)/libbatteryservice.a

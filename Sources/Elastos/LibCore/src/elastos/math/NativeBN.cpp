@@ -10,6 +10,18 @@ namespace Math {
 
 using Elastos::Core::UniquePtr;
 
+#if defined(OPENSSL_IS_BORINGSSL)
+/* BoringSSL no longer exports |bn_check_top|. */
+static void bn_check_top(const BIGNUM* bn) {
+  /* This asserts that |bn->top| (which contains the number of elements of
+   * |bn->d| that are valid) is minimal. In other words, that there aren't
+   * superfluous zeros. */
+  if (bn != NULL && bn->top != 0 && bn->d[bn->top-1] == 0) {
+    abort();
+  }
+}
+#endif
+
 struct BN_CTX_Deleter
 {
     void operator()(BN_CTX* p) const
@@ -19,6 +31,8 @@ struct BN_CTX_Deleter
 };
 
 typedef UniquePtr<BN_CTX, BN_CTX_Deleter> Unique_BN_CTX;
+
+static const Int32 BN_BYTES = sizeof(BN_ULONG);
 
 BIGNUM* NativeBN::ToBigNum(
     /* [in] */ Int64 address)
@@ -109,7 +123,7 @@ void NativeBN::PutULongInt(
     // cf. litEndInts2bn:
     BIGNUM* a = ToBigNum(a0);
     bn_check_top(a);
-    if (bn_wexpand(a, 8/BN_BYTES) != NULL) {
+    if (bn_wexpand(a, BN_BYTES) != NULL) {
 #ifdef __LP64__
         a->d[0] = dw;
 #else
@@ -118,7 +132,7 @@ void NativeBN::PutULongInt(
         a->d[0] = lo;
         a->d[1] = hi;
 #endif
-        a->top = 8 / BN_BYTES;
+        a->top = BN_BYTES;
         a->neg = neg;
         bn_correct_top(a);
     }

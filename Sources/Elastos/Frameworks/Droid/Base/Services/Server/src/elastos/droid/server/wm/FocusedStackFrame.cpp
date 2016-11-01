@@ -23,7 +23,7 @@ namespace Wm {
 
 const String FocusedStackFrame::TAG("FocusedStackFrame");
 const Int32 FocusedStackFrame::THICKNESS;
-const Float FocusedStackFrame::ALPHA;
+const Float FocusedStackFrame::ALPHA = 0.3f;
 
 FocusedStackFrame::FocusedStackFrame(
     /* [in] */ IDisplay* display,

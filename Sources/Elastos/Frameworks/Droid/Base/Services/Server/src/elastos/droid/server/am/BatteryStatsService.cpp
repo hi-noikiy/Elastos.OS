@@ -77,9 +77,9 @@ namespace Am {
 static Boolean wakeup_init = FALSE;
 static sem_t wakeup_sem;
 
-static void wakeup_callback(void)
+static void wakeup_callback(bool success)
 {
-    //ALOGV("In wakeup_callback");
+    // ALOGV("In wakeup_callback: %s", success ? "resumed from suspend" : "suspend aborted");
     Int32 ret = sem_post(&wakeup_sem);
     if (ret < 0) {
         char buf[80];
@@ -388,6 +388,9 @@ ECode BatteryStatsService::constructor(
 ECode BatteryStatsService::Publish(
     /* [in] */ IContext* context)
 {
+    // TODO: caojing
+    return NOERROR;
+
     mContext = context;
     AutoPtr<IServiceManager> sm;
     CServiceManager::AcquireSingleton((IServiceManager**)&sm);

@@ -1985,9 +1985,10 @@ ECode HdmiControlService::HandleCecCommand(
 }
 
 ECode HdmiControlService::SetAudioReturnChannel(
+    /* [in] */ Int32 port,
     /* [in] */ Boolean enabled)
 {
-    return mCecController->SetAudioReturnChannel(enabled);
+    return mCecController->SetAudioReturnChannel(port, enabled);
 }
 
 ECode HdmiControlService::DispatchMessageToLocalDevice(

@@ -1,7 +1,6 @@
 
 #include "CAtomicBoolean.h"
 #include <cutils/atomic.h>
-#include <cutils/atomic-inline.h>
 #include "StringUtils.h"
 
 using Elastos::Core::StringUtils;

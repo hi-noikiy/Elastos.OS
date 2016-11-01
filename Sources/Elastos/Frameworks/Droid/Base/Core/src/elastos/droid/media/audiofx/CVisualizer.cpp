@@ -1,5 +1,6 @@
 #include "elastos/droid/media/audiofx/CVisualizer.h"
 #include "elastos/droid/media/audiofx/CVisualizerMeasurementPeakRms.h"
+#include "elastos/droid/app/CActivityThread.h"
 #include "elastos/droid/os/CLooperHelper.h"
 #include <elastos/utility/logging/Logger.h>
 #include <elastos/core/AutoLock.h>
@@ -14,6 +15,7 @@ using Elastos::Core::EIID_IByte;
 using Elastos::Core::IArrayOf;
 using Elastos::Core::CArrayOf;
 using Elastos::Utility::Logging::Logger;
+using Elastos::Droid::App::CActivityThread;
 using Elastos::Droid::Os::ILooperHelper;
 using Elastos::Droid::Os::CLooperHelper;
 
@@ -602,6 +604,7 @@ Int32 CVisualizer::Native_Setup(
     visualizerJniStorage* lpJniStorage = NULL;
     Int32 lStatus = VISUALIZER_ERROR_NO_MEMORY;
     android::Visualizer* lpVisualizer = NULL;
+    String opPackageNameStr = CActivityThread::GetCurrentPackageName();//GetCurrentOpPackageName();
 
     lpJniStorage = new visualizerJniStorage();
     if (lpJniStorage == NULL) {
@@ -616,7 +619,7 @@ Int32 CVisualizer::Native_Setup(
     }
 
     // create the native Visualizer object
-    lpVisualizer = new android::Visualizer(0,
+    lpVisualizer = new android::Visualizer(android::String16(opPackageNameStr.string()), 0,
         elastos_media_visualizer_effect_callback, lpJniStorage, sessionId);
 
     if (lpVisualizer == NULL) {
@@ -657,10 +660,14 @@ Int32 CVisualizer::Native_Setup(
 
 void CVisualizer::Native_Finalize()
 {
+    Native_Release();
+}
+
+void CVisualizer::Native_Release()
+{
     // delete the Visualizer object
     android::Visualizer* lpVisualizer = (android::Visualizer *)mNativeVisualizer;
     if (lpVisualizer) {
-        lpVisualizer->cancelCaptureCallBack();
         delete lpVisualizer;
     }
 
@@ -669,12 +676,6 @@ void CVisualizer::Native_Finalize()
     if (lpJniStorage) {
         delete lpJniStorage;
     }
-}
-
-void CVisualizer::Native_Release()
-{
-    // do everything a call to finalize would
-    Native_Finalize();
     mNativeVisualizer = 0;
     mJniData = 0;
 }

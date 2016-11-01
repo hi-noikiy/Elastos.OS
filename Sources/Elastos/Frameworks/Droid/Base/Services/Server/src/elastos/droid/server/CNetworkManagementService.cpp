@@ -795,14 +795,14 @@ ECode CNetworkManagementService::NotifyInterfaceClassActivity(
         if (mLastPowerStateFromRadio != powerState) {
             mLastPowerStateFromRadio = powerState;
             // try {
-            AutoPtr<IIBatteryStats> bstats;
-            GetBatteryStats((IIBatteryStats**)&bstats);
-            ECode ec = bstats->NoteMobileRadioPowerState(powerState, tsNanos);
+            // AutoPtr<IIBatteryStats> bstats;
+            // GetBatteryStats((IIBatteryStats**)&bstats);
+            // ECode ec = bstats->NoteMobileRadioPowerState(powerState, tsNanos);
             // } catch (RemoteException e) {
-            if (FAILED(ec)) {
-                if ((ECode)E_REMOTE_EXCEPTION != ec)
-                    return ec;
-            }
+            // if (FAILED(ec)) {
+            //     if ((ECode)E_REMOTE_EXCEPTION != ec)
+            //         return ec;
+            // }
             // }
         }
     }
@@ -1239,7 +1239,7 @@ ECode CNetworkManagementService::SetInterfaceConfig(
     linkAddr->GetPrefixLength(&prefixLength);
 
     AutoPtr< ArrayOf<IInterface*> > args = ArrayOf<IInterface*>::Alloc(4);
-    args->Set(0, CoreUtils::Convert(String("getcfg")));
+    args->Set(0, CoreUtils::Convert(String("setcfg")));
     args->Set(1, CoreUtils::Convert(iface));
     args->Set(2, CoreUtils::Convert(hostAddr));
     args->Set(3, CoreUtils::Convert(prefixLength));

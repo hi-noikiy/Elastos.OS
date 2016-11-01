@@ -4576,16 +4576,18 @@ WifiStateMachine::WifiNetworkFactory::WifiNetworkFactory(
     constructor(l, c, TAG, f);
 }
 
-void WifiStateMachine::WifiNetworkFactory::StartNetwork()
+ECode WifiStateMachine::WifiNetworkFactory::StartNetwork()
 {
     // TODO
     // Enter association mode.
+    return NOERROR;
 }
 
-void WifiStateMachine::WifiNetworkFactory::StopNetwork()
+ECode WifiStateMachine::WifiNetworkFactory::StopNetwork()
 {
     // TODO
     // Stop associating.
+    return NOERROR;
 }
 
 //==============================================================================
@@ -6012,13 +6014,13 @@ ECode WifiStateMachine::UpdateBatteryWorkSource(
                 // to remove old work from battery stats.
                 Boolean b;
                 if (mLastRunningWifiUids->Diff(mRunningWifiUids, &b), b) {
-                    mBatteryStats->NoteWifiRunningChanged(mLastRunningWifiUids, mRunningWifiUids);
+                    // mBatteryStats->NoteWifiRunningChanged(mLastRunningWifiUids, mRunningWifiUids);
                     mLastRunningWifiUids->Set(mRunningWifiUids);
                 }
             }
             else {
                 // Now being started, report it.
-                mBatteryStats->NoteWifiRunning(mRunningWifiUids);
+                // mBatteryStats->NoteWifiRunning(mRunningWifiUids);
                 mLastRunningWifiUids->Set(mRunningWifiUids);
                 mReportedRunning = TRUE;
             }
@@ -6026,7 +6028,7 @@ ECode WifiStateMachine::UpdateBatteryWorkSource(
         else {
             if (mReportedRunning) {
                 // Last reported we were running, time to stop.
-                mBatteryStats->NoteWifiStopped(mLastRunningWifiUids);
+                // mBatteryStats->NoteWifiStopped(mLastRunningWifiUids);
                 mLastRunningWifiUids->Clear();
                 mReportedRunning = FALSE;
             }
@@ -8206,7 +8208,7 @@ void WifiStateMachine::NoteScanStart(
             CWorkSource::New(callingUid, (IWorkSource**)&mScanWorkSource);
         }
         // try {
-        mBatteryStats->NoteWifiScanStartedFromSource(mScanWorkSource);
+        // mBatteryStats->NoteWifiScanStartedFromSource(mScanWorkSource);
         // } catch (RemoteException e) {
         //     log(e.toString());
         // }
@@ -8236,7 +8238,7 @@ void WifiStateMachine::NoteScanEnd()
     }
     if (mScanWorkSource != NULL) {
         // try {
-        mBatteryStats->NoteWifiScanStoppedFromSource(mScanWorkSource);
+        // mBatteryStats->NoteWifiScanStoppedFromSource(mScanWorkSource);
         // } catch (RemoteException e) {
         //     log(e.toString());
         // } finally {
@@ -8254,7 +8256,7 @@ void WifiStateMachine::NoteBatchedScanStart()
             ((IObject::Probe(mNotedBatchedScanWorkSource)->Equals(mBatchedScanWorkSource, &b), b) == FALSE ||
              mNotedBatchedScanCsph != mBatchedScanCsph)) {
         // try {
-        mBatteryStats->NoteWifiBatchedScanStoppedFromSource(mNotedBatchedScanWorkSource);
+        // mBatteryStats->NoteWifiBatchedScanStoppedFromSource(mNotedBatchedScanWorkSource);
         // } catch (RemoteException e) {
         //     log(e.toString());
         // } finally {
@@ -8264,8 +8266,8 @@ void WifiStateMachine::NoteBatchedScanStart()
     }
     // note the start of the new
     // try {
-    mBatteryStats->NoteWifiBatchedScanStartedFromSource(mBatchedScanWorkSource,
-            mBatchedScanCsph);
+    // mBatteryStats->NoteWifiBatchedScanStartedFromSource(mBatchedScanWorkSource,
+            // mBatchedScanCsph);
     mNotedBatchedScanWorkSource = mBatchedScanWorkSource;
     mNotedBatchedScanCsph = mBatchedScanCsph;
     // } catch (RemoteException e) {
@@ -8279,7 +8281,7 @@ void WifiStateMachine::NoteBatchedScanStop()
 
     if (mNotedBatchedScanWorkSource != NULL) {
         // try {
-        mBatteryStats->NoteWifiBatchedScanStoppedFromSource(mNotedBatchedScanWorkSource);
+        // mBatteryStats->NoteWifiBatchedScanStoppedFromSource(mNotedBatchedScanWorkSource);
         // } catch (RemoteException e) {
         //     log(e.toString());
         // } finally {
@@ -8773,10 +8775,10 @@ void WifiStateMachine::SetWifiState(
 
     // try {
     if (wifiState == IWifiManager::WIFI_STATE_ENABLED) {
-        mBatteryStats->NoteWifiOn();
+        // mBatteryStats->NoteWifiOn();
     }
     else if (wifiState == IWifiManager::WIFI_STATE_DISABLED) {
-        mBatteryStats->NoteWifiOff();
+        // mBatteryStats->NoteWifiOff();
     }
     // } catch (RemoteException e) {
     //     Loge("Failed to note battery stats in wifi");
@@ -8804,10 +8806,10 @@ void WifiStateMachine::SetWifiApState(
 
     // try {
     if (wifiApState == IWifiManager::WIFI_AP_STATE_ENABLED) {
-        mBatteryStats->NoteWifiOn();
+        // mBatteryStats->NoteWifiOn();
     }
     else if (wifiApState == IWifiManager::WIFI_AP_STATE_DISABLED) {
-        mBatteryStats->NoteWifiOff();
+        // mBatteryStats->NoteWifiOff();
     }
     // } catch (RemoteException e) {
     //     Loge("Failed to note battery stats in wifi");
@@ -9830,7 +9832,7 @@ void WifiStateMachine::SendRssiChangeBroadcast(
     /* [in] */ Int32 newRssi)
 {
     // try {
-    mBatteryStats->NoteWifiRssiChanged(newRssi);
+    // mBatteryStats->NoteWifiRssiChanged(newRssi);
     // } catch (RemoteException e) {
     //     // Won't happen.
     // }

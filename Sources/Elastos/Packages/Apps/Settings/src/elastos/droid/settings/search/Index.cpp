@@ -1683,6 +1683,8 @@ void Index::IndexFromProvider(
             Int32 xmlResId;
             item->GetXmlResId(&xmlResId);
 
+    Logger::D("xihaoc", "IndexFromResource xmlResId = 0x%08x", xmlResId);
+
             IndexFromResource(context, database, localeStr,
                     xmlResId, itemClassName, itemIconResId, itemRank,
                     siData->mIntentAction, siData->mIntentTargetPackage,

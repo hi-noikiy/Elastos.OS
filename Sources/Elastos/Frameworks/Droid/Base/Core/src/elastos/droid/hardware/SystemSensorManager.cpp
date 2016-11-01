@@ -239,8 +239,9 @@ Int64 SystemSensorManager::BaseEventQueue::NativeInitBaseEventQueue(
     /* [in] */ IMessageQueue* msgQ,
     /* [in] */ ArrayOf<Float>* scratch)
 {
-    android::SensorManager& mgr(android::SensorManager::getInstance());
-    android::sp<android::SensorEventQueue> queue(mgr.createEventQueue());
+    android::SensorManager* mgr = reinterpret_cast<android::SensorManager*>(
+        ((SystemSensorManager*)mManager.Get())->mNativeInstance);
+    android::sp<android::SensorEventQueue> queue(mgr->createEventQueue());
 
     // android::sp<MessageQueue> messageQueue = android_os_MessageQueue_getMessageQueue(env, msgQ);
     Handle64 handle;
@@ -555,6 +556,10 @@ ECode SystemSensorManager::constructor(
     AutoPtr<IApplicationInfo> info;
     FAIL_RETURN(context->GetApplicationInfo((IApplicationInfo**)&info))
     FAIL_RETURN(info->GetTargetSdkVersion(&mTargetSdkLevel))
+    String packageName;
+    context->GetOpPackageName(&packageName);
+    mNativeInstance = NativeCreate(packageName);
+
     {
         AutoLock syncLock(sSensorModuleLock);
         if (!sSensorModuleInitialized) {
@@ -808,16 +813,23 @@ void SystemSensorManager::NativeClassInit()
 {
 }
 
+Int64 SystemSensorManager::NativeCreate(
+    /* [in] */ const String& opPackageName)
+{
+    return reinterpret_cast<Int64>(&android::SensorManager::getInstanceForPackage(
+        android::String16(opPackageName.string())));
+}
+
 Int32 SystemSensorManager::NativeGetNextSensor(
     /* [in] */ ISensor* sensorObj,
     /* [in] */ Int32 iNext)
 {
     CSensor* sensor = (CSensor*)sensorObj;
     size_t next = size_t(iNext);
-    android::SensorManager& mgr(android::SensorManager::getInstance());
+    android::SensorManager* mgr = reinterpret_cast<android::SensorManager*>(mNativeInstance);
 
     android::Sensor const* const* sensorList;
-    size_t count = mgr.getSensorList(&sensorList);
+    size_t count = mgr->getSensorList(&sensorList);
     if (next >= count)
         return -1;
 

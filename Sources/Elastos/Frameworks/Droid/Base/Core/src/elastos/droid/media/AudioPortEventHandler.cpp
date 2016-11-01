@@ -273,14 +273,14 @@ ECode AudioPortEventHandler::NativeSetup(
     /* [in] */ IWeakReference* weak_this)
 {
     android::sp<JNIAudioPortCallback> callback = new JNIAudioPortCallback(weak_this);
-    android::AudioSystem::setAudioPortCallback(callback);
+    android::AudioSystem::addAudioPortCallback(callback);
     return NOERROR;
 }
 
 ECode AudioPortEventHandler::NativeFinalize()
 {
     android::sp<JNIAudioPortCallback> callback;
-    android::AudioSystem::setAudioPortCallback(callback);
+    android::AudioSystem::addAudioPortCallback(callback);
     return NOERROR;
 }
 

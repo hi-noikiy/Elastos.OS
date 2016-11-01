@@ -316,7 +316,7 @@ ECode Surface::NativeReadFromParcel(
     // update the Surface only if the underlying IGraphicBufferProducer
     // has changed.
     if (self != NULL
-            && (self->getIGraphicBufferProducer()->asBinder() == binder)) {
+            && (android::IInterface::asBinder(self->getIGraphicBufferProducer()) == binder)) {
         // same IGraphicBufferProducer, return ourselves
         *result = reinterpret_cast<Int64>(self.get());
         return NOERROR;
@@ -353,7 +353,7 @@ ECode Surface::NativeWriteToParcel(
         return E_ILLEGAL_ARGUMENT_EXCEPTION;
     }
     sp<android::Surface> self(reinterpret_cast<android::Surface *>(mNativeObject));
-    parcel->writeStrongBinder(self != 0 ? self->getIGraphicBufferProducer()->asBinder() : NULL);
+    parcel->writeStrongBinder(self != 0 ? android::IInterface::asBinder(self->getIGraphicBufferProducer()) : NULL);
     return NOERROR;
 }
 
@@ -370,24 +370,6 @@ void Surface::NativeAllocateBuffers()
 ECode Surface::NativeSetDirtyRect(
     /* [in] */ IRect* dirty)
 {
-#ifdef QCOM_BSP
-    sp<android::Surface> surface(reinterpret_cast<android::Surface *>(mNativeObject));
-
-    if (!isSurfaceValid(surface)) {
-        return E_ILLEGAL_ARGUMENT_EXCEPTION;
-    }
-
-    Int32 l, t, r, b;
-    dirty->Get(&l, &t, &r, &b);
-
-    android::Rect rect;
-    rect.left = l;
-    rect.top = t;
-    rect.right = r;
-    rect.bottom = b;
-
-    surface->setDirtyRect(&rect);
-#endif
     return NOERROR;
 }
 

@@ -5354,8 +5354,8 @@ void CConnectivityService::RematchNetworkAndRequests(
 
         AutoPtr<INetworkStatsFactoryHelper> nsfHelper;
         CNetworkStatsFactoryHelper::AcquireSingleton((INetworkStatsFactoryHelper**)&nsfHelper);
-        AutoPtr<IIBatteryStats> bs = BatteryStatsService::GetService();
-        bs->NoteNetworkInterfaceType(baseIface, type);
+        // AutoPtr<IIBatteryStats> bs = BatteryStatsService::GetService();
+        // bs->NoteNetworkInterfaceType(baseIface, type);
         AutoPtr<IList> links;
         newNetwork->mLinkProperties->GetStackedLinks((IList**)&links);
         it = NULL;
@@ -5366,7 +5366,7 @@ void CConnectivityService::RematchNetworkAndRequests(
             ILinkProperties* stacked = ILinkProperties::Probe(obj);
             String stackedIface;
             stacked->GetInterfaceName(&stackedIface);
-            bs->NoteNetworkInterfaceType(stackedIface, type);
+            // bs->NoteNetworkInterfaceType(stackedIface, type);
             nsfHelper->NoteStackedIface(stackedIface, baseIface);
         }
 

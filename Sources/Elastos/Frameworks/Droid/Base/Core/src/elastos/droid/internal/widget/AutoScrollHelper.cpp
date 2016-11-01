@@ -31,11 +31,18 @@ namespace Droid {
 namespace Internal {
 namespace Widget {
 
+
 const Float AutoScrollHelper::NO_MAX = Elastos::Core::Math::FLOAT_MAX_VALUE;
-
+const Int32 AutoScrollHelper::DEFAULT_EDGE_TYPE = EDGE_TYPE_INSIDE_EXTEND;
+const Int32 AutoScrollHelper::DEFAULT_MINIMUM_VELOCITY_DIPS = 315;
+const Int32 AutoScrollHelper::DEFAULT_MAXIMUM_VELOCITY_DIPS = 1575;
 const Float AutoScrollHelper::DEFAULT_MAXIMUM_EDGE = NO_MAX;
-
+const Float AutoScrollHelper::DEFAULT_RELATIVE_EDGE = 0.2f;
+const Float AutoScrollHelper::DEFAULT_RELATIVE_VELOCITY = 1.0f;
 const Int32 AutoScrollHelper::DEFAULT_ACTIVATION_DELAY = ViewConfiguration::GetTapTimeout();
+const Int32 AutoScrollHelper::DEFAULT_RAMP_UP_DURATION = 500;
+const Int32 AutoScrollHelper::DEFAULT_RAMP_DOWN_DURATION = 500;
+
 
 //==============================================================================
 //          AutoScrollHelper::ScrollAnimationRunnable
