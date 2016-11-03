@@ -220,13 +220,13 @@ private:
      * The scale by which to multiply the unlock handle width to compute the radius
      * in which it can be grabbed when accessibility is disabled.
      */
-    static const Float GRAB_HANDLE_RADIUS_SCALE_ACCESSIBILITY_DISABLED = 0.5f;
+    static const Float GRAB_HANDLE_RADIUS_SCALE_ACCESSIBILITY_DISABLED;
 
     /**
      * The scale by which to multiply the unlock handle width to compute the radius
      * in which it can be grabbed when accessibility is enabled (more generous).
      */
-    static const Float GRAB_HANDLE_RADIUS_SCALE_ACCESSIBILITY_ENABLED = 1.0f;
+    static const Float GRAB_HANDLE_RADIUS_SCALE_ACCESSIBILITY_ENABLED;
 
     static const AutoPtr<IAudioAttributes> VIBRATION_ATTRIBUTES;
 

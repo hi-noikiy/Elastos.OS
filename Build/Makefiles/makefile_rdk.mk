@@ -167,7 +167,7 @@ SYSTEM_INCLUDES := $(INCLUDES)
 
 # default C_FLAGS
 ifeq "$(XDK_COMPILER)" "gnu"
-C_FLAGS= -fno-exceptions
+C_FLAGS += -fno-exceptions
 endif
 
 
@@ -205,6 +205,7 @@ ifneq "$(CAR_OBJECTS)" ""
 -include $(TARGET_OBJ_PATH)/$(CAR_OBJECTS)
 endif
 endif
+
 ##########################################################################
 #
 # DIRS SOURCES

@@ -2,6 +2,8 @@
 TARGET_NAME = ElApp_process
 TARGET_TYPE = ecx
 
+CPP_FLAGS += -std=c++11
+
 C_DEFINES += -DHAVE_ENDIAN_H
 
 IMPORTS = Elastos.Droid.Core.eco

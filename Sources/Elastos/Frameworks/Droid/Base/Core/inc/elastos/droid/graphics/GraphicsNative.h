@@ -226,8 +226,8 @@ public:
     static CARAPI_(SkBitmap*) GetNativeBitmap(
         /* [in] */ IBitmap* bitmap);
 
-    static CARAPI_(SkBitmap::Config) GetNativeBitmapConfig(
-        /* [in] */ BitmapConfig config);
+    // static CARAPI_(SkBitmap::Config) GetNativeBitmapConfig(
+    //     /* [in] */ BitmapConfig config);
 
     /*
      *  LegacyBitmapConfig is the old enum in Skia that matched the enum int values

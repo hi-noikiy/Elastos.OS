@@ -174,12 +174,8 @@ ECode CPicture::GetNativePicture(
 Int64 CPicture::NativeConstructor(
     /* [in] */ Int64 nativeSrcOr0)
 {
-    if (nativeSrcOr0) {
-        return (Int64)new SkPicture(*(SkPicture*)nativeSrcOr0);
-    }
-    else {
-        return (Int64)new SkPicture;
-    }
+    const NativePicture* src = reinterpret_cast<NativePicture*>(nativeSrcOr0);
+    return reinterpret_cast<Int64>(new NativePicture(src));
 }
 
 Int64 CPicture::NativeCreateFromStream(

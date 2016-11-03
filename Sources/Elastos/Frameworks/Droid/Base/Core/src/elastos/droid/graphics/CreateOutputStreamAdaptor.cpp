@@ -161,7 +161,7 @@ SkStreamRewindable* CopyJavaInputStream(
     /* [in] */ IInputStream* stream,
     /* [in] */ ArrayOf<Byte>* storage)
 {
-    SkAutoTUnref<SkStream> adaptor(CreateInputStreamAdaptor(stream, storage));
+    SkAutoTDelete<SkStream> adaptor(CreateInputStreamAdaptor(stream, storage));
     if (NULL == adaptor.get()) {
         return NULL;
     }

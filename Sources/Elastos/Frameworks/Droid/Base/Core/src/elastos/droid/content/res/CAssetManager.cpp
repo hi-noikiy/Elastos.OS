@@ -1040,8 +1040,7 @@ ECode CAssetManager::AddOverlayPath(
         android::String8 targetPkgPath8(targetPkgPath.string());
         android::String8 prefixPath8(prefixPath.string());
         int32_t cookie;
-        bool res = am->addOverlayPath(
-            idmapPath8, themeApkPath8, &cookie, resApkPath8, targetPkgPath8, prefixPath8);
+        bool res = am->addOverlayPath(idmapPath8, &cookie);
         if (res) {
             *result = cookie;
         }
@@ -1057,44 +1056,44 @@ ECode CAssetManager::AddCommonOverlayPath(
 {
     VALIDATE_NOT_NULL(result)
     *result = 0;
+    assert(0);
+    // {    AutoLock syncLock(this);
+    //     AutoPtr<IFile> file;
+    //     CFile::New(themeApkPath, (IFile**)&file);
+    //     Boolean exists;
+    //     if (file->Exists(&exists), exists) {
+    //         AutoPtr<IFile> resFile;
+    //         CFile::New(resApkPath, (IFile**)&resFile);
+    //         Boolean resExists;
+    //         if (resFile->Exists(&resExists), resExists) {
+    //             if (themeApkPath.IsNull()) {
+    //                 return NOERROR;
+    //             }
 
-    {    AutoLock syncLock(this);
-        AutoPtr<IFile> file;
-        CFile::New(themeApkPath, (IFile**)&file);
-        Boolean exists;
-        if (file->Exists(&exists), exists) {
-            AutoPtr<IFile> resFile;
-            CFile::New(resApkPath, (IFile**)&resFile);
-            Boolean resExists;
-            if (resFile->Exists(&resExists), resExists) {
-                if (themeApkPath.IsNull()) {
-                    return NOERROR;
-                }
+    //             if (resApkPath.IsNull()) {
+    //                 return NOERROR;
+    //             }
 
-                if (resApkPath.IsNull()) {
-                    return NOERROR;
-                }
+    //             if (prefixPath.IsNull()) {
+    //                 return NOERROR;
+    //             }
 
-                if (prefixPath.IsNull()) {
-                    return NOERROR;
-                }
+    //             android::AssetManager* am = reinterpret_cast<android::AssetManager*>(mObject);
+    //             if (am == NULL) {
+    //                 return NOERROR;
+    //             }
 
-                android::AssetManager* am = reinterpret_cast<android::AssetManager*>(mObject);
-                if (am == NULL) {
-                    return NOERROR;
-                }
+    //             android::String8 themeApkPath8(themeApkPath.string());
+    //             android::String8 resApkPath8(resApkPath.string());
+    //             android::String8 prefixPath8(prefixPath.string());
+    //             int32_t cookie;
+    //             bool res = am->addCommonOverlayPath(themeApkPath8, &cookie,
+    //                     resApkPath8, prefixPath8);
 
-                android::String8 themeApkPath8(themeApkPath.string());
-                android::String8 resApkPath8(resApkPath.string());
-                android::String8 prefixPath8(prefixPath.string());
-                int32_t cookie;
-                bool res = am->addCommonOverlayPath(themeApkPath8, &cookie,
-                        resApkPath8, prefixPath8);
-
-                *result = (res) ? cookie : 0;
-            }
-        }
-    }
+    //             *result = (res) ? cookie : 0;
+    //         }
+    //     }
+    // }
     return NOERROR;
 }
 
@@ -1108,33 +1107,34 @@ ECode CAssetManager::AddIconPath(
     VALIDATE_NOT_NULL(result)
     *result = 0;
 
-    {    AutoLock syncLock(this);
-        if(idmapPath.IsNull()) {
-            return NOERROR;
-        }
+    assert(0);
+    // {    AutoLock syncLock(this);
+    //     if(idmapPath.IsNull()) {
+    //         return NOERROR;
+    //     }
 
-        if(resApkPath.IsNull()) {
-            return NOERROR;
-        }
+    //     if(resApkPath.IsNull()) {
+    //         return NOERROR;
+    //     }
 
-        if(prefixPath.IsNull()) {
-            return NOERROR;
-        }
+    //     if(prefixPath.IsNull()) {
+    //         return NOERROR;
+    //     }
 
-        android::AssetManager* am = reinterpret_cast<android::AssetManager*>(mObject);
-        if (am == NULL) {
-            return NOERROR;
-        }
+    //     android::AssetManager* am = reinterpret_cast<android::AssetManager*>(mObject);
+    //     if (am == NULL) {
+    //         return NOERROR;
+    //     }
 
-        android::String8 idmapPath8(idmapPath.string());
-        android::String8 resApkPath8(resApkPath.string());
-        android::String8 prefixPath8(prefixPath.string());
-        int32_t cookie;
-        bool res = am->addIconPath(idmapPath8, &cookie, resApkPath8,
-                prefixPath8, pkgIdOverride);
+    //     android::String8 idmapPath8(idmapPath.string());
+    //     android::String8 resApkPath8(resApkPath.string());
+    //     android::String8 prefixPath8(prefixPath.string());
+    //     int32_t cookie;
+    //     bool res = am->addIconPath(idmapPath8, &cookie, resApkPath8,
+    //             prefixPath8, pkgIdOverride);
 
-        *result = (res) ? cookie : 0;
-    }
+    //     *result = (res) ? cookie : 0;
+    // }
     return NOERROR;
 }
 
@@ -1146,21 +1146,22 @@ ECode CAssetManager::RemoveOverlayPath(
     VALIDATE_NOT_NULL(result)
     *result = FALSE;
 
-    {    AutoLock syncLock(this);
-        if (packageName.IsNull()) {
-            return E_NULL_POINTER_EXCEPTION;
-        }
+    assert(0);
+    // {    AutoLock syncLock(this);
+    //     if (packageName.IsNull()) {
+    //         return E_NULL_POINTER_EXCEPTION;
+    //     }
 
-        android::AssetManager* am = reinterpret_cast<android::AssetManager*>(mObject);
-        if (am == NULL) {
-            return NOERROR;
-        }
+    //     android::AssetManager* am = reinterpret_cast<android::AssetManager*>(mObject);
+    //     if (am == NULL) {
+    //         return NOERROR;
+    //     }
 
-        android::String8 packageName8(packageName.string());
-        bool res = am->removeOverlayPath(packageName8, cookie);
+    //     android::String8 packageName8(packageName.string());
+    //     bool res = am->removeOverlayPath(packageName8, cookie);
 
-        *result = res;
-    }
+    //     *result = res;
+    // }
     return NOERROR;
 }
 
@@ -1924,7 +1925,7 @@ ECode CAssetManager::ApplyStyle(
     const android::ResTable::bag_entry* defStyleEnt = NULL;
     uint32_t defStyleTypeSetFlags = 0;
     ssize_t bagOff = defStyleRes != 0
-            ? res.getBagLocked(defStyleRes, &defStyleEnt, &defStyleTypeSetFlags, TRUE) : -1;
+            ? res.getBagLocked(defStyleRes, &defStyleEnt, &defStyleTypeSetFlags) : -1;
     defStyleTypeSetFlags |= defStyleBagTypeSetFlags;
     const android::ResTable::bag_entry* endDefStyleEnt = defStyleEnt +
         (bagOff >= 0 ? bagOff : 0);
@@ -1932,7 +1933,7 @@ ECode CAssetManager::ApplyStyle(
     // Retrieve the style class bag, if requested.
     const android::ResTable::bag_entry* styleEnt = NULL;
     uint32_t styleTypeSetFlags = 0;
-    bagOff = style != 0 ? res.getBagLocked(style, &styleEnt, &styleTypeSetFlags, TRUE) : -1;
+    bagOff = style != 0 ? res.getBagLocked(style, &styleEnt, &styleTypeSetFlags) : -1;
     styleTypeSetFlags |= styleBagTypeSetFlags;
     const android::ResTable::bag_entry* endStyleEnt = styleEnt +
         (bagOff >= 0 ? bagOff : 0);
@@ -2156,7 +2157,7 @@ ECode CAssetManager::ResolveAttrs(
     const android::ResTable::bag_entry* defStyleEnt = NULL;
     uint32_t defStyleTypeSetFlags = 0;
     ssize_t bagOff = defStyleRes != 0
-            ? res.getBagLocked(defStyleRes, &defStyleEnt, &defStyleTypeSetFlags, TRUE) : -1;
+            ? res.getBagLocked(defStyleRes, &defStyleEnt, &defStyleTypeSetFlags) : -1;
     defStyleTypeSetFlags |= defStyleBagTypeSetFlags;
     const android::ResTable::bag_entry* endDefStyleEnt = defStyleEnt +
         (bagOff >= 0 ? bagOff : 0);;
@@ -2465,7 +2466,7 @@ ECode CAssetManager::RetrieveArray(
 
     const android::ResTable::bag_entry* arrayEnt = NULL;
     uint32_t arrayTypeSetFlags = 0;
-    ssize_t bagOff = res.getBagLocked(resource, &arrayEnt, &arrayTypeSetFlags, TRUE);
+    ssize_t bagOff = res.getBagLocked(resource, &arrayEnt, &arrayTypeSetFlags);
     const android::ResTable::bag_entry* endArrayEnt = arrayEnt +
         (bagOff >= 0 ? bagOff : 0);
 
@@ -2839,12 +2840,13 @@ ECode CAssetManager::GetBasePackageName(
 {
     VALIDATE_NOT_NULL(pkgName)
     *pkgName = String(NULL);
-    android::AssetManager* am = reinterpret_cast<android::AssetManager*>(mObject);
-    if (am == NULL) {
-        return NOERROR;
-    }
+    assert(0);
+    // android::AssetManager* am = reinterpret_cast<android::AssetManager*>(mObject);
+    // if (am == NULL) {
+    //     return NOERROR;
+    // }
 
-    *pkgName = String(am->getBasePackageName(index));
+    // *pkgName = String(am->getBasePackageName(index));
     return NOERROR;
 }
 

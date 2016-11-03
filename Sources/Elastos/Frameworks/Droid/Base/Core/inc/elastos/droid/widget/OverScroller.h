@@ -616,7 +616,7 @@ public:
     Int32 mState;
 
     // Constant gravity value, used in the deceleration phase.
-    static const Float GRAVITY = 2000.0f;
+    static const Float GRAVITY;
 
     // A context-specific coefficient adjusted to physical values.
     Float mPhysicalCoeff;
@@ -624,9 +624,9 @@ public:
     AutoPtr<IPowerManager> mPm;
 
     static Float DECELERATION_RATE;
-    static const Float INFLEXION = 0.35f; // Tension lines cross at (INFLEXION, 1)
-    static const Float START_TENSION = 0.5f;
-    static const Float END_TENSION = 1.0f;
+    static const Float INFLEXION; // Tension lines cross at (INFLEXION, 1)
+    static const Float START_TENSION;
+    static const Float END_TENSION;
     static const Float P1;
     static const Float P2;
 

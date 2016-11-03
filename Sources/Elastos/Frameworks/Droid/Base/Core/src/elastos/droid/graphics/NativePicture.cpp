@@ -78,10 +78,13 @@ NativePicture* NativePicture::CreateFromStream(
 {
     NativePicture* newPict = new NativePicture;
 
-    newPict->mPicture.reset(SkPicture::CreateFromStream(stream));
-    if (NULL != newPict->mPicture.get()) {
-        newPict->mWidth = newPict->mPicture->width();
-        newPict->mHeight = newPict->mPicture->height();
+    SkPicture* skPicture = SkPicture::CreateFromStream(stream);
+    if (NULL != skPicture) {
+        newPict->mPicture.reset(skPicture);
+
+        const SkIRect cullRect = skPicture->cullRect().roundOut();
+        newPict->mWidth = cullRect.width();
+        newPict->mHeight = cullRect.height();
     }
 
     return newPict;
@@ -98,8 +101,10 @@ void NativePicture::Serialize(
         mPicture->serialize(stream);
     }
     else {
-        SkPicture empty;
-        empty.serialize(stream);
+        SkPictureRecorder recorder;
+        recorder.beginRecording(0, 0);
+        SkAutoTUnref<SkPicture> empty(recorder.endRecording());
+        empty->serialize(stream);
     }
 }
 
@@ -111,8 +116,7 @@ void NativePicture::Draw(
         SkASSERT(NULL != mPicture.get());
     }
     if (NULL != mPicture.get()) {
-        // TODO: remove this const_cast once pictures are immutable
-        const_cast<SkPicture*>(mPicture.get())->draw(canvas->getSkCanvas());
+        mPicture.get()->playback(canvas->getSkCanvas());
     }
 }
 

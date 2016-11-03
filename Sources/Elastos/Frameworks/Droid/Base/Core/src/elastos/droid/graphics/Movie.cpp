@@ -216,7 +216,7 @@ ECode Movie::NativeDecodeAsset(
         *movie = NULL;
         return NOERROR;
     }
-    SkAutoTUnref<SkStreamRewindable> stream (new AssetStreamAdaptor(asset,
+    SkAutoTDelete<SkStreamRewindable> stream (new AssetStreamAdaptor(asset,
             AssetStreamAdaptor::kNo_OwnAsset,
             AssetStreamAdaptor::kNo_HasMemoryBase));
     SkMovie* moov = SkMovie::DecodeStream(stream.get());
@@ -247,11 +247,10 @@ ECode Movie::NativeDecodeStream(
     // trying to determine the stream's format. The only decoder for movies is GIF, which
     // will only read 6.
     // FIXME: Get this number from SkImageDecoder
-    SkAutoTUnref<SkStreamRewindable> bufferedStream(SkFrontBufferedStream::Create(strm, 6));
+    SkAutoTDelete<SkStreamRewindable> bufferedStream(SkFrontBufferedStream::Create(strm, 6));
     SkASSERT(bufferedStream.get() != NULL);
 
     SkMovie* moov = SkMovie::DecodeStream(bufferedStream);
-    strm->unref();
     return CreateMovie(moov, movie);
 }
 

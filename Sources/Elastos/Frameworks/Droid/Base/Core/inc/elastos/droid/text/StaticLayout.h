@@ -289,7 +289,7 @@ private:
     static const Char32 CHAR_SPACE = ' ';
     static const Char32 CHAR_ZWSP = 0x200B;
 
-    static const Double EXTRA_ROUNDING = 0.5;
+    static const Double EXTRA_ROUNDING;
 
     static const Int32 CHAR_FIRST_HIGH_SURROGATE = 0xD800;
     static const Int32 CHAR_LAST_LOW_SURROGATE = 0xDFFF;

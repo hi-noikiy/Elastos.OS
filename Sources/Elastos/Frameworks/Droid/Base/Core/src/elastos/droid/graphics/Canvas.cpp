@@ -37,7 +37,6 @@
 #include <skia/core/SkShader.h>
 #include <skia/core/SkTemplates.h>
 #include <skia/core/SkDrawFilter.h>
-#include <skia/effects/SkPorterDuff.h>
 #include <utils/RefBase.h>
 #include <minikin/Layout.h>
 #include <minikin/MinikinFont.h>
@@ -1985,8 +1984,8 @@ void Canvas::NativeDrawColor(
     /* [in] */ Int32 color,
     /* [in] */ Int32 modeHandle)
 {
-    SkPorterDuff::Mode mode = static_cast<SkPorterDuff::Mode>(modeHandle);
-    get_canvas(canvasHandle)->drawColor(color, SkPorterDuff::ToXfermodeMode(mode));
+    SkXfermode::Mode mode = static_cast<SkXfermode::Mode>(modeHandle);
+    get_canvas(canvasHandle)->drawColor(color, mode);
 }
 
 void Canvas::NativeDrawPaint(
@@ -2158,7 +2157,7 @@ void Canvas::NativeDrawBitmap(
             if (paint) {
                 filteredPaint = *paint;
             }
-            filteredPaint.setFilterLevel(NativePaint::kLow_FilterLevel);
+            filteredPaint.setFilterQuality(kLow_SkFilterQuality);
             canvas->drawBitmap(*bitmap, left, top, &filteredPaint);
         }
         else {
@@ -2175,7 +2174,7 @@ void Canvas::NativeDrawBitmap(
         if (paint) {
             filteredPaint = *paint;
         }
-        filteredPaint.setFilterLevel(NativePaint::kLow_FilterLevel);
+        filteredPaint.setFilterQuality(kLow_SkFilterQuality);
 
         canvas->drawBitmap(*bitmap, 0, 0, &filteredPaint);
         canvas->restore();
@@ -2206,7 +2205,7 @@ void Canvas::NativeDrawBitmap(
         if (paint) {
             filteredPaint = *paint;
         }
-        filteredPaint.setFilterLevel(NativePaint::kLow_FilterLevel);
+        filteredPaint.setFilterQuality(kLow_SkFilterQuality);;
         canvas->drawBitmap(*bitmap, srcLeft, srcTop, srcRight, srcBottom,
                            dstLeft, dstTop, dstRight, dstBottom, &filteredPaint);
     } else {
@@ -2233,7 +2232,7 @@ void Canvas::NativeDrawBitmap(
                            hasAlpha ? kN32_SkColorType : kRGB_565_SkColorType,
                            kPremul_SkAlphaType);
     SkBitmap bitmap;
-    if (!bitmap.allocPixels(info)) {
+    if (!bitmap.tryAllocPixels(info)) {
         return;
     }
 

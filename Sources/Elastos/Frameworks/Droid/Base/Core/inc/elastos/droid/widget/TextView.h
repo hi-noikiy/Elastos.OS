@@ -350,14 +350,14 @@ private:
     friend class TextView;
 
     // TODO: Add an option to configure this
-    static const Float MARQUEE_DELTA_MAX = 0.07f;
-    static const Int32 MARQUEE_DELAY = 1200;
-    static const Int32 MARQUEE_RESTART_DELAY = 1200;
-    static const Int32 MARQUEE_DP_PER_SECOND = 30;
+    static const Float MARQUEE_DELTA_MAX;
+    static const Int32 MARQUEE_DELAY;
+    static const Int32 MARQUEE_RESTART_DELAY;
+    static const Int32 MARQUEE_DP_PER_SECOND;
 
-    static const Byte MARQUEE_STOPPED = 0x0;
-    static const Byte MARQUEE_STARTING = 0x1;
-    static const Byte MARQUEE_RUNNING = 0x2;
+    static const Byte MARQUEE_STOPPED;
+    static const Byte MARQUEE_STARTING;
+    static const Byte MARQUEE_RUNNING;
 
     AutoPtr<IWeakReference> mView;  //TextView
     AutoPtr<IChoreographer> mChoreographer;

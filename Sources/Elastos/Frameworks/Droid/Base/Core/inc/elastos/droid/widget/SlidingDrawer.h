@@ -323,17 +323,17 @@ private:
 
 private:
     static const String TAG;
-    static const Int32 TAP_THRESHOLD = 6;
-    static const Float MAXIMUM_TAP_VELOCITY = 100.0f;
-    static const Float MAXIMUM_MINOR_VELOCITY = 150.0f;
-    static const Float MAXIMUM_MAJOR_VELOCITY = 200.0f;
-    static const Float MAXIMUM_ACCELERATION = 2000.0f;
-    static const Int32 VELOCITY_UNITS = 1000;
-    static const Int32 MSG_ANIMATE = 1000;
-    static const Int32 ANIMATION_FRAME_DURATION = 1000 / 60;
+    static const Int32 TAP_THRESHOLD;
+    static const Float MAXIMUM_TAP_VELOCITY;
+    static const Float MAXIMUM_MINOR_VELOCITY;
+    static const Float MAXIMUM_MAJOR_VELOCITY;
+    static const Float MAXIMUM_ACCELERATION;
+    static const Int32 VELOCITY_UNITS;
+    static const Int32 MSG_ANIMATE;
+    static const Int32 ANIMATION_FRAME_DURATION;
 
-    static const Int32 EXPANDED_FULL_OPEN = -10001;
-    static const Int32 COLLAPSED_FULL_CLOSED = -10002;
+    static const Int32 EXPANDED_FULL_OPEN;
+    static const Int32 COLLAPSED_FULL_CLOSED;
 
     Int32 mHandleId;
     Int32 mContentId;

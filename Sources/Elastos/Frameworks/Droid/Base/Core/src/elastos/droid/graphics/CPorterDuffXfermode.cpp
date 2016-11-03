@@ -3,7 +3,7 @@
 #include "Elastos.Droid.Os.h"
 #include "elastos/droid/ext/frameworkext.h"
 #include "elastos/droid/graphics/CPorterDuffXfermode.h"
-#include <skia/effects/SkPorterDuff.h>
+#include "SkXfermode.h"
 
 namespace Elastos {
 namespace Droid {
@@ -30,8 +30,8 @@ ECode CPorterDuffXfermode::GetMode(
 Int64 CPorterDuffXfermode::NativeCreateXfermode(
     /* [in] */ PorterDuffMode modeHandle)
 {
-    SkPorterDuff::Mode mode = static_cast<SkPorterDuff::Mode>(modeHandle);
-    return reinterpret_cast<Int64>(SkPorterDuff::CreateXfermode(mode));
+    SkXfermode::Mode mode = static_cast<SkXfermode::Mode>(modeHandle);
+    return reinterpret_cast<Int64>(SkXfermode::Create(mode));
 }
 
 } // namespace Graphics

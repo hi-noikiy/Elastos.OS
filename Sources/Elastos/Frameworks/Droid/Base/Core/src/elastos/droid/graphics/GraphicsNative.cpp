@@ -263,18 +263,18 @@ SkBitmap* GraphicsNative::GetNativeBitmap(
     return b;
 }
 
-SkBitmap::Config GraphicsNative::GetNativeBitmapConfig(
-    /* [in] */ BitmapConfig config)
-{
-    if (-1 == config) {
-        return SkBitmap::kNo_Config;
-    }
-    Int32 c = config;
-    if (c < 0 || c >= SkBitmap::kConfigCount) {
-        c = SkBitmap::kNo_Config;
-    }
-    return static_cast<SkBitmap::Config>(c);
-}
+// SkBitmap::Config GraphicsNative::GetNativeBitmapConfig(
+//     /* [in] */ BitmapConfig config)
+// {
+//     if (-1 == config) {
+//         return SkBitmap::kNo_Config;
+//     }
+//     Int32 c = config;
+//     if (c < 0 || c >= SkBitmap::kConfigCount) {
+//         c = SkBitmap::kNo_Config;
+//     }
+//     return static_cast<SkBitmap::Config>(c);
+// }
 
 SkColorType GraphicsNative::GetNativeBitmapColorType(
     /* [in] */ BitmapConfig config)

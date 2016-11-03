@@ -305,14 +305,13 @@ void NinePatch::NativeFinalize(
     /* [in] */ Int64 patchHandle)
 {
     int8_t* patch = reinterpret_cast<int8_t*>(patchHandle);
-#ifdef USE_OPENGL_RENDERER
-    if (android::uirenderer::Caches::hasInstance()) {
+    if (android::uirenderer::ResourceCache::hasInstance()) {
         android::Res_png_9patch* p = (android::Res_png_9patch*) patch;
-        android::uirenderer::Caches::getInstance().resourceCache.destructor(p);
-        return;
+        android::uirenderer::ResourceCache::getInstance().destructor(p);
     }
-#endif // USE_OPENGL_RENDERER
-    delete[] patch;
+    else {
+        delete[] patch;
+    }
 }
 
 static void draw(

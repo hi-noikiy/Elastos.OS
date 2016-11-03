@@ -306,9 +306,12 @@ protected:
         /* [out] */ Boolean* result);
 
 private:
-    static  CARAPI_(void) NativeClassInit();
+    static CARAPI_(void) NativeClassInit();
 
-    static CARAPI_(Int32) NativeGetNextSensor(
+    static CARAPI_(Int64) NativeCreate(
+        /* [in] */ const String& opPackageName);
+
+    CARAPI_(Int32) NativeGetNextSensor(
         /* [in] */ ISensor* sensor,
         /* [in] */ Int32 next);
 
@@ -327,6 +330,7 @@ private:
     // Looper associated with the context in which this instance was created.
     AutoPtr<ILooper> mMainLooper;
     Int32 mTargetSdkLevel;
+    Int64 mNativeInstance;
 };
 
 } // namespace Hardware

@@ -6,6 +6,8 @@ include $(MAKEDIR)/../../../../../../../sources.inc
 C_DEFINES += -DDROID_CORE
 C_DEFINES += -DSK_BUILD_FOR_ELASTOS_FRAMEWORK
 
+CPP_FLAGS += -std=c++11
+
 INCLUDES += ../../
 INCLUDES += $(MAKEDIR)/../../../../../inc/
 

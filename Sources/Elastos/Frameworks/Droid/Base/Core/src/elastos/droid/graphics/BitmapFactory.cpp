@@ -704,7 +704,7 @@ static AutoPtr<IBitmap> DoDecode(
         // to/from unpremultiplied bitmaps.
         outputBitmap->setInfo(SkImageInfo::Make(scaledWidth, scaledHeight,
                 colorType, decodingBitmap.alphaType()));
-        if (!outputBitmap->allocPixels(outputAllocator, NULL)) {
+        if (!outputBitmap->tryAllocPixels(outputAllocator, NULL)) {
             // return nullObjectReturn("allocation failed for scaled bitmap");
             Logger::W("BitmapFactory", String("allocation failed for scaled bitmap"));
             return NULL;
@@ -717,7 +717,7 @@ static AutoPtr<IBitmap> DoDecode(
         }
 
         SkPaint paint;
-        paint.setFilterLevel(SkPaint::kLow_FilterLevel);
+        paint.setFilterQuality(kLow_SkFilterQuality);
 
         SkCanvas canvas(*outputBitmap);
         canvas.scale(sx, sy);
@@ -783,10 +783,10 @@ AutoPtr<IBitmap> BitmapFactory::NativeDecodeStream(
     /* [in] */ IBitmapFactoryOptions* opts)
 {
     AutoPtr<IBitmap> bitmap;
-    SkAutoTUnref<SkStream> stream(CreateInputStreamAdaptor(is, storage));
+    SkAutoTDelete<SkStream> stream(CreateInputStreamAdaptor(is, storage));
 
     if (stream.get()) {
-        SkAutoTUnref<SkStreamRewindable> bufferedStream(
+        SkAutoTDelete<SkStreamRewindable> bufferedStream(
                 SkFrontBufferedStream::Create(stream, BYTES_TO_BUFFER));
         SkASSERT(bufferedStream.get() != NULL);
         bitmap = DoDecode(bufferedStream, outPadding, opts);
@@ -825,13 +825,13 @@ AutoPtr<IBitmap> BitmapFactory::NativeDecodeFileDescriptor(
         return NULL;
     }
 
-    SkAutoTUnref<SkFILEStream> fileStream(new SkFILEStream(file,
+    SkAutoTDelete<SkFILEStream> fileStream(new SkFILEStream(file,
                          SkFILEStream::kCallerRetains_Ownership));
 
     // Use a buffered stream. Although an SkFILEStream can be rewound, this
     // ensures that SkImageDecoder::Factory never rewinds beyond the
     // current position of the file descriptor.
-    SkAutoTUnref<SkStreamRewindable> stream(SkFrontBufferedStream::Create(fileStream,
+    SkAutoTDelete<SkStreamRewindable> stream(SkFrontBufferedStream::Create(fileStream,
             BYTES_TO_BUFFER));
 
     return DoDecode(stream, padding, opts);
@@ -845,7 +845,7 @@ AutoPtr<IBitmap> BitmapFactory::NativeDecodeAsset(
     android::Asset* asset = reinterpret_cast<android::Asset*>(native_asset);
     // since we know we'll be done with the asset when we return, we can
     // just use a simple wrapper
-    SkAutoTUnref<SkStreamRewindable> stream(new AssetStreamAdaptor(asset,
+    SkAutoTDelete<SkStreamRewindable> stream(new AssetStreamAdaptor(asset,
             AssetStreamAdaptor::kNo_OwnAsset, AssetStreamAdaptor::kNo_HasMemoryBase));
     return DoDecode(stream, padding, opts);
 }
@@ -857,7 +857,7 @@ AutoPtr<IBitmap> BitmapFactory::NativeDecodeByteArray(
     /* [in] */ IBitmapFactoryOptions* options)
 {
     SkMemoryStream* stream = new SkMemoryStream(data->GetPayload() + offset, length, false);
-    SkAutoUnref aur(stream);
+    SkAutoTDelete<SkMemoryStream> aur(stream);
     return DoDecode(stream, NULL, options);
 }
 

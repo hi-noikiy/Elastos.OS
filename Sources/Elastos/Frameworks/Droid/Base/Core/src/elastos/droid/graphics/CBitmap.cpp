@@ -1461,24 +1461,22 @@ static void ToColor_SI8_Alpha(SkColor dst[], const void* src, int width,
 {
     SkASSERT(width > 0);
     const uint8_t* s = (const uint8_t*)src;
-    const SkPMColor* colors = ctable->lockColors();
+    const SkPMColor* colors = ctable->readColors();
     do {
         *dst++ = SkUnPreMultiply::PMColorToColor(colors[*s++]);
     } while (--width != 0);
-    ctable->unlockColors(/*FALSE*/);
 }
 
 static void ToColor_SI8_Raw(SkColor dst[], const void* src, int width,
                               SkColorTable* ctable) {
     SkASSERT(width > 0);
     const uint8_t* s = (const uint8_t*)src;
-    const SkPMColor* colors = ctable->lockColors();
+    const SkPMColor* colors = ctable->readColors();
     do {
         SkPMColor c = colors[*s++];
         *dst++ = SkColorSetARGB(SkGetPackedA32(c), SkGetPackedR32(c),
                                 SkGetPackedG32(c), SkGetPackedB32(c));
     } while (--width != 0);
-    ctable->unlockColors();
 }
 
 static void ToColor_SI8_Opaque(SkColor dst[], const void* src, int width,
@@ -1486,13 +1484,12 @@ static void ToColor_SI8_Opaque(SkColor dst[], const void* src, int width,
 {
     SkASSERT(width > 0);
     const uint8_t* s = (const uint8_t*)src;
-    const SkPMColor* colors = ctable->lockColors();
+    const SkPMColor* colors = ctable->readColors();
     do {
         SkPMColor c = colors[*s++];
         *dst++ = SkColorSetRGB(SkGetPackedR32(c), SkGetPackedG32(c),
                                SkGetPackedB32(c));
     } while (--width != 0);
-    ctable->unlockColors();
 }
 
 // can return NULL
@@ -1625,8 +1622,9 @@ void CBitmap::NativeDestructor(
 {
     SkBitmap* bitmap = reinterpret_cast<SkBitmap*>(nativeBitmap);
 #ifdef USE_OPENGL_RENDERER
-    if (android::uirenderer::Caches::hasInstance()) {
-        android::uirenderer::Caches::getInstance().resourceCache.destructor(bitmap);
+    if (android::uirenderer::Caches::hasInstance() && bitmap->pixelRef() != NULL) {
+        android::uirenderer::Caches::getInstance().textureCache.releaseTexture(
+                bitmap->pixelRef()->getStableID());
         return;
     }
 #endif // USE_OPENGL_RENDERER
@@ -1638,10 +1636,9 @@ Boolean CBitmap::NativeRecycle(
 {
     SkBitmap* bitmap = reinterpret_cast<SkBitmap*>(nativeBitmap);
 #ifdef USE_OPENGL_RENDERER
-    if (android::uirenderer::Caches::hasInstance()) {
-        return android::uirenderer::Caches::getInstance().resourceCache.recycle(bitmap);
-        bool result = android::uirenderer::Caches::getInstance().resourceCache.recycle(bitmap);
-        return result ? TRUE : FALSE;
+    if (android::uirenderer::Caches::hasInstance() && bitmap->pixelRef() != NULL) {
+        android::uirenderer::Caches::getInstance().textureCache.releaseTexture(
+                bitmap->pixelRef()->getStableID());
     }
 #endif // USE_OPENGL_RENDERER
     bitmap->setPixels(NULL, NULL);
@@ -2055,8 +2052,7 @@ Boolean CBitmap::NativeWriteToParcel(
             int count = ctable->count();
             p->writeInt32(count);
             memcpy(p->writeInplace(count * sizeof(SkPMColor)),
-                   ctable->lockColors(), count * sizeof(SkPMColor));
-            ctable->unlockColors();
+                   ctable->readColors(), count * sizeof(SkPMColor));
         } else {
             p->writeInt32(0);   // indicate no ctable
         }
@@ -2065,7 +2061,7 @@ Boolean CBitmap::NativeWriteToParcel(
     size_t size = bitmap->getSize();
 
     android::Parcel::WritableBlob blob;
-    android::status_t status = p->writeBlob(size, &blob);
+    android::status_t status = p->writeBlob(size, isMutable, &blob);
     if (status) {
         Logger::E(TAG, "Could not write bitmap to parcel blob.");
         return FALSE;
@@ -2224,10 +2220,8 @@ Boolean CBitmap::NativeSameAs(
             return FALSE;
         }
 
-        SkAutoLockColors alc0(ct0);
-        SkAutoLockColors alc1(ct1);
         const size_t size = ct0->count() * sizeof(SkPMColor);
-        if (memcmp(alc0.colors(), alc1.colors(), size) != 0) {
+        if (memcmp(ct0->readColors(), ct1->readColors(), size) != 0) {
             return FALSE;
         }
     }

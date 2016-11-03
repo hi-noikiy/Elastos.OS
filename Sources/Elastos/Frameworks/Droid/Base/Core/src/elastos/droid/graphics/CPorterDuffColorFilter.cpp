@@ -3,7 +3,6 @@
 #include "Elastos.Droid.Os.h"
 #include "elastos/droid/graphics/CPorterDuffColorFilter.h"
 #include <skia/core/SkColorFilter.h>
-#include <skia/effects/SkPorterDuff.h>
 
 namespace Elastos {
 namespace Droid {
@@ -98,10 +97,10 @@ ECode CPorterDuffColorFilter::GetHashCode(
 
 Int64 CPorterDuffColorFilter::NativeCreatePorterDuffFilter(
     /* [in] */ Int32 srcColor,
-    /* [in] */ Int32 porterDuffMode)
+    /* [in] */ Int32 modeHandle)
 {
-    SkPorterDuff::Mode mode = (SkPorterDuff::Mode) porterDuffMode;
-    return reinterpret_cast<Int64>(SkColorFilter::CreateModeFilter(srcColor, SkPorterDuff::ToXfermodeMode(mode)));
+    SkXfermode::Mode mode = static_cast<SkXfermode::Mode>(modeHandle);
+    return reinterpret_cast<Int64>(SkColorFilter::CreateModeFilter(srcColor, mode));
 }
 
 } // namespace Graphics

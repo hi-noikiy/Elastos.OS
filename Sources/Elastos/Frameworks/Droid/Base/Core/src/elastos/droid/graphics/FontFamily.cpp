@@ -5,7 +5,9 @@
 #include "elastos/droid/graphics/Utils.h"
 #include "elastos/droid/content/res/CAssetManager.h"
 #include <elastos/utility/logging/Logger.h>
-#include <skia/core/SkTypeface.h>
+#include <SkData.h>
+#include <SkRefCnt.h>
+#include <SkTypeface.h>
 #include <androidfw/AssetManager.h>
 
 using Elastos::Utility::Logging::Logger;
@@ -143,6 +145,11 @@ Boolean FontFamily::NativeAddFontWeightStyle(
     return TRUE;
 }
 
+static void releaseAsset(const void* ptr, size_t length, void* context)
+{
+    delete static_cast<android::Asset*>(context);
+}
+
 Boolean FontFamily::NativeAddFontFromAsset(
     /* [in] */ Int64 familyPtr,
     /* [in] */ IAssetManager* assetMgr,
@@ -162,12 +169,15 @@ Boolean FontFamily::NativeAddFontFromAsset(
         return FALSE;
     }
 
-    SkStream* stream = new AssetStreamAdaptor(asset,
-                                              AssetStreamAdaptor::kYes_OwnAsset,
-                                              AssetStreamAdaptor::kYes_HasMemoryBase);
+    const void* buf = asset->getBuffer(false);
+    if (NULL == buf) {
+        delete asset;
+        return false;
+    }
+
+    SkAutoTUnref<SkData> data(SkData::NewWithProc(buf, asset->getLength(), releaseAsset, asset));
+    SkMemoryStream* stream = new SkMemoryStream(data);
     SkTypeface* face = SkTypeface::CreateFromStream(stream);
-    // Note: SkTypeface::CreateFromStream holds its own reference to the stream
-    stream->unref();
     if (face == NULL) {
         Logger::E(String("FontFamily"), String("addFontFromAsset failed to create font %s"), path.string());
         return FALSE;

@@ -5,12 +5,20 @@
 #include "_Elastos.Droid.Media.h"
 #include <system/audio.h>
 
-#define ENCODING_AMR_NB     100
-#define ENCODING_AMR_WB     101
-#define ENCODING_EVRC       102
-#define ENCODING_EVRC_B     103
-#define ENCODING_EVRC_WB    104
-#define ENCODING_EVRC_NW    105
+// keep these values in sync with AudioFormat.java
+#define ENCODING_PCM_16BIT  2
+#define ENCODING_PCM_8BIT   3
+#define ENCODING_PCM_FLOAT  4
+#define ENCODING_AC3        5
+#define ENCODING_E_AC3      6
+#define ENCODING_DTS        7
+#define ENCODING_DTS_HD     8
+#define ENCODING_MP3        9
+#define ENCODING_AAC_LC     10
+#define ENCODING_AAC_HE_V1  11
+#define ENCODING_AAC_HE_V2  12
+#define ENCODING_INVALID    0
+#define ENCODING_DEFAULT    1
 
 namespace Elastos {
 namespace Droid {
@@ -19,31 +27,29 @@ namespace Media {
 static inline audio_format_t AudioFormatToNative(int audioFormat)
 {
     switch (audioFormat) {
-    case IAudioFormat::ENCODING_PCM_16BIT:
+    case ENCODING_PCM_16BIT:
         return AUDIO_FORMAT_PCM_16_BIT;
-    case IAudioFormat::ENCODING_PCM_8BIT:
+    case ENCODING_PCM_8BIT:
         return AUDIO_FORMAT_PCM_8_BIT;
-    case IAudioFormat::ENCODING_PCM_FLOAT:
+    case ENCODING_PCM_FLOAT:
         return AUDIO_FORMAT_PCM_FLOAT;
-    case IAudioFormat::ENCODING_AC3:
+    case ENCODING_AC3:
         return AUDIO_FORMAT_AC3;
-    case IAudioFormat::ENCODING_E_AC3:
+    case ENCODING_E_AC3:
         return AUDIO_FORMAT_E_AC3;
-#ifdef QCOM_HARDWARE
-    case ENCODING_AMR_NB:
-        return AUDIO_FORMAT_AMR_NB;
-    case ENCODING_AMR_WB:
-        return AUDIO_FORMAT_AMR_WB;
-    case ENCODING_EVRC:
-        return AUDIO_FORMAT_EVRC;
-    case ENCODING_EVRC_B:
-        return AUDIO_FORMAT_EVRCB;
-    case ENCODING_EVRC_WB:
-        return AUDIO_FORMAT_EVRCWB;
-    case ENCODING_EVRC_NW:
-        return AUDIO_FORMAT_EVRCNW;
-#endif
-    case IAudioFormat::ENCODING_DEFAULT:
+    case ENCODING_DTS:
+        return AUDIO_FORMAT_DTS;
+    case ENCODING_DTS_HD:
+        return AUDIO_FORMAT_DTS_HD;
+    case ENCODING_MP3:
+        return AUDIO_FORMAT_MP3;
+    case ENCODING_AAC_LC:
+        return AUDIO_FORMAT_AAC_LC;
+    case ENCODING_AAC_HE_V1:
+        return AUDIO_FORMAT_AAC_HE_V1;
+    case ENCODING_AAC_HE_V2:
+        return AUDIO_FORMAT_AAC_HE_V2;
+    case ENCODING_DEFAULT:
         return AUDIO_FORMAT_DEFAULT;
     default:
         return AUDIO_FORMAT_INVALID;
@@ -54,33 +60,38 @@ static inline Int32 AudioFormatFromNative(audio_format_t nativeFormat)
 {
     switch (nativeFormat) {
     case AUDIO_FORMAT_PCM_16_BIT:
-        return IAudioFormat::ENCODING_PCM_16BIT;
+        return ENCODING_PCM_16BIT;
     case AUDIO_FORMAT_PCM_8_BIT:
-        return IAudioFormat::ENCODING_PCM_8BIT;
+        return ENCODING_PCM_8BIT;
     case AUDIO_FORMAT_PCM_FLOAT:
-        return IAudioFormat::ENCODING_PCM_FLOAT;
+        return ENCODING_PCM_FLOAT;
+
+    // map these to ENCODING_PCM_FLOAT
+    case AUDIO_FORMAT_PCM_8_24_BIT:
+    case AUDIO_FORMAT_PCM_24_BIT_PACKED:
+    case AUDIO_FORMAT_PCM_32_BIT:
+        return ENCODING_PCM_FLOAT;
+
     case AUDIO_FORMAT_AC3:
-        return IAudioFormat::ENCODING_AC3;
+        return ENCODING_AC3;
     case AUDIO_FORMAT_E_AC3:
-        return IAudioFormat::ENCODING_E_AC3;
-#ifdef QCOM_HARDWARE
-    case AUDIO_FORMAT_AMR_NB:
-        return ENCODING_AMR_NB;
-    case AUDIO_FORMAT_AMR_WB:
-        return ENCODING_AMR_WB;
-    case AUDIO_FORMAT_EVRC:
-        return ENCODING_EVRC;
-    case AUDIO_FORMAT_EVRCB:
-        return ENCODING_EVRC_B;
-    case AUDIO_FORMAT_EVRCWB:
-        return ENCODING_EVRC_WB;
-    case AUDIO_FORMAT_EVRCNW:
-        return ENCODING_EVRC_NW;
-#endif
+        return ENCODING_E_AC3;
+    case AUDIO_FORMAT_DTS:
+        return ENCODING_DTS;
+    case AUDIO_FORMAT_DTS_HD:
+        return ENCODING_DTS_HD;
+    case AUDIO_FORMAT_MP3:
+        return ENCODING_MP3;
+    case AUDIO_FORMAT_AAC_LC:
+        return ENCODING_AAC_LC;
+    case AUDIO_FORMAT_AAC_HE_V1:
+        return ENCODING_AAC_HE_V1;
+    case AUDIO_FORMAT_AAC_HE_V2:
+        return ENCODING_AAC_HE_V2;
     case AUDIO_FORMAT_DEFAULT:
-        return IAudioFormat::ENCODING_DEFAULT;
+        return ENCODING_DEFAULT;
     default:
-        return IAudioFormat::ENCODING_INVALID;
+        return ENCODING_INVALID;
     }
 }
 

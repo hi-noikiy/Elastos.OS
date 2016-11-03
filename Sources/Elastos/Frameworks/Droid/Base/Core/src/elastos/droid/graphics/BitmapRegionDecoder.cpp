@@ -445,7 +445,6 @@ ECode BitmapRegionDecoder::NativeNewInstance(
     SkMemoryStream* stream = new SkMemoryStream(data->GetPayload() + offset, length, TRUE);
 
     ECode ec = CreateBitmapRegionDecoder(stream, decoder);
-    SkSafeUnref(stream); // the decoder now holds a reference
     return ec;
 }
 
@@ -470,7 +469,6 @@ ECode BitmapRegionDecoder::NativeNewInstance(
     SkMemoryStream* stream = new SkMemoryStream(data);
 
     ECode ec = CreateBitmapRegionDecoder(stream, decoder);
-    SkSafeUnref(stream); // the decoder now holds a reference
     return ec;
 }
 
@@ -487,7 +485,6 @@ ECode BitmapRegionDecoder::NativeNewInstance(
     *decoder = NULL;
     if (stream) {
         ec = CreateBitmapRegionDecoder(stream, decoder);
-        stream->unref(); // the decoder now holds a reference
     }
     return ec;
 }
@@ -498,14 +495,14 @@ ECode BitmapRegionDecoder::NativeNewInstance(
     /* [out] */ IBitmapRegionDecoder** decoder)
 {
     android::Asset* asset = reinterpret_cast<android::Asset*>(nativeAsset);
-    SkAutoTUnref<SkMemoryStream> stream(CopyAssetToStream(asset));
-    if (NULL == stream.get()) {
+    SkMemoryStream* stream = CopyAssetToStream(asset);
+    if (NULL == stream) {
         *decoder = NULL;
         return NOERROR;
     }
 
     // The decoder now holds a reference to stream.
-    return CreateBitmapRegionDecoder(stream.get(), decoder);
+    return CreateBitmapRegionDecoder(stream, decoder);
 }
 
 } // namespace Graphics

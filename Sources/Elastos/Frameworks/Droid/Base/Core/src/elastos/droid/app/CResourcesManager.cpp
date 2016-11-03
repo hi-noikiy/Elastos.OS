@@ -349,36 +349,36 @@ ECode CResourcesManager::GetTopLevelResources(
         GetConfiguration((IConfiguration**)&config);
     }
 
-    Boolean iconsAttached = FALSE;
-    /* Attach theme information to the resulting AssetManager when appropriate. */
-    AutoPtr<IPackageManager> pm;
-    context->GetPackageManager((IPackageManager**)&pm);
-    Boolean isSafeMode;
-    if (isThemeable && config != NULL && (pm->IsSafeMode(&isSafeMode), !isSafeMode)) {
-        AutoPtr<IThemeConfig> tc;
-        config->GetThemeConfig((IThemeConfig**)&tc);
-        if (tc == NULL) {
-            // try {
-            AutoPtr<IContentResolver> resolver;
-            context->GetContentResolver((IContentResolver**)&resolver);
-            ECode ec = CThemeConfig::GetBootTheme(resolver, (IThemeConfig**)&tc);
-            if (FAILED(ec)) {
-                Logger::D(TAG, "ThemeConfig.getBootTheme failed, falling back to system theme");
-                tc = CThemeConfig::GetSystemTheme();
-            }
-            config->SetThemeConfig(tc);
-        }
+    // Boolean iconsAttached = FALSE;
+    // /* Attach theme information to the resulting AssetManager when appropriate. */
+    // AutoPtr<IPackageManager> pm;
+    // context->GetPackageManager((IPackageManager**)&pm);
+    // Boolean isSafeMode;
+    // if (isThemeable && config != NULL && (pm->IsSafeMode(&isSafeMode), !isSafeMode)) {
+    //     AutoPtr<IThemeConfig> tc;
+    //     config->GetThemeConfig((IThemeConfig**)&tc);
+    //     if (tc == NULL) {
+    //         // try {
+    //         AutoPtr<IContentResolver> resolver;
+    //         context->GetContentResolver((IContentResolver**)&resolver);
+    //         ECode ec = CThemeConfig::GetBootTheme(resolver, (IThemeConfig**)&tc);
+    //         if (FAILED(ec)) {
+    //             Logger::D(TAG, "ThemeConfig.getBootTheme failed, falling back to system theme");
+    //             tc = CThemeConfig::GetSystemTheme();
+    //         }
+    //         config->SetThemeConfig(tc);
+    //     }
 
-        if (tc != NULL) {
-            AttachThemeAssets(assets, tc);
-            AttachCommonAssets(assets, tc);
-            iconsAttached = AttachIconAssets(assets, tc);
-        }
-    }
+    //     if (tc != NULL) {
+    //         AttachThemeAssets(assets, tc);
+    //         AttachCommonAssets(assets, tc);
+    //         iconsAttached = AttachIconAssets(assets, tc);
+    //     }
+    // }
 
     r = NULL;
     CResources::New(assets, dm, config, compatInfo, token, (IResources**)&r);
-    if (iconsAttached) SetActivityIcons(r);
+    // if (iconsAttached) SetActivityIcons(r);
 
     if (FALSE) {
         AutoPtr<IConfiguration> c;

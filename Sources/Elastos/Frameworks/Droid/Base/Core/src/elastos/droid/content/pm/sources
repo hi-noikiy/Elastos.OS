@@ -5,6 +5,8 @@ include $(MAKEDIR)/../../../../../../../sources.inc
 
 C_DEFINES += -DDROID_CORE
 
+CPP_FLAGS += -std=c++11
+
 INCLUDES += ../../
 INCLUDES += $(MAKEDIR)/../../../../../inc/
 

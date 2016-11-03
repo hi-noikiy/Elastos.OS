@@ -17,6 +17,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <sys/prctl.h>
+#include <sys/stat.h>
 
 using namespace Elastos;
 using namespace android;

@@ -24,5 +24,4 @@ SOURCES += Elastos.CoreLibrary.cpp
 LIBRARIES  = $(XDK_USER_LIB)/Elastos.Runtime.lib
 LIBRARIES += $(XDK_TARGETS)/Elastos.Runtime.eco
 LIBRARIES += $(XDK_TARGETS)/Elastos.CoreLibrary.eco
-LIBRARIES += $(XDK_USER_LIB)/crt0.lib
 LIBRARIES += -llog -lssl -lcrypto

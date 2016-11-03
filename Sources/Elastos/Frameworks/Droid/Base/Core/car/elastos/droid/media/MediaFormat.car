@@ -115,7 +115,7 @@ module
          * A key describing the language of the content, using either ISO 639-1
          * or 639-2/T codes.  The associated value is a string.
          */
-        const String KEY_LANGUAGE = "language";
+        const String _KEY_LANGUAGE = "language";
 
         /**
          * A key describing the sample rate of an audio format.

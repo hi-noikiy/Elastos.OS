@@ -244,7 +244,7 @@ public:
     DroidSurfaceTextureContext(
         /* [in] */ IWeakReference* weakThiz);
     virtual ~DroidSurfaceTextureContext();
-    virtual void onFrameAvailable();
+    virtual void onFrameAvailable(const android::BufferItem& item);
 
 private:
     AutoPtr<IWeakReference> mWeakThiz;
@@ -260,7 +260,7 @@ DroidSurfaceTextureContext::~DroidSurfaceTextureContext()
     mWeakThiz = NULL;
 }
 
-void DroidSurfaceTextureContext::onFrameAvailable()
+void DroidSurfaceTextureContext::onFrameAvailable(const android::BufferItem& item)
 {
     CSurfaceTexture::PostEventFromNative(mWeakThiz);
 }

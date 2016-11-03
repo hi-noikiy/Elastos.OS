@@ -2,7 +2,7 @@
 #include "Elastos.Droid.Content.h"
 #include "Elastos.Droid.Os.h"
 #include "elastos/droid/graphics/CAvoidXfermode.h"
-#include <SkAvoidXfermode.h>
+#include "elastos/droid/graphics/AvoidXfermode.h"
 #include <SkPixelXorXfermode.h>
 
 namespace Elastos {
@@ -32,8 +32,8 @@ Int64 CAvoidXfermode::NativeCreate(
     /* [in] */ Int32 tolerance,
     /* [in] */ Int32 nativeMode)
 {
-    SkAvoidXfermode::Mode mode = static_cast<SkAvoidXfermode::Mode>(nativeMode);
-    return reinterpret_cast<Int64>(SkAvoidXfermode::Create(opColor, tolerance, mode));
+    AvoidXfermode::Mode mode = static_cast<AvoidXfermode::Mode>(nativeMode);
+    return reinterpret_cast<Int64>(AvoidXfermode::Create(opColor, tolerance, mode));
 }
 
 } // namespace Graphics
