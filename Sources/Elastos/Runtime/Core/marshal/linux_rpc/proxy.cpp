@@ -123,8 +123,8 @@ EXTERN_C void ProxyEntryFunc_RPC(void);
                 ".globl _ProxyEntryFunc_RPC;"      \
                 "_ProxyEntryFunc_RPC:"             \
                 ".intel_syntax;"                   \
-                "push   esp;"                      \
-                "mov    eax, dword ptr [esp + 8];" \
+                "push   %esp;"                      \
+                "mov    %eax, dword ptr [esp + 8];" \
                 "call   dword ptr [eax + 4];"      \
                 "ret    0x4;"                      \
                 ".att_syntax;"                     \

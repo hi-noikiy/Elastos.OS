@@ -119,8 +119,8 @@ EXTERN_C void ProxyEntryFunc(void);
                 ".globl _ProxyEntryFunc;"          \
                 "_ProxyEntryFunc:"                 \
                 ".intel_syntax;"                   \
-                "push   esp;"                      \
-                "mov    eax, dword ptr [esp + 8];" \
+                "push   %esp;"                      \
+                "mov    %eax, dword ptr [esp + 8];" \
                 "call   dword ptr [eax + 4];"      \
                 "ret    0x4;"                      \
                 ".att_syntax;"                     \

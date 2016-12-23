@@ -1,7 +1,6 @@
-/*	$OpenBSD: asm.h,v 1.1 2004/02/01 05:09:49 drahn Exp $	*/
-/*	$NetBSD: asm.h,v 1.4 2001/07/16 05:43:32 matt Exp $	*/
+/*	$NetBSD: asm.h,v 1.40 2011/06/16 13:16:20 joerg Exp $	*/
 
-/*
+/*-
  * Copyright (c) 1990 The Regents of the University of California.
  * All rights reserved.
  *
@@ -32,28 +31,33 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	from: @(#)asm.h	5.5 (Berkeley) 5/7/91
+ *	@(#)asm.h	5.5 (Berkeley) 5/7/91
  */
 
-#ifndef _ARM32_ASM_H_
-#define _ARM32_ASM_H_
+#ifndef _I386_ASM_H_
+#define _I386_ASM_H_
 
-#ifndef _ALIGN_TEXT
-# define _ALIGN_TEXT .align 0
+#define PIC_PROLOGUE	\
+	pushl	%ebx;	\
+	call	666f;	\
+666:			\
+	popl	%ebx;	\
+	addl	$_GLOBAL_OFFSET_TABLE_+[.-666b], %ebx
+#define PIC_EPILOGUE	\
+	popl	%ebx
+#define PIC_PLT(x)	x@PLT
+#define PIC_GOT(x)	x@GOT(%ebx)
+#define PIC_GOTOFF(x)	x@GOTOFF(%ebx)
+
+/* let kernels and others override entrypoint alignment */
+#if !defined(_ALIGN_TEXT) && !defined(_KERNEL)
+# ifdef _STANDALONE
+#  define _ALIGN_TEXT .align 1
+# elif defined __ELF__
+#  define _ALIGN_TEXT .align 16
+# else
+#  define _ALIGN_TEXT .align 4
+# endif
 #endif
 
-#undef __bionic_asm_custom_entry
-#undef __bionic_asm_custom_end
-#define __bionic_asm_custom_entry(f) .fnstart
-#define __bionic_asm_custom_end(f) .fnend
-
-#undef __bionic_asm_function_type
-#define __bionic_asm_function_type #function
-
-#if defined(__ELF__) && defined(PIC)
-#define PIC_SYM(x,y) x ## ( ## y ## )
-#else
-#define PIC_SYM(x,y) x
-#endif
-
-#endif /* !_ARM_ASM_H_ */
+#endif /* !_I386_ASM_H_ */
