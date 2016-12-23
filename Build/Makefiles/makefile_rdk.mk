@@ -82,7 +82,12 @@ endif
 endif
 ifndef PREBUILD_PATH
 ifeq "$(XDK_TARGET_PLATFORM)" "android"
-      PREBUILD_PATH = $(XDK_BUILD_PATH)/Prebuilt/Linux
+      ifeq "$(XDK_TARGET_CPU)" "arm"
+            PREBUILD_PATH = $(XDK_BUILD_PATH)/Prebuilt/Linux
+      endif
+      ifeq "$(XDK_TARGET_CPU)" "x86"
+            PREBUILD_PATH = $(XDK_BUILD_PATH)/Prebuilt_x86/Linux
+      endif
 endif
 ifndef PREBUILD_INC
       PREBUILD_INC = $(PREBUILD_PATH)/usr/include
