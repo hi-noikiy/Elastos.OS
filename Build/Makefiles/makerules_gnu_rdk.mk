@@ -78,7 +78,7 @@ else
 	perl $(XDK_TOOLS)/cls_trans.pl __$*.rc $(dir $<)
 	perl $(XDK_TOOLS)/res_trans.pl __$*.rc "rc" "$(SOURCES)"
 	if [ -e "__section.cpp" ]; then \
-		$(CC) $(C_DEFINES) -c -fno-builtin -o __section.o __section.cpp; \
+		$(CC) $(C_DEFINES) -c -fpermissive -fno-builtin -o __section.o __section.cpp; \
 	fi
 
 	-mv __section.cpp __section0.cpp;
