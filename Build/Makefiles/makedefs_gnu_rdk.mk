@@ -235,7 +235,11 @@ else # "$(XDK_TARGET_FORMAT)" "elf"
           ECX_CRT_END=$(PREBUILD_LIB)/crtend_android.o
 
           DLL_CRT_BEGIN=--sysroot=$(GCC_SYSROOT) -Wl,-X -Wl,-dynamic-linker,/system/bin/linker $(PREBUILD_LIB)/crtbegin_so.o $(PREBUILD_LIB)/crtend_so.o
-          DLL_CRT_END=$(GCC_LIB_PATH)/libgcc.a
+          ifeq "$(XDK_TARGET_CPU)" "x86"
+              DLL_CRT_END=$(GCC_LIB_PATH)/32/libgcc.a
+          else
+              DLL_CRT_END=$(GCC_LIB_PATH)/libgcc.a
+          endif
       endif
 endif # elf
 
@@ -306,6 +310,12 @@ C_DEFINES := -D_GNUC $(C_DEFINES)
 
 ifeq "$(XDK_TARGET_PLATFORM)" "linux"
   ifneq "$(XDK_TARGET_CPU)" "arm"
+    C_DEFINES := $(C_DEFINES) $(32B_FLAG)
+  endif
+endif
+
+ifeq "$(XDK_TARGET_PLATFORM)" "android"
+  ifeq "$(XDK_TARGET_CPU)" "x86"
     C_DEFINES := $(C_DEFINES) $(32B_FLAG)
   endif
 endif
