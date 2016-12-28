@@ -1,0 +1,7 @@
+out/target/product/generic_x86/obj/lib/crtbrand.s: \
+ bionic/libc/bionic/crtbrand.c bionic/libc/include/stdint.h \
+ /home/xilong/work/Android5_0_2_Google/prebuilts/gcc/linux-x86/x86/x86_64-linux-android-4.8/lib/gcc/x86_64-linux-android/4.8/include/stddef.h \
+ bionic/libc/include/machine/wchar_limits.h
+ bionic/libc/bionic/crtbrand.c bionic/libc/include/stdint.h :
+ /home/xilong/work/Android5_0_2_Google/prebuilts/gcc/linux-x86/x86/x86_64-linux-android-4.8/lib/gcc/x86_64-linux-android/4.8/include/stddef.h :
+ bionic/libc/include/machine/wchar_limits.h :
