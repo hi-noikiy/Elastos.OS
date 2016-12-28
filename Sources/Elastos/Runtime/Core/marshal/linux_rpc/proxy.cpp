@@ -116,18 +116,18 @@ EXTERN_C void ProxyEntryFunc_RPC(void);
         )
         DECL_SYS_PROXY_ENTRY();
 #    elif defined(_x86)
-#       define DECL_SYS_PROXY_ENTRY()              \
-            __asm__(                               \
-                ".text;"                           \
-                ".align 4;"                        \
-                ".globl _ProxyEntryFunc_RPC;"      \
-                "_ProxyEntryFunc_RPC:"             \
-                ".intel_syntax;"                   \
-                "push   %esp;"                      \
-                "mov    %eax, dword ptr [esp + 8];" \
-                "call   dword ptr [eax + 4];"      \
-                "ret    0x4;"                      \
-                ".att_syntax;"                     \
+#       define DECL_SYS_PROXY_ENTRY()                \
+            __asm__(                                 \
+                ".text;"                             \
+                ".align 4;"                          \
+                ".globl ProxyEntryFunc_RPC;"         \
+                "ProxyEntryFunc_RPC:"               \
+                ".intel_syntax;"                     \
+                "push   %esp;"                       \
+                "mov    %eax, dword ptr [%esp + 8];" \
+                "call   dword ptr [%eax + 4];"       \
+                "ret    0x4;"                        \
+                ".att_syntax;"                       \
             )
         DECL_SYS_PROXY_ENTRY();
 #    else
@@ -137,11 +137,11 @@ EXTERN_C void ProxyEntryFunc_RPC(void);
 #   if defined(_x86)
 #       define DECL_SYS_PROXY_ENTRY() \
             __declspec( naked ) void ProxyEntryFunc_RPC() \
-            {                                       \
-                __asm push esp                      \
-                __asm mov eax, dword ptr [esp + 8]  \
-                __asm call dword ptr [eax +4]       \
-                __asm ret  0x4                      \
+            {                                             \
+                __asm push %esp                           \
+                __asm mov %eax, dword ptr [%esp + 8]      \
+                __asm call dword ptr [%eax +4]            \
+                __asm ret  0x4                            \
             }
         DECL_SYS_PROXY_ENTRY();
 #   endif
