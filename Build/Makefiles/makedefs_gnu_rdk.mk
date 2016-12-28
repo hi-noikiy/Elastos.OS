@@ -113,9 +113,17 @@ endif
 
 endif
 else
+ifeq "$(XDK_TARGET_PLATFORM)" "android"
+  ifneq "$(DLLTOOL_FLAGS)" ""
+    DLLTOOL_FLAGS := -Wl,-soname,$(strip $(DLLTOOL_FLAGS:-D=))
+  endif
+  DLLTOOL_FLAGS := -Wl,-soname,$(TARGET_NAME).$(DEPEND_OBJ_TYPE) -lstdc++ $(LIBC_FLAGS) -nostdlib -L$(PREBUILD_LIB) \
+                   $(DLLTOOL_FLAGS)
+else
   DLLTOOL_FLAGS := -D $(TARGET_NAME).$(DEPEND_OBJ_TYPE)  \
                    -l $(XDK_USER_LIB)/$(TARGET_NAME).lib \
                    $(DLLTOOL_FLAGS)
+endif
 endif
 
 ##########################################################################
