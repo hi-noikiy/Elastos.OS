@@ -26,6 +26,8 @@ static UInt32 g_marshalVtbl[MSH_MAX_METHODS];
 
 Address s_proxyEntryAddress = (Address)NULL;
 
+#define SYS_PROXY_RET_OFFSET    9
+
 #define PROXY_ENTRY_BASE    s_proxyEntryAddress
 #define PROXY_ENTRY_SIZE    0x10
 #define PROXY_ENTRY_MASK    0x0f
