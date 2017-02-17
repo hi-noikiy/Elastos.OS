@@ -98,9 +98,14 @@ ECode CAtomicInteger64::GetAndSet(
     }
 }
 
+#define dvmQuasiAtomicCas64 android_atomic_cas
+
 static int dvmQuasiAtomicCas64(int64_t oldvalue, int64_t newvalue,
     volatile int64_t* addr)
 {
+#ifdef _x86
+    return __sync_bool_compare_and_swap(addr, oldvalue, newvalue);
+#else
     int64_t prev;
     int status;
     do {
@@ -115,6 +120,7 @@ static int dvmQuasiAtomicCas64(int64_t oldvalue, int64_t newvalue,
             : "cc");
     } while (__builtin_expect(status != 0, 0));
     return prev != oldvalue;
+#endif
 }
 
 /**

@@ -47,7 +47,7 @@ extern "C" {
 #include <cutils/atomic-arm64.h>
 #elif defined(__arm__)
 #include <cutils/atomic-arm.h>
-#elif defined(__i386__)
+#elif defined(_x86)
 #include <cutils/atomic-x86.h>
 #elif defined(__x86_64__)
 #include <cutils/atomic-x86_64.h>
@@ -68,7 +68,11 @@ extern "C" {
 #if ANDROID_SMP == 0
 #define ANDROID_MEMBAR_STORE android_compiler_barrier
 #else
+#if defined(_x86)
+#define ANDROID_MEMBAR_STORE android_memory_barrier
+#else
 #define ANDROID_MEMBAR_STORE android_memory_store_barrier
+#endif
 #endif
 
 #ifdef __cplusplus
