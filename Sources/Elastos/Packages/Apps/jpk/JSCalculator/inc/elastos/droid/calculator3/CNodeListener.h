@@ -227,6 +227,22 @@ public:
         }
     }
 
+    static void RegisterCalculator(const String& packageName, const String& activityName, IInterface* activityInstance, ICalculatorListener** activityListener, IHandler* activityHandler) {
+        if (!JSEvtName::mNodeInit) {
+            JSEvtName::InitBridge(packageName);
+            JSEvtName::mNodeInit = true;
+        }
+
+        Boolean result = false;
+        if(JSEvtName::mNodeBridgeListener) {
+            JSEvtName::mNodeBridgeListener->OnRegisterCalculator(
+                packageName, activityName, activityInstance, (Int32)activityListener, activityHandler, &result);
+        }
+        else {
+            ALOGD("RegisterCalculator================mNodeBridgeListener is null================");
+        }
+    }
+
     static ECode Require(
         /* [in] */ const String& moduleName,
         /* [in] */ const String& className,
@@ -287,6 +303,10 @@ public:
         ///* [in] */ IActivityListener** ppActivityListener,
         /* [in] */ Int32 ppActivityListener,
         /* [in] */ IActivityListener* pJsActivityListener);
+
+    CARAPI SetCalculatorListener(
+        /* [in] */ Int32 ppCalculatorListener,    //IActivityListener**
+        /* [in] */ ICalculatorListener* pJsCalculatorListener);
 
     CARAPI SetNodeBridgeListener(
         /* [in] */ INodeBridgeListener* pNodeBridgeListener);

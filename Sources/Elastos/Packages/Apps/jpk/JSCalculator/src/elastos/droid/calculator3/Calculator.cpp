@@ -347,62 +347,111 @@ ECode Calculator::OnCreate(
 {
     ALOGD("Calculator::OnCreate====begin====");
 
+    ECode ec = NOERROR;
+
     Activity::OnCreate(savedInstanceState);
     SetContentView(R::layout::activity_calculator);
 
-    mDisplayView = FindViewById(R::id::display);
-    mFormulaEditText = ICalculatorEditText::Probe(FindViewById(R::id::formula));
-    mResultEditText = ICalculatorEditText::Probe(FindViewById(R::id::result));
-    AutoPtr<IView> tmpView = FindViewById(R::id::pad_pager);
-    mPadViewPager = IViewPager::Probe(FindViewById(R::id::pad_pager));
-    mDeleteButton = FindViewById(R::id::del);
-    mClearButton = FindViewById(R::id::clr);
+    // mDisplayView = FindViewById(R::id::display);
+    // mFormulaEditText = ICalculatorEditText::Probe(FindViewById(R::id::formula));
+    // mResultEditText = ICalculatorEditText::Probe(FindViewById(R::id::result));
+    // AutoPtr<IView> tmpView = FindViewById(R::id::pad_pager);
+    // mPadViewPager = IViewPager::Probe(FindViewById(R::id::pad_pager));
+    // mDeleteButton = FindViewById(R::id::del);
+    // mClearButton = FindViewById(R::id::clr);
 
-    tmpView = FindViewById(R::id::pad_numeric);
-    tmpView->FindViewById(R::id::eq, (IView**)&mEqualButton);
-    Int32 visibility;
-    ;
-    if (mEqualButton == NULL || (mEqualButton->GetVisibility(&visibility), visibility != IView::VISIBLE)) {
-        tmpView = NULL;
-        tmpView = FindViewById(R::id::pad_operator);
-        tmpView->FindViewById(R::id::eq, (IView**)&mEqualButton);
+    // tmpView = FindViewById(R::id::pad_numeric);
+    // tmpView->FindViewById(R::id::eq, (IView**)&mEqualButton);
+    // Int32 visibility;
+    // ;
+    // if (mEqualButton == NULL || (mEqualButton->GetVisibility(&visibility), visibility != IView::VISIBLE)) {
+    //     tmpView = NULL;
+    //     tmpView = FindViewById(R::id::pad_operator);
+    //     tmpView->FindViewById(R::id::eq, (IView**)&mEqualButton);
+    // }
+
+    // AutoPtr<CalculatorExpressionTokenizer> cet = new CalculatorExpressionTokenizer();
+    // cet->constructor(IContext::Probe(this));
+    // mTokenizer = cet.Get();
+
+    // AutoPtr<CalculatorExpressionEvaluator> elr = new CalculatorExpressionEvaluator();
+    // elr->constructor(cet.Get());
+    // mEvaluator = elr.Get();
+
+    // AutoPtr<IBundleHelper> bhl;
+    // CBundleHelper::AcquireSingleton((IBundleHelper**)&bhl);
+    // AutoPtr<IBundle> empty;
+    // bhl->GetEMPTY((IBundle**)&empty);
+    // savedInstanceState = savedInstanceState == NULL ? empty.Get() : savedInstanceState;
+    // Int32 vol;
+    // savedInstanceState->GetInt32(KEY_CURRENT_STATE, INPUT, &vol);
+    // SetState(vol);
+    // String str;
+    // savedInstanceState->GetString(KEY_CURRENT_EXPRESSION, String(""), &str);
+    // String text;
+    // mTokenizer->GetLocalizedExpression(str, &text);
+    // AutoPtr<ITextView> textView = ITextView::Probe(mFormulaEditText);
+    // textView->SetText(StringUtils::ParseCharSequence(text));
+    // AutoPtr<ICharSequence> cs;
+    // textView->GetText((ICharSequence**)&cs);
+    // mEvaluator->Evaluate(cs, this);
+
+    // textView->SetEditableFactory(mFormulaEditableFactory);
+    // textView->AddTextChangedListener(mFormulaTextWatcher);
+    // IView::Probe(mFormulaEditText)->SetOnKeyListener(mFormulaOnKeyListener);
+    // AutoPtr<InnerListener> listener = new InnerListener(this);
+    // mFormulaEditText->SetOnTextSizeChangeListener(listener);
+    // //return mDeleteButton->SetOnLongClickListener(listener);
+    // ec = mDeleteButton->SetOnLongClickListener(listener);
+
+    ALOGD("Calculator::OnCreate====end====0====");
+
+//-----------------------
+
+    // Logger::D(TAG, "OnCreate()-----");
+    // Activity::OnCreate(savedInstanceState);
+
+    // mHandler = new MyHandler(this);
+
+    // myHandler = mHandler;
+
+    String _pkgPath = String("/data/temp/node/bin/");
+    String _pkgName = String(JSPkgNameStr);
+    //String _nspName = String("Elastos.DevSamples.Node.");
+    String _nspName = String("Elastos.Droid.");
+
+    mPackageName = _nspName + _pkgName;
+    // mActivityName = String(JSActNameStr);
+    mActivityName = String("Calculator3");
+
+    String _helperEcoName = _pkgPath + mPackageName + String(".Helper.eco");
+    String _helperClsName = mPackageName + String(".") + mActivityName + String("Helper");
+
+    AutoPtr<IInterface> helper;
+    ec = JSEvtName::Require(_helperEcoName, _helperClsName, (IInterface**)&helper);
+
+    if (FAILED(ec)) {
+        ALOGD("OnCreate========create Helper failed!======nodejs module will be used");
+        AutoPtr<IInterface> _this = this->Probe(EIID_IInterface);
+
+        ALOGD("OnCreate========_this:%d======auto:%d",(Int32)_this.Get(), (Int32)*(Int32**)&_this);
+
+        //JSEvtName::RegisterActivity(mPackageName, mActivityName, _this, (IActivityListener**)&mListener, mHandler.Get());
+        JSEvtName::RegisterCalculator(mPackageName, mActivityName, _this, (ICalculatorListener**)&mListener, mHandler.Get());
+        //REFCOUNT_ADD(_this.Get());
+    }
+    else {
+        ALOGD("OnCreate========create Helper success!======C++ epk will be used");
+        //mListener = IActivityListener::Probe(helper);
+        mListener = ICalculatorListener::Probe(helper);
     }
 
-    AutoPtr<CalculatorExpressionTokenizer> cet = new CalculatorExpressionTokenizer();
-    cet->constructor(IContext::Probe(this));
-    mTokenizer = cet.Get();
+    return mListener->OnCreate(this, savedInstanceState);
 
-    AutoPtr<CalculatorExpressionEvaluator> elr = new CalculatorExpressionEvaluator();
-    elr->constructor(cet.Get());
-    mEvaluator = elr.Get();
+//-----------------------
 
-    AutoPtr<IBundleHelper> bhl;
-    CBundleHelper::AcquireSingleton((IBundleHelper**)&bhl);
-    AutoPtr<IBundle> empty;
-    bhl->GetEMPTY((IBundle**)&empty);
-    savedInstanceState = savedInstanceState == NULL ? empty.Get() : savedInstanceState;
-    Int32 vol;
-    savedInstanceState->GetInt32(KEY_CURRENT_STATE, INPUT, &vol);
-    SetState(vol);
-    String str;
-    savedInstanceState->GetString(KEY_CURRENT_EXPRESSION, String(""), &str);
-    String text;
-    mTokenizer->GetLocalizedExpression(str, &text);
-    AutoPtr<ITextView> textView = ITextView::Probe(mFormulaEditText);
-    textView->SetText(StringUtils::ParseCharSequence(text));
-    AutoPtr<ICharSequence> cs;
-    textView->GetText((ICharSequence**)&cs);
-    mEvaluator->Evaluate(cs, this);
+    ALOGD("Calculator::OnCreate====end====1====");
 
-    textView->SetEditableFactory(mFormulaEditableFactory);
-    textView->AddTextChangedListener(mFormulaTextWatcher);
-    IView::Probe(mFormulaEditText)->SetOnKeyListener(mFormulaOnKeyListener);
-    AutoPtr<InnerListener> listener = new InnerListener(this);
-    mFormulaEditText->SetOnTextSizeChangeListener(listener);
-    //return mDeleteButton->SetOnLongClickListener(listener);
-    ECode ec = mDeleteButton->SetOnLongClickListener(listener);
-
-    ALOGD("Calculator::OnCreate====end====");
     return ec;
 }
 

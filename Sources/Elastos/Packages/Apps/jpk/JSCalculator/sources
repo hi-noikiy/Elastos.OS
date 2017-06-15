@@ -61,6 +61,10 @@ LIBRARIES += $(XDK_TARGETS)/Elastos.Droid.Core.eco
 LIBRARIES += $(XDK_TARGETS)/Org.Javia.Arity.eco
 LIBRARIES += -lm -lcutils -licuuc -llog -lutils -landroidfw
 
+LIBRARIES += $(XDK_USER_LIB)/crt0.lib
+LIBRARIES += -ldl
+LIBRARIES += -lnode
+
 APPPACK = 1
 APP_PACKAGE_NAME = Elastos.Droid.Calculator3
 RES_NAMESPACE = Elastos.Droid.Calculator3

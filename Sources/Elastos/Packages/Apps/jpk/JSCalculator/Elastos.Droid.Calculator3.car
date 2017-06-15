@@ -46,6 +46,8 @@ module
     interface Elastos.Droid.Calculator3.ICalculatorPadViewPager;
     interface Elastos.Droid.Support.V4.View.IViewPager;
 
+    interface ICalculatorListener;
+
     using interface Elastos.Droid.App.IActivity;
     using interface Elastos.Droid.App.IApplication;
     using interface Elastos.Droid.Content.IContext;
@@ -94,6 +96,14 @@ module
             [in] Int32 activityListener,    //IActivityListener**
             [in] IHandler* activityHandler,
             [out] Boolean* result);
+
+        OnRegisterCalculator(
+            [in] String packageName,
+            [in] String activityName,
+            [in] IInterface* activityInstance,
+            [in] Int32 activityListener,    //ICalculatorListener**
+            [in] IHandler* activityHandler,
+            [out] Boolean* result);
     }
 
     [deprecated]
@@ -115,6 +125,10 @@ module
             [in] Int32 activityListener,    //IActivityListener**
             [in] IActivityListener* jsActivityListener);
 
+        SetCalculatorListener(
+            [in] Int32 calculatorListener,  //ICalculatorListener**
+            [in] ICalculatorListener* jsCalculatorListener);
+
         SetNodeBridgeListener(
             [in] INodeBridgeListener* nodeBridgeListener);
 
@@ -134,6 +148,20 @@ module
     interface ICallbackRunnable {
         GetInstance(
             [out] IInterface** instance);
+    }
+
+    [local]
+    interface ICalculatorListener {
+        OnCreate(
+            [in] IContext* ctx,
+            [in] IBundle* savedInstanceState);
+        OnSaveInstanceState(
+            [in] IContext* ctx,
+            [in] IBundle* outState);
+        OnBackPressed(
+            [in] IContext* ctx);
+        OnUserInteraction(
+            [in] IContext* ctx);
     }
 
     class CNodeListener {

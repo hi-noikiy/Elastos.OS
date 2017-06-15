@@ -17,6 +17,8 @@
 #ifndef _ELASTOS_DROID_CALCULATOR3_CALCULATOR_H__
 #define _ELASTOS_DROID_CALCULATOR3_CALCULATOR_H__
 
+#include "CNodeListener.h"
+
 #include "_Elastos.Droid.Calculator3.h"
 #include "elastos/droid/calculator3/CalculatorEditText.h"
 #include "elastos/droid/calculator3/CalculatorExpressionEvaluator.h"
@@ -335,6 +337,15 @@ private:
 
     AutoPtr<IView> mCurrentButton;
     AutoPtr<IAnimator> mCurrentAnimator;
+
+private:
+    static const String TAG;
+
+    String mPackageName;
+    String mActivityName;
+
+    AutoPtr<IHandler> mHandler;
+    AutoPtr<ICalculatorListener> mListener;
 };
 
 } // namespace Calculator3
