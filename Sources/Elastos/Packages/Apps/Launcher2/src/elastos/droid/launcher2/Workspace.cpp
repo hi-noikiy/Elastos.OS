@@ -1046,20 +1046,18 @@ ECode Workspace::constructor(
         display->GetCurrentSizeRange(minDims, maxDims);
 
         cellCountX = 1;
-        Int32 width;
-        CellLayout::WidthInPortrait(res, cellCountX + 1, &width);
+        Int32 width = 0;
         Int32 x;
         minDims->GetX(&x);
-        while (width <= x) {
+        while ((CellLayout::WidthInPortrait(res, cellCountX + 1, &width), width) <= x) {
             cellCountX++;
         }
 
         cellCountY = 1;
-        Int32 height;
-        CellLayout::HeightInLandscape(res, cellCountY + 1, &height);
+        Int32 height = 0;
         Int32 y;
         minDims->GetY(&y);
-        while (actionBarHeight + height <= y) {
+        while (actionBarHeight + (CellLayout::HeightInLandscape(res, cellCountY + 1, &height), height) <= y) {
             cellCountY++;
         }
     }
