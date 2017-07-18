@@ -173,6 +173,7 @@ private:
     static const String KEY_DEVICE_MODEL;
     static const String KEY_SELINUX_STATUS;
     static const String KEY_BASEBAND_VERSION;
+    static const String KEY_FIRMWARE_VERSION_ELASTOS;
     static const String KEY_FIRMWARE_VERSION;
     static const String KEY_UPDATE_SETTING;
     static const String KEY_EQUIPMENT_ID;

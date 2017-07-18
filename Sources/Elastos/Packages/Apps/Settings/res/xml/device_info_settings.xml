@@ -104,6 +104,12 @@
                 android:summary="@string/device_info_default"/>
 
         <!-- Device firmware version -->
+        <Elastos.Droid.Preference.CPreference android:key="firmware_version_elastos"
+                style="?android:preferenceInformationStyle"
+                android:title="@string/firmware_version_elastos"
+                android:summary="@string/device_info_default"/>
+
+        <!-- Device firmware version -->
         <Elastos.Droid.Preference.CPreference android:key="firmware_version"
                 style="?android:preferenceInformationStyle"
                 android:title="@string/firmware_version"
