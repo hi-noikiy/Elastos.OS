@@ -19,14 +19,6 @@
 
 #include "_Elastos.Droid.Calculator3.h"
 
-// #include "elastos/droid/calculator3/CalculatorEditText.h"
-// #include "elastos/droid/calculator3/CalculatorExpressionEvaluator.h"
-// #include "elastos/droid/calculator3/CalculatorExpressionTokenizer.h"
-// #include <elastos/droid/animation/AnimatorListenerAdapter.h>
-// #include <elastos/droid/app/Activity.h>
-// #include <elastos/droid/ext/frameworkext.h>
-// #include <Elastos.Droid.Text.h>
-// #include <Elastos.Droid.Support.V4.View.h>
 #include <elastos/core/Object.h>
 
 #include <elastos/droid/app/Application.h>

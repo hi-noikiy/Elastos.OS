@@ -573,14 +573,17 @@ CreateView(name, inPrefix, attrs) {
     elog("====STC::CreateView====attrs====className:"+attrs.getClass().GetName());
 
     var bCustomControl = false;
-    // bCustomControl = bCustomControl || reflectionClassName.indexOf("CalculatorEditText") > -1;
-    // bCustomControl = bCustomControl || reflectionClassName.indexOf("CalculatorPadViewPager") > -1;
-    // bCustomControl = bCustomControl || reflectionClassName.indexOf("CalculatorPadLayout") > -1;
+    bCustomControl = bCustomControl || reflectionClassName.indexOf("CalculatorEditText") > -1;
+    bCustomControl = bCustomControl || reflectionClassName.indexOf("CalculatorPadViewPager") > -1;
+    bCustomControl = bCustomControl || reflectionClassName.indexOf("CalculatorPadLayout") > -1;
     // bCustomControl = bCustomControl || reflectionClassName.indexOf("NodeLinearLayout") > -1;
     if (bCustomControl) {
-        view = CObject.New("/data/elastos/Elastos.DevSamples.Node.JSCalculator.eco", reflectionClassName, oActivity, attrs);
+        elog("====CustomControl====begin====");
+        //view = CObject.New("/data/elastos/Elastos.DevSamples.Node.JSCalculator.eco", reflectionClassName, oActivity, attrs);
+        view = CObject.New("/system/lib/Elastos.Droid.Calculator3.Component.eco", reflectionClassName, oActivity, attrs);
     }
     else {
+        elog("====StandControl====begin====");
         view = Droid_New(reflectionClassName, oActivity, attrs);
     }
 
@@ -779,12 +782,18 @@ OnFinishInflate(parent) {
 // CButton                 Button::OnFinishInflate
 // CLinearLayout           LinearLayout::OnFinishInflate
 // CCalculatorEditText
-// CCalculatorPadLayout
+// CCalculatorPadLayout                 OnFinishInfate
 // CCalculatorPadViewPager
+
+//all tags:CButton/CCalculatorPadLayout/CLinearLayout/CCalculatorPadViewPager
 
     if(parent&&parent.OnFinishInflate) {
         //parent.OnFinishInflate();
         parent.OnFinishInflate();
+    }
+    else if(parent&&parent._OnFinishInflate) {
+        elog("====STC::RInflate====finishInflate====protect to public!");
+        parent._OnFinishInflate();
     }
     else {
         elog("====STC::RInflate====finishInflate====error: can not call protected method!");

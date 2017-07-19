@@ -18,6 +18,7 @@
 #define _ELASTOS_DROID_CALCULATOR3_CCALCULATORAPPLICATION_H__
 
 #include "_Elastos_Droid_Calculator3_CCalculatorApplication.h"
+
 #include "elastos/droid/calculator3/CalculatorApplication.h"
 
 namespace Elastos {

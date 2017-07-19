@@ -17,18 +17,18 @@
 #ifndef _ELASTOS_DROID_CALCULATOR3_CALCULATOR_H__
 #define _ELASTOS_DROID_CALCULATOR3_CALCULATOR_H__
 
-#include "CNodeListener.h"
-
-#include "_Elastos.Droid.Calculator3.h"
-#include "elastos/droid/calculator3/CalculatorEditText.h"
-#include "elastos/droid/calculator3/CalculatorExpressionEvaluator.h"
-#include "elastos/droid/calculator3/CalculatorExpressionTokenizer.h"
 #include <elastos/droid/animation/AnimatorListenerAdapter.h>
 #include <elastos/droid/app/Activity.h>
 #include <elastos/droid/ext/frameworkext.h>
 #include <Elastos.Droid.Text.h>
-#include <Elastos.Droid.Support.V4.View.h>
 #include <elastos/core/Object.h>
+
+#include "_Elastos.Droid.Support.V4.View.h"
+#include "_Elastos.Droid.Calculator3.Component.h"
+#include "_Elastos.Droid.Calculator3.Expression.h"
+#include "_Elastos.Droid.Calculator3.h"
+
+#include "CNodeListener.h"
 
 using Elastos::Droid::Animation::IAnimator;
 using Elastos::Droid::Animation::IAnimatorListener;
@@ -47,7 +47,21 @@ using Elastos::Droid::View::IViewOnLongClickListener;
 using Elastos::Droid::View::IViewOnKeyListener;
 using Elastos::Droid::Widget::ITextView;
 using Elastos::Droid::Os::IBundle;
+
 using Elastos::Droid::Support::V4::View::IViewPager;
+
+using Elastos::Droid::Calculator3::Component::IOnTextSizeChangeListener;
+using Elastos::Droid::Calculator3::Component::ICalculatorEditText;
+using Elastos::Droid::Calculator3::Component::EIID_IOnTextSizeChangeListener;
+
+using Elastos::Droid::Calculator3::Expression::IEvaluateCallback;
+using Elastos::Droid::Calculator3::Expression::EIID_IEvaluateCallback;
+using Elastos::Droid::Calculator3::Expression::ICalculatorExpressionTokenizer;
+using Elastos::Droid::Calculator3::Expression::ICalculatorExpressionEvaluator;
+using Elastos::Droid::Calculator3::Expression::ICalculatorExpressionBuilder;
+using Elastos::Droid::Calculator3::Expression::CCalculatorExpressionTokenizer;
+using Elastos::Droid::Calculator3::Expression::CCalculatorExpressionEvaluator;
+using Elastos::Droid::Calculator3::Expression::CCalculatorExpressionBuilder;
 
 namespace Elastos {
 namespace Droid {

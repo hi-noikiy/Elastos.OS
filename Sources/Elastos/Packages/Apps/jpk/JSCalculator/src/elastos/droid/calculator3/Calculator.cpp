@@ -1,5 +1,5 @@
 //=========================================================================
-// Copyright (C) 2012 The Elastos Open Source Project
+// Copyright (C) 2017 The Elastos Open Source Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@
 //=========================================================================
 
 #include "elastos/droid/calculator3/Calculator.h"
-#include "elastos/droid/calculator3/CalculatorExpressionBuilder.h"
 #include "Elastos.Droid.Animation.h"
 #include "Elastos.Droid.Content.h"
 #include "Elastos.Droid.Graphics.h"
@@ -168,8 +167,10 @@ ECode Calculator::MyEditableFactory::NewEditable(
 
     Boolean isEdited = mHost->mCurrentState == INPUT
                     || mHost->mCurrentState == ERROR;
-    AutoPtr<CalculatorExpressionBuilder> etl = new CalculatorExpressionBuilder();
-    etl->constructor(source, ICalculatorExpressionTokenizer::Probe(mHost->mTokenizer), isEdited);
+    //AutoPtr<CalculatorExpressionBuilder> etl = new CalculatorExpressionBuilder();
+    //etl->constructor(source, ICalculatorExpressionTokenizer::Probe(mHost->mTokenizer), isEdited);
+    AutoPtr<ICalculatorExpressionBuilder> etl;
+    CCalculatorExpressionBuilder::New(source, ICalculatorExpressionTokenizer::Probe(mHost->mTokenizer), isEdited, (ICalculatorExpressionBuilder**)&etl);
     *editable = IEditable::Probe(etl);
     REFCOUNT_ADD(*editable);
     return NOERROR;
@@ -345,69 +346,15 @@ ECode Calculator::constructor()
 ECode Calculator::OnCreate(
     /* [in] */ IBundle* savedInstanceState)
 {
-    ALOGD("Calculator::OnCreate====begin====");
+    ALOGD("Calculator::OnCreate====begin====0000====");
 
     ECode ec = NOERROR;
 
     Activity::OnCreate(savedInstanceState);
-    SetContentView(R::layout::activity_calculator);
+    //SetContentView(R::layout::activity_calculator);
 
-    // mDisplayView = FindViewById(R::id::display);
-    // mFormulaEditText = ICalculatorEditText::Probe(FindViewById(R::id::formula));
-    // mResultEditText = ICalculatorEditText::Probe(FindViewById(R::id::result));
-    // AutoPtr<IView> tmpView = FindViewById(R::id::pad_pager);
-    // mPadViewPager = IViewPager::Probe(FindViewById(R::id::pad_pager));
-    // mDeleteButton = FindViewById(R::id::del);
-    // mClearButton = FindViewById(R::id::clr);
-
-    // tmpView = FindViewById(R::id::pad_numeric);
-    // tmpView->FindViewById(R::id::eq, (IView**)&mEqualButton);
-    // Int32 visibility;
-    // ;
-    // if (mEqualButton == NULL || (mEqualButton->GetVisibility(&visibility), visibility != IView::VISIBLE)) {
-    //     tmpView = NULL;
-    //     tmpView = FindViewById(R::id::pad_operator);
-    //     tmpView->FindViewById(R::id::eq, (IView**)&mEqualButton);
-    // }
-
-    // AutoPtr<CalculatorExpressionTokenizer> cet = new CalculatorExpressionTokenizer();
-    // cet->constructor(IContext::Probe(this));
-    // mTokenizer = cet.Get();
-
-    // AutoPtr<CalculatorExpressionEvaluator> elr = new CalculatorExpressionEvaluator();
-    // elr->constructor(cet.Get());
-    // mEvaluator = elr.Get();
-
-    // AutoPtr<IBundleHelper> bhl;
-    // CBundleHelper::AcquireSingleton((IBundleHelper**)&bhl);
-    // AutoPtr<IBundle> empty;
-    // bhl->GetEMPTY((IBundle**)&empty);
-    // savedInstanceState = savedInstanceState == NULL ? empty.Get() : savedInstanceState;
-    // Int32 vol;
-    // savedInstanceState->GetInt32(KEY_CURRENT_STATE, INPUT, &vol);
-    // SetState(vol);
-    // String str;
-    // savedInstanceState->GetString(KEY_CURRENT_EXPRESSION, String(""), &str);
-    // String text;
-    // mTokenizer->GetLocalizedExpression(str, &text);
-    // AutoPtr<ITextView> textView = ITextView::Probe(mFormulaEditText);
-    // textView->SetText(StringUtils::ParseCharSequence(text));
-    // AutoPtr<ICharSequence> cs;
-    // textView->GetText((ICharSequence**)&cs);
-    // mEvaluator->Evaluate(cs, this);
-
-    // textView->SetEditableFactory(mFormulaEditableFactory);
-    // textView->AddTextChangedListener(mFormulaTextWatcher);
-    // IView::Probe(mFormulaEditText)->SetOnKeyListener(mFormulaOnKeyListener);
-    // AutoPtr<InnerListener> listener = new InnerListener(this);
-    // mFormulaEditText->SetOnTextSizeChangeListener(listener);
-    // //return mDeleteButton->SetOnLongClickListener(listener);
-    // ec = mDeleteButton->SetOnLongClickListener(listener);
-
-    ALOGD("Calculator::OnCreate====end====0====");
-
-//-----------------------
-
+//---------------------
+if(true){
     // Logger::D(TAG, "OnCreate()-----");
     // Activity::OnCreate(savedInstanceState);
 
@@ -422,10 +369,13 @@ ECode Calculator::OnCreate(
 
     mPackageName = _nspName + _pkgName;
     // mActivityName = String(JSActNameStr);
-    mActivityName = String("Calculator3");
+    mActivityName = String("CCalculator");
 
     String _helperEcoName = _pkgPath + mPackageName + String(".Helper.eco");
-    String _helperClsName = mPackageName + String(".") + mActivityName + String("Helper");
+    //String _helperClsName = mPackageName + String(".") + mActivityName + String("Helper");
+    String _helperClsName = mPackageName + String(".Helper.") + mActivityName + String("Helper");
+
+    ALOGD("Calculator::OnCreate====helperClsName====%s", _helperClsName.string());
 
     AutoPtr<IInterface> helper;
     ec = JSEvtName::Require(_helperEcoName, _helperClsName, (IInterface**)&helper);
@@ -443,14 +393,87 @@ ECode Calculator::OnCreate(
     else {
         ALOGD("OnCreate========create Helper success!======C++ epk will be used");
         //mListener = IActivityListener::Probe(helper);
+
+ALOGD("OnCreate========0001===helper:%d",*(Int32*)&helper);
         mListener = ICalculatorListener::Probe(helper);
+ALOGD("OnCreate========0002===mListener:%d",*(Int32*)&mListener);
+        ICalculatorListener* mCalculatorListener = ICalculatorListener::Probe(helper);
+ALOGD("OnCreate========0002===mCalculatorListener:%d",*(Int32*)&mCalculatorListener);
+        ICalculator* mCalculator = ICalculator::Probe(helper);
+ALOGD("OnCreate========0002===mCalculator:%d",*(Int32*)&mCalculator);
+        IEvaluateCallback* mIvaluateCallback = IEvaluateCallback::Probe(helper);
+ALOGD("OnCreate========0002===mIvaluateCallback:%d",*(Int32*)&mIvaluateCallback);
+
+
+
     }
 
-    return mListener->OnCreate(this, savedInstanceState);
+ALOGD("OnCreate========0003===");
+    ec = mListener->OnCreate(this, savedInstanceState);
+ALOGD("OnCreate========0004===");
 
+    //return ec;
+}
 //-----------------------
+    ALOGD("Calculator::OnCreate====begin====1====");
 
-    ALOGD("Calculator::OnCreate====end====1====");
+    mDisplayView = FindViewById(R::id::display);
+    mFormulaEditText = ICalculatorEditText::Probe(FindViewById(R::id::formula));
+    mResultEditText = ICalculatorEditText::Probe(FindViewById(R::id::result));
+    AutoPtr<IView> tmpView = FindViewById(R::id::pad_pager);
+    mPadViewPager = IViewPager::Probe(FindViewById(R::id::pad_pager));
+    mDeleteButton = FindViewById(R::id::del);
+    mClearButton = FindViewById(R::id::clr);
+
+    tmpView = FindViewById(R::id::pad_numeric);
+    tmpView->FindViewById(R::id::eq, (IView**)&mEqualButton);
+    Int32 visibility;
+    ;
+    if (mEqualButton == NULL || (mEqualButton->GetVisibility(&visibility), visibility != IView::VISIBLE)) {
+        tmpView = NULL;
+        tmpView = FindViewById(R::id::pad_operator);
+        tmpView->FindViewById(R::id::eq, (IView**)&mEqualButton);
+    }
+
+    //AutoPtr<CalculatorExpressionTokenizer> cet = new CalculatorExpressionTokenizer();
+    //cet->constructor(IContext::Probe(this));
+    AutoPtr<ICalculatorExpressionTokenizer> cet;
+    CCalculatorExpressionTokenizer::New(IContext::Probe(this), (ICalculatorExpressionTokenizer**)&cet);
+    mTokenizer = cet.Get();
+
+    //AutoPtr<CalculatorExpressionEvaluator> elr = new CalculatorExpressionEvaluator();
+    //elr->constructor(cet.Get());
+    AutoPtr<ICalculatorExpressionEvaluator> elr;
+    CCalculatorExpressionEvaluator::New(cet.Get(), (ICalculatorExpressionEvaluator**)&elr);
+    mEvaluator = elr.Get();
+
+    AutoPtr<IBundleHelper> bhl;
+    CBundleHelper::AcquireSingleton((IBundleHelper**)&bhl);
+    AutoPtr<IBundle> empty;
+    bhl->GetEMPTY((IBundle**)&empty);
+    savedInstanceState = savedInstanceState == NULL ? empty.Get() : savedInstanceState;
+    Int32 vol;
+    savedInstanceState->GetInt32(KEY_CURRENT_STATE, INPUT, &vol);
+    SetState(vol);
+    String str;
+    savedInstanceState->GetString(KEY_CURRENT_EXPRESSION, String(""), &str);
+    String text;
+    mTokenizer->GetLocalizedExpression(str, &text);
+    AutoPtr<ITextView> textView = ITextView::Probe(mFormulaEditText);
+    // textView->SetText(StringUtils::ParseCharSequence(text));
+    AutoPtr<ICharSequence> cs;
+    textView->GetText((ICharSequence**)&cs);
+    mEvaluator->Evaluate(cs, this);
+
+    textView->SetEditableFactory(mFormulaEditableFactory);
+    textView->AddTextChangedListener(mFormulaTextWatcher);
+    IView::Probe(mFormulaEditText)->SetOnKeyListener(mFormulaOnKeyListener);
+    AutoPtr<InnerListener> listener = new InnerListener(this);
+    mFormulaEditText->SetOnTextSizeChangeListener(listener);
+    //return mDeleteButton->SetOnLongClickListener(listener);
+    ec = mDeleteButton->SetOnLongClickListener(listener);
+
+    ALOGD("Calculator::OnCreate====end========");
 
     return ec;
 }
@@ -458,6 +481,7 @@ ECode Calculator::OnCreate(
 ECode Calculator::OnSaveInstanceState(
     /*[in] */ /*@NonNull */IBundle* outState)
 {
+    ALOGD("Calculator::OnSaveInstanceState====begin====");
     VALIDATE_NOT_NULL(outState);
 
     // If there's an animation in progress, cancel it first to ensure our state is up-to-date.
@@ -480,6 +504,7 @@ ECode Calculator::OnSaveInstanceState(
 void Calculator::SetState(
     /*[in] */ CalculatorState state)
 {
+    ALOGD("Calculator::SetState====begin====");
     if (mCurrentState != state) {
         mCurrentState = state;
 
@@ -517,6 +542,7 @@ void Calculator::SetState(
 
 ECode Calculator::OnBackPressed()
 {
+    ALOGD("Calculator::OnBackPressed====begin====");
     Int32 currentItem;
     if (mPadViewPager == NULL || (mPadViewPager->GetCurrentItem(&currentItem), currentItem == 0)) {
         // If the user is currently looking at the first pad (or the pad is not paged),
@@ -533,10 +559,14 @@ ECode Calculator::OnBackPressed()
 
 ECode Calculator::OnUserInteraction()
 {
+    ALOGD("Calculator::OnUserInteraction====begin====");
     Activity::OnUserInteraction();
 
-    // If there's an animation in progress, cancel it so the user interaction can be handled
-    // immediately.
+    // ECode ec = mListener->OnUserInteraction(this);
+    // return ec;
+
+    //If there's an animation in progress, cancel it so the user interaction can be handled
+    //immediately.
     if (mCurrentAnimator != NULL) {
         mCurrentAnimator->Cancel();
     }
@@ -546,6 +576,10 @@ ECode Calculator::OnUserInteraction()
 ECode Calculator::OnButtonClick(
     /* [in] */ IView* iview)
 {
+    ALOGD("Calculator::OnButtonClick====begin====");
+
+    //ECode ec = mListener->OnButtonClick(this, iview);
+
     mCurrentButton = iview;
 
     Int32 id;
@@ -589,6 +623,7 @@ ECode Calculator::OnLongClick(
     /* [in] */ IView* iview,
     /* [out] */ Boolean* result)
 {
+    ALOGD("Calculator::OnLongClick====begin====");
     VALIDATE_NOT_NULL(result);
 
     mCurrentButton = iview;
@@ -609,10 +644,12 @@ ECode Calculator::OnEvaluate(
     /* [in] */ const String& result,
     /* [in] */ Int32 errorResourceId)
 {
+    ALOGD("Calculator::OnEvaluated====begin====");
     if (mCurrentState == INPUT) {
         ITextView::Probe(mResultEditText)->SetText(StringUtils::ParseCharSequence(result));
     }
-    else if (errorResourceId != INVALID_RES_ID) {
+    //else if (errorResourceId != INVALID_RES_ID) {
+    else if (errorResourceId != IEvaluateCallback::INVALID_RES_ID) {
         OnError(errorResourceId);
     }
     else if (!TextUtils::IsEmpty(result)) {
@@ -631,6 +668,7 @@ ECode Calculator::OnTextSizeChanged(
     /* [in] */ ITextView* textView,
     /* [in] */ Float oldSize)
 {
+    ALOGD("Calculator::OnTextSizeChanged====begin====");
     if (mCurrentState != INPUT) {
         // Only animate text changes that occur from user input.
         return NOERROR;
@@ -700,6 +738,7 @@ ECode Calculator::OnTextSizeChanged(
 
 void Calculator::OnEquals()
 {
+    ALOGD("Calculator::OnEquals====begin====");
     if (mCurrentState == INPUT) {
         SetState(EVALUATE);
         AutoPtr<ICharSequence> cs;
@@ -710,6 +749,7 @@ void Calculator::OnEquals()
 
 void Calculator::OnDelete()
 {
+    ALOGD("Calculator::OnDelete====begin====");
     // Delete works like backspace; remove the last character from the expression.
     AutoPtr<IEditable> formulaText;
     ITextView::Probe(mFormulaEditText)->GetEditableText((IEditable**)&formulaText);
@@ -725,6 +765,7 @@ void Calculator::Reveal(
     /* [in] */ Int32 colorRes,
     /* [in] */ IAnimatorListener* listener)
 {
+    ALOGD("Calculator::Reveal====begin====");
     AutoPtr<IWindow> window;
     GetWindow((IWindow**)&window);
     AutoPtr<IView> dView;
@@ -818,6 +859,7 @@ void Calculator::Reveal(
 
 void Calculator::OnClear()
 {
+    ALOGD("Calculator::OnClear====begin====");
     AutoPtr<ICharSequence> cs;
     ITextView::Probe(mFormulaEditText)->GetText((ICharSequence**)&cs);
     if (TextUtils::IsEmpty(cs)) {
@@ -831,6 +873,7 @@ void Calculator::OnClear()
 void Calculator::OnError(
     /* [in] */ Int32 errorResourceId)
 {
+    ALOGD("Calculator::OnError====begin====");
     if (mCurrentState != EVALUATE) {
         // Only animate error on evaluate.
         ITextView::Probe(mResultEditText)->SetText(errorResourceId);
@@ -844,6 +887,7 @@ void Calculator::OnError(
 void Calculator::OnResult(
     /* [in] */ const String& result)
 {
+    ALOGD("Calculator::OnResult====begin====");
     // Calculate the values needed to perform the scale and translation animations,
     // accounting for how the scale will affect the final position of the text.
     Float formulaSize;
