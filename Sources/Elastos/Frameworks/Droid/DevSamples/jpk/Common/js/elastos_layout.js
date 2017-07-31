@@ -466,6 +466,10 @@ CreateView(name, inPrefix, attrs) {
     var prefix = inPrefix;
     if(!prefix)prefix = "Elastos.Droid.View.";
 
+    if(name=="com.nolane.calculator.CustomHorizontalScrollView") {
+        name = "HorizontalScrollView";
+    }
+
     if(name=="LinearLayout")prefix = "Elastos.Droid.Widget.";
     // if(name=="LinearLayout") {
     //     name = "Elastos.DevSamples.Node.JSCalculator.CNodeLinearLayout";
@@ -481,6 +485,9 @@ CreateView(name, inPrefix, attrs) {
     if(name=="RadioButton")prefix = "Elastos.Droid.Widget.";
     if(name=="ToggleButton")prefix = "Elastos.Droid.Widget.";
     if(name=="ListView")prefix = "Elastos.Droid.Widget.";
+    if(name=="TableLayout")prefix = "Elastos.Droid.Widget.";
+    if(name=="HorizontalScrollView")prefix = "Elastos.Droid.Widget.";
+    if(name=="TableRow")prefix = "Elastos.Droid.Widget.";
 
     if(name.indexOf("Elastos.")==0)prefix = "";
 

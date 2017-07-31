@@ -1,0 +1,172 @@
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/TableLayout1"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.nolane.calculator.CustomHorizontalScrollView
+        android:id="@+id/horizontalScrollView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingLeft="@dimen/number_view_margin"
+        android:paddingRight="@dimen/number_view_margin"
+        android:background="@color/value_background"
+        android:layout_weight="1">
+
+        <TextView
+            android:id="@+id/textViewCurNum"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right|center_vertical"
+            android:singleLine="true"
+            android:text="0"
+            android:textSize="@dimen/number_view_text_size"
+            android:ellipsize="marquee"
+            android:focusable="true"
+            android:textColor="@color/value" />
+
+    </com.nolane.calculator.CustomHorizontalScrollView>
+
+    <TableRow style="@style/CalculatorTableRow">
+
+        <Button
+            style="@style/CalculatorButton.Operation"
+            android:id="@+id/buttonPow"
+            android:text="x^y" />
+
+        <Button
+            style="@style/CalculatorButton.Operation"
+            android:id="@+id/buttonSqrt"
+            android:text="√x" />
+
+        <Button
+            style="@style/CalculatorButton.Functional"
+            android:id="@+id/buttonDelete"
+            android:text="←" />
+
+        <Button
+            style="@style/CalculatorButton.Functional"
+            android:id="@+id/buttonClear"
+            android:text="C" />
+
+    </TableRow>
+
+    <TableRow style="@style/CalculatorTableRow">
+
+        <Button
+            style="@style/CalculatorButton.Operation"
+            android:id="@+id/buttonM"
+            android:text="M" />
+
+        <Button
+            style="@style/CalculatorButton.Operation"
+            android:id="@+id/buttonMplus"
+            android:text="M+" />
+
+        <Button
+            style="@style/CalculatorButton.Operation"
+            android:id="@+id/buttonMminus"
+            android:text="M-" />
+
+        <Button
+            style="@style/CalculatorButton.Operation"
+            android:id="@+id/buttonPlusMinus"
+            android:text="+/-" />
+    </TableRow>
+
+    <TableRow style="@style/CalculatorTableRow">
+
+        <Button
+            style="@style/CalculatorButton.Number"
+            android:id="@+id/button7"
+            android:text="7" />
+
+        <Button
+            style="@style/CalculatorButton.Number"
+            android:id="@+id/button8"
+            android:text="8" />
+
+        <Button
+            style="@style/CalculatorButton.Number"
+            android:id="@+id/button9"
+            android:text="9" />
+
+        <Button
+            style="@style/CalculatorButton.Operation"
+            android:id="@+id/buttonDiv"
+            android:text="/" />
+
+    </TableRow>
+
+    <TableRow style="@style/CalculatorTableRow">
+
+        <Button
+            style="@style/CalculatorButton.Number"
+            android:id="@+id/button4"
+            android:text="4" />
+
+        <Button
+            style="@style/CalculatorButton.Number"
+            android:id="@+id/button5"
+            android:text="5" />
+
+        <Button
+            style="@style/CalculatorButton.Number"
+            android:id="@+id/button6"
+            android:text="6" />
+
+        <Button
+            style="@style/CalculatorButton.Operation"
+            android:id="@+id/buttonMul"
+            android:text="*" />
+
+    </TableRow>
+
+    <TableRow style="@style/CalculatorTableRow">
+
+        <Button
+            style="@style/CalculatorButton.Number"
+            android:id="@+id/button1"
+            android:text="1" />
+
+        <Button
+            style="@style/CalculatorButton.Number"
+            android:id="@+id/button2"
+            android:text="2" />
+
+        <Button
+            style="@style/CalculatorButton.Number"
+            android:id="@+id/button3"
+            android:text="3" />
+
+        <Button
+            style="@style/CalculatorButton.Operation"
+            android:id="@+id/buttonMinus"
+            android:text="-" />
+
+    </TableRow>
+
+    <TableRow style="@style/CalculatorTableRow">
+
+        <Button
+            style="@style/CalculatorButton.Number"
+            android:id="@+id/button0"
+            android:text="0" />
+
+        <Button
+            style="@style/CalculatorButton.Number"
+            android:id="@+id/buttonPoint"
+            android:text="." />
+
+        <Button
+            style="@style/CalculatorButton.Operation"
+            android:id="@+id/buttonAssign"
+            android:text="=" />
+
+        <Button
+            style="@style/CalculatorButton.Operation"
+            android:id="@+id/buttonPlus"
+            android:text="+" />
+
+    </TableRow>
+
+</TableLayout>

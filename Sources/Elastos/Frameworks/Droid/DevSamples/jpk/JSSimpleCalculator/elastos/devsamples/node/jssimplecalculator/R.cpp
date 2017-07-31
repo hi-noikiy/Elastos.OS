@@ -1,0 +1,80 @@
+#include "R.h"
+namespace Elastos {
+namespace DevSamples {
+namespace Node {
+namespace JSSimpleCalculator {
+ 
+const int R::color::button_border;
+const int R::color::button_focused;
+const int R::color::button_pressed;
+const int R::color::button_text;
+const int R::color::functional_button_normal;
+const int R::color::number_button_normal;
+const int R::color::operation_button_normal;
+const int R::color::value;
+const int R::color::value_background;
+const int R::dimen::activity_horizontal_margin;
+const int R::dimen::activity_vertical_margin;
+const int R::dimen::button_separator_line_width;
+const int R::dimen::number_button_text_size;
+const int R::dimen::number_view_margin;
+const int R::dimen::number_view_text_size;
+const int R::drawable::functional_button_background_selector;
+const int R::drawable::ic_launcher;
+const int R::drawable::icon;
+const int R::drawable::icon_change_precision;
+const int R::drawable::number_button_background_selector;
+const int R::drawable::operation_button_background_selector;
+const int R::id::TableLayout1;
+const int R::id::button0;
+const int R::id::button1;
+const int R::id::button2;
+const int R::id::button3;
+const int R::id::button4;
+const int R::id::button5;
+const int R::id::button6;
+const int R::id::button7;
+const int R::id::button8;
+const int R::id::button9;
+const int R::id::buttonAssign;
+const int R::id::buttonClear;
+const int R::id::buttonDelete;
+const int R::id::buttonDiv;
+const int R::id::buttonM;
+const int R::id::buttonMinus;
+const int R::id::buttonMminus;
+const int R::id::buttonMplus;
+const int R::id::buttonMul;
+const int R::id::buttonPlus;
+const int R::id::buttonPlusMinus;
+const int R::id::buttonPoint;
+const int R::id::buttonPow;
+const int R::id::buttonSqrt;
+const int R::id::horizontalScrollView;
+const int R::id::menu_item_set_precision;
+const int R::id::seekBar;
+const int R::id::textView;
+const int R::id::textViewCurNum;
+const int R::layout::layout_calc;
+const int R::layout::precision_dialog;
+const int R::menu::calculator_menu;
+const int R::string::app_name;
+const int R::string::text_cancel_button;
+const int R::string::text_infinity;
+const int R::string::text_no_button;
+const int R::string::text_ok_button;
+const int R::string::text_rate_dialog;
+const int R::string::text_set_precision_item;
+const int R::string::text_too_long_value;
+const int R::string::text_wrong_argument;
+const int R::style::AppTheme;
+const int R::style::CalculatorButton;
+const int R::style::CalculatorButton_Functional;
+const int R::style::CalculatorButton_Number;
+const int R::style::CalculatorButton_Operation;
+const int R::style::CalculatorTableRow;
+};
+};
+};
+};
+
