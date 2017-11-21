@@ -55,7 +55,7 @@ namespace Droid {
 namespace Net {
 namespace Nsd {
 
-CAR_INTERFACE_IMPL_2(NsdServiceInfo, Object, IParcelable, INsdServiceInfo)
+CAR_INTERFACE_IMPL(NsdServiceInfo, Object, IParcelable, INsdServiceInfo)
 
 const String NsdServiceInfo::TAG("NsdServiceInfo");
 

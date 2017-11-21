@@ -1276,7 +1276,7 @@ ECode View::InnerViewOnClickListener::OnClick(
 //===================================================================
 //                          View
 //===================================================================
-CAR_INTERFACE_IMPL_4(View, Object, IView, IDrawableCallback, IKeyEventCallback, IAccessibilityEventSource)
+CAR_INTERFACE_IMPL(View, Object, IView, IDrawableCallback, IKeyEventCallback, IAccessibilityEventSource)
 
 View::View()
     : mCachingFailed(FALSE)
