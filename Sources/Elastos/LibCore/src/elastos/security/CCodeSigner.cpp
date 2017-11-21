@@ -28,7 +28,7 @@ namespace Security {
 static const Int64 sSerialVersionUID = 6819288105193937581L;
 
 CAR_OBJECT_IMPL(CCodeSigner)
-CAR_INTERFACE_IMPL_2(CCodeSigner, Object, ICodeSigner, ISerializable)
+CAR_INTERFACE_IMPL(CCodeSigner, Object, ICodeSigner, ISerializable)
 CCodeSigner::CCodeSigner()
     : mHash(0)
 {}

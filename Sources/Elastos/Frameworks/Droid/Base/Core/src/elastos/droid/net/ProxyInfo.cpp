@@ -46,7 +46,7 @@ namespace Elastos {
 namespace Droid {
 namespace Net {
 
-CAR_INTERFACE_IMPL_2(ProxyInfo, Object, IParcelable, IProxyInfo)
+CAR_INTERFACE_IMPL(ProxyInfo, Object, IParcelable, IProxyInfo)
 
 ProxyInfo::ProxyInfo()
     : mPort(0)

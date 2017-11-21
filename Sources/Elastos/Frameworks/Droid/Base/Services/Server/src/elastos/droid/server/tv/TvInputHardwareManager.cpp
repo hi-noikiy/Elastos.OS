@@ -273,7 +273,7 @@ ECode TvInputHardwareManager::TvInputHardwareImpl::InnerSub_AudioManagerOnAudioP
 //=============================================================================
 // TvInputHardwareManager::TvInputHardwareImpl
 //=============================================================================
-CAR_INTERFACE_IMPL_2(TvInputHardwareManager::TvInputHardwareImpl, Object, IITvInputHardware, IBinder)
+CAR_INTERFACE_IMPL(TvInputHardwareManager::TvInputHardwareImpl, Object, IITvInputHardware, IBinder)
 
 TvInputHardwareManager::TvInputHardwareImpl::TvInputHardwareImpl(
     /* [in] */ TvInputHardwareManager* host)
@@ -753,7 +753,7 @@ ECode TvInputHardwareManager::ListenerHandler::HandleMessage(
 //=============================================================================
 // TvInputHardwareManager::HdmiHotplugEventListener
 //=============================================================================
-CAR_INTERFACE_IMPL_2(TvInputHardwareManager::HdmiHotplugEventListener, Object, IIHdmiHotplugEventListener, IBinder)
+CAR_INTERFACE_IMPL(TvInputHardwareManager::HdmiHotplugEventListener, Object, IIHdmiHotplugEventListener, IBinder)
 
 TvInputHardwareManager::HdmiHotplugEventListener::HdmiHotplugEventListener(
     /* [in] */ TvInputHardwareManager* host)
@@ -795,7 +795,7 @@ ECode TvInputHardwareManager::HdmiHotplugEventListener::ToString(
 //=============================================================================
 // TvInputHardwareManager::HdmiDeviceEventListener
 //=============================================================================
-CAR_INTERFACE_IMPL_2(TvInputHardwareManager::HdmiDeviceEventListener, Object, IIHdmiDeviceEventListener, IBinder)
+CAR_INTERFACE_IMPL(TvInputHardwareManager::HdmiDeviceEventListener, Object, IIHdmiDeviceEventListener, IBinder)
 
 TvInputHardwareManager::HdmiDeviceEventListener::HdmiDeviceEventListener(
     /* [in] */ TvInputHardwareManager* host)
@@ -896,7 +896,7 @@ ECode TvInputHardwareManager::HdmiDeviceEventListener::ToString(
 //=============================================================================
 // TvInputHardwareManager::HdmiSystemAudioModeChangeListener
 //=============================================================================
-CAR_INTERFACE_IMPL_2(TvInputHardwareManager::HdmiSystemAudioModeChangeListener, Object, IIHdmiSystemAudioModeChangeListener, IBinder)
+CAR_INTERFACE_IMPL(TvInputHardwareManager::HdmiSystemAudioModeChangeListener, Object, IIHdmiSystemAudioModeChangeListener, IBinder)
 
 TvInputHardwareManager::HdmiSystemAudioModeChangeListener::HdmiSystemAudioModeChangeListener(
     /* [in] */ TvInputHardwareManager* host)

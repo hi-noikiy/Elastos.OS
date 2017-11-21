@@ -2410,7 +2410,7 @@ RemoteViews::MyContextWrapper::GetTheme(
 //==============================================================================
 //                  RemoteViews
 //==============================================================================
-CAR_INTERFACE_IMPL_3(RemoteViews, Object, IRemoteViews, IParcelable, ILayoutInflaterFilter)
+CAR_INTERFACE_IMPL(RemoteViews, Object, IRemoteViews, IParcelable, ILayoutInflaterFilter)
 
 static void ThreadDestructor(void* st)
 {
