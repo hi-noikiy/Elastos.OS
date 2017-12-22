@@ -293,7 +293,7 @@ ECode Calculator::OnResultAnimatorListenerAdapter::OnAnimationEnd(
 //           Calculator::InnerListener
 //----------------------------------------------------------------
 
-CAR_INTERFACE_IMPL_2(Calculator::InnerListener, Object, IOnTextSizeChangeListener, IViewOnLongClickListener)
+CAR_INTERFACE_IMPL(Calculator::InnerListener, Object, IOnTextSizeChangeListener, IViewOnLongClickListener)
 
 Calculator::InnerListener::InnerListener(
     /* [in] */ Calculator* host)
@@ -326,7 +326,7 @@ ECode Calculator::InnerListener::OnTextSizeChanged(
 //----------------------------------------------------------------
 //           Calculator
 //----------------------------------------------------------------
-CAR_INTERFACE_IMPL_2(Calculator, Activity, IEvaluateCallback, ICalculator)
+CAR_INTERFACE_IMPL(Calculator, Activity, IEvaluateCallback, ICalculator)
 
 Calculator::Calculator()
 {
