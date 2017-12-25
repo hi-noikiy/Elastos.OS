@@ -1,0 +1,66 @@
+#=========================================================================
+# Copyright (C) 2017 The Elastos Open Source Project
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#=========================================================================
+
+TARGET_NAME = Elastos.Droid.Calculator3
+TARGET_TYPE = eco
+
+C_DEFINES += -DHAVE_SYS_UIO_H
+
+CAR_FLAGS += -n -u
+LUBE_FLAGS += -n -u
+
+INCLUDES += $(MAKEDIR)/inc
+INCLUDES += $(MAKEDIR)/src
+INCLUDES += $(MAKEDIR)/../../Arity/inc
+
+VPATH += $(MAKEDIR)/src/elastos/droid/calculator3
+
+SOURCES += Elastos.Droid.Calculator3.car
+SOURCES += R.cpp
+
+SOURCES += CNodeListener.cpp
+
+SOURCES += Calculator.cpp
+SOURCES += CalculatorApplication.cpp
+
+SOURCES += calculator.cpp
+
+SOURCES += Elastos.CoreLibrary.cpp
+SOURCES += Elastos.Droid.Core.cpp
+SOURCES += Elastos.Droid.Calculator3.Component.cpp
+SOURCES += Elastos.Droid.Calculator3.Expression.cpp
+
+LIBRARIES = $(XDK_USER_LIB)/Elastos.Runtime.lib
+LIBRARIES += $(XDK_TARGETS)/Elastos.Runtime.eco
+LIBRARIES += $(XDK_TARGETS)/Elastos.CoreLibrary.eco
+LIBRARIES += $(XDK_TARGETS)/Elastos.Droid.Core.eco
+LIBRARIES += $(XDK_TARGETS)/Elastos.Droid.Calculator3.Component.eco
+LIBRARIES += $(XDK_TARGETS)/Elastos.Droid.Calculator3.Expression.eco
+LIBRARIES += -lm -lcutils -licuuc -llog -lutils -landroidfw
+
+LIBRARIES += $(XDK_USER_LIB)/crt0.lib
+LIBRARIES += -ldl
+LIBRARIES += -lnode
+
+APPPACK = 1
+APP_PACKAGE_NAME = Elastos.Droid.Calculator3
+RES_NAMESPACE = Elastos.Droid.Calculator3
+DIRRESOURCES += $(MAKEDIR)/res;
+TARGET_CPU_ABI = armeabi-v7a
+LIBRESOURCES = $(XDK_TARGETS)/Org.Javia.Arity.eco
+LIBRESOURCES += $(XDK_TARGETS)/Elastos.Droid.Calculator3.Component.eco
+LIBRESOURCES += $(XDK_TARGETS)/Elastos.Droid.Calculator3.Expression.eco
+APP_DIR_NAME = Calculator3

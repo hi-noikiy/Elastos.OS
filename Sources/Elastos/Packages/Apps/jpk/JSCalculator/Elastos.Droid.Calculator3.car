@@ -1,0 +1,94 @@
+//=========================================================================
+// Copyright (C) 2017 The Elastos Open Source Project
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//=========================================================================
+
+module
+{
+    importlib("Elastos.Droid.Core.eco");
+
+    importlib("Elastos.Droid.Calculator3.Component.eco");
+    importlib("Elastos.Droid.Calculator3.Expression.eco");
+
+    merge("car/elastos/droid/calculator3/helper.car");
+
+    merge("car/elastos/droid/calculator3/calculator.car");
+    merge("car/elastos/droid/calculator3/calculatorApplication.car");
+
+    interface Elastos.Droid.Calculator3.ICalculator;
+    interface Elastos.Droid.Calculator3.ICalculatorApplication;
+
+    using interface Elastos.Droid.Calculator3.Expression.IEvaluateCallback;
+
+    using interface Elastos.Droid.App.IActivity;
+    using interface Elastos.Droid.App.IApplication;
+    using interface Elastos.Droid.Content.IContext;
+    using interface Elastos.Droid.Content.IContextWrapper;
+    using interface Elastos.Droid.Content.IComponentCallbacks;
+    using interface Elastos.Droid.Content.IComponentCallbacks2;
+    using interface Elastos.Droid.View.IContextThemeWrapper;
+    using interface Elastos.Droid.View.ILayoutInflaterFactory;
+    using interface Elastos.Droid.View.ILayoutInflaterFactory2;
+    using interface Elastos.Droid.View.IWindowCallback;
+    using interface Elastos.Droid.View.IKeyEventCallback;
+    using interface Elastos.Droid.View.IViewOnCreateContextMenuListener;
+    using interface Elastos.Droid.View.IOnWindowDismissedCallback;
+
+    namespace Elastos{
+    namespace Droid {
+    namespace Calculator3 {
+
+    class CNodeListener {
+        constructor();
+
+        interface INodeListener;
+    }
+
+    class CCalculatorApplication {
+        constructor();
+
+        interface IApplication;
+        interface IContextWrapper;
+        interface IContext;
+        interface IComponentCallbacks2;
+        interface IComponentCallbacks;
+
+        interface ICalculatorApplication;
+    }
+
+    class CCalculator
+    {
+        constructor();
+
+        interface IContext;
+        interface IContextThemeWrapper;
+
+        interface IActivity;
+        interface ILayoutInflaterFactory;
+        interface ILayoutInflaterFactory2;
+        interface IWindowCallback;
+        interface IKeyEventCallback;
+        interface IViewOnCreateContextMenuListener;
+        interface IComponentCallbacks;
+        interface IComponentCallbacks2;
+        interface IOnWindowDismissedCallback;
+
+        interface IEvaluateCallback;
+        interface ICalculator;
+    }
+
+    } // namespace Calculator3
+    } // namespace Droid
+    } // namespace Elastos
+}

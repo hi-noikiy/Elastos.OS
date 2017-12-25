@@ -51,6 +51,9 @@ public:
     CARAPI GetClassID(
         /* [out] */ _ELASTOS ClassID *pCLSID);
 
+    CARAPI GetClassInfo(
+        /* [out] */ IInterface** clsInfo);
+
     CARAPI GetHashCode(
         /* [out] */ Int32* pHashCode);
 

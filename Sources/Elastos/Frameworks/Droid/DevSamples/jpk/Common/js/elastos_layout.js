@@ -466,11 +466,15 @@ CreateView(name, inPrefix, attrs) {
     var prefix = inPrefix;
     if(!prefix)prefix = "Elastos.Droid.View.";
 
-    // if(name=="LinearLayout")prefix = "Elastos.Droid.Widget.";
-    if(name=="LinearLayout") {
-        name = "Elastos.DevSamples.Node.JSCalculator.CNodeLinearLayout";
-        prefix = "";
+    if(name=="com.nolane.calculator.CustomHorizontalScrollView") {
+        name = "HorizontalScrollView";
     }
+
+    if(name=="LinearLayout")prefix = "Elastos.Droid.Widget.";
+    // if(name=="LinearLayout") {
+    //     name = "Elastos.DevSamples.Node.JSCalculator.CNodeLinearLayout";
+    //     prefix = "";
+    // }
     if(name=="RelativeLayout")prefix = "Elastos.Droid.Widget.";
     if(name=="Button")prefix = "Elastos.Droid.Widget.";
 
@@ -481,6 +485,9 @@ CreateView(name, inPrefix, attrs) {
     if(name=="RadioButton")prefix = "Elastos.Droid.Widget.";
     if(name=="ToggleButton")prefix = "Elastos.Droid.Widget.";
     if(name=="ListView")prefix = "Elastos.Droid.Widget.";
+    if(name=="TableLayout")prefix = "Elastos.Droid.Widget.";
+    if(name=="HorizontalScrollView")prefix = "Elastos.Droid.Widget.";
+    if(name=="TableRow")prefix = "Elastos.Droid.Widget.";
 
     if(name.indexOf("Elastos.")==0)prefix = "";
 
@@ -576,11 +583,14 @@ CreateView(name, inPrefix, attrs) {
     bCustomControl = bCustomControl || reflectionClassName.indexOf("CalculatorEditText") > -1;
     bCustomControl = bCustomControl || reflectionClassName.indexOf("CalculatorPadViewPager") > -1;
     bCustomControl = bCustomControl || reflectionClassName.indexOf("CalculatorPadLayout") > -1;
-    bCustomControl = bCustomControl || reflectionClassName.indexOf("NodeLinearLayout") > -1;
+    // bCustomControl = bCustomControl || reflectionClassName.indexOf("NodeLinearLayout") > -1;
     if (bCustomControl) {
-        view = CObject.New("/data/elastos/Elastos.DevSamples.Node.JSCalculator.eco", reflectionClassName, oActivity, attrs);
+        elog("====CustomControl====begin====");
+        //view = CObject.New("/data/elastos/Elastos.DevSamples.Node.JSCalculator.eco", reflectionClassName, oActivity, attrs);
+        view = CObject.New("/system/lib/Elastos.Droid.Calculator3.Component.eco", reflectionClassName, oActivity, attrs);
     }
     else {
+        elog("====StandControl====begin====");
         view = Droid_New(reflectionClassName, oActivity, attrs);
     }
 
@@ -779,12 +789,18 @@ OnFinishInflate(parent) {
 // CButton                 Button::OnFinishInflate
 // CLinearLayout           LinearLayout::OnFinishInflate
 // CCalculatorEditText
-// CCalculatorPadLayout
+// CCalculatorPadLayout                 OnFinishInfate
 // CCalculatorPadViewPager
+
+//all tags:CButton/CCalculatorPadLayout/CLinearLayout/CCalculatorPadViewPager
 
     if(parent&&parent.OnFinishInflate) {
         //parent.OnFinishInflate();
         parent.OnFinishInflate();
+    }
+    else if(parent&&parent._OnFinishInflate) {
+        elog("====STC::RInflate====finishInflate====protect to public!");
+        parent._OnFinishInflate();
     }
     else {
         elog("====STC::RInflate====finishInflate====error: can not call protected method!");

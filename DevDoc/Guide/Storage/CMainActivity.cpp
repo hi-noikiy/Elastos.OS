@@ -50,7 +50,7 @@ CMainActivity::ButtonClickListener::ButtonClickListener(
     : mHost(host)
 {}
 
-CAR_INTERFACE_IMPL_2(CMainActivity::ButtonClickListener, IViewOnClickListener, IRadioGroupOnCheckedChangeListener)
+CAR_INTERFACE_IMPL(CMainActivity::ButtonClickListener, IViewOnClickListener, IRadioGroupOnCheckedChangeListener)
 
 
 const String CMainActivity::TAG("Storage.CMainActivity");

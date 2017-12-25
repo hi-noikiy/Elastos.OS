@@ -4,7 +4,7 @@
 ## 目录
 * [前言](#preface)
 * [数据类型](#datatype)
-    * [基本数据类型](#basicdatatype) 
+    * [基本数据类型](#basicdatatype)
     * [String类型](#string)
     * [ArrayOf类型](#arrayof)
     * [接口](#interfacetype)
@@ -15,17 +15,17 @@
 * [容器](#container)
     * [ETL模板类](#etl)
     * [容器类](#utility)
-* [接口](#interface) 
+* [接口](#interface)
     * [方法重载](#override)
     * [方法签名](#methodsignature)
     * [命名约束](#namingrule)
-    * [返回类型](#returntype) 
+    * [返回类型](#returntype)
     * [IInterface接口](#iinterface)
     * [接口间继承](#inheritinterface)
     * [local与parcelable属性](#localandparcelable)
 * [类与对象](#classandobject)
     * [CAR类与C++类](#carclassandc++class)
-    * [类成员声明及定义](#declareanddefine) 
+    * [类成员声明及定义](#declareanddefine)
     * [CAR类构造方法](#carclassconstructor)
     * [Object类](#objectclass)
     * [Object锁](#objectlock)
@@ -33,19 +33,19 @@
 * [循环引用场景](#referencecycle)
 * [异常](#exception)
 * [线程](#thread)
-    * [Runnable类与HandlerRunnable类](#runnableandhandlerrunnable) 
+    * [Runnable类与HandlerRunnable类](#runnableandhandlerrunnable)
 * [消息](#message)
 * [预定义宏](#macros)
 * [编译](#compile)
-    * [生成文件](#filegeneration) 
+    * [生成文件](#filegeneration)
     * [子模块编译](#submodulecompile)
 * [符号导出](#symbolexport)
 * [调试](#debug)
-    * [定位crash](#locatecrash) 
+    * [定位crash](#locatecrash)
     * [定位内存泄漏](#locatememoryleak)
 * [sources文件](#sources)
     * [ELASTOS_LIBS变量](#elastoslibs)
-    * [LIBRARIES变量](#libraries) 
+    * [LIBRARIES变量](#libraries)
 * [其它](#others)
 * [范例](#example)
 
@@ -141,7 +141,7 @@ ArrayOf的几种典型用法如下：
     }
 
     // CPackageInfo.h
-    CarClass(CPackageInfo) 
+    CarClass(CPackageInfo)
     {
         CARAPI GetActivities(
             /* [out, callee] */ ArrayOf<IActivityInfo*>** activities);
@@ -149,7 +149,7 @@ ArrayOf的几种典型用法如下：
 
     // CPackageInfo.cpp
     ECode CPackageInfo::GetActivities(
-        /* [out, callee] */ ArrayOf<IActivityInfo*>** activities) 
+        /* [out, callee] */ ArrayOf<IActivityInfo*>** activities)
     {
         VALIDATE_NOT_NULL(activities);
         *activities = mActivities;
@@ -628,7 +628,7 @@ Elastos5.0中CButton控件的继承关系为 __CButton-->Button-->TextView-->Vie
 
 ```
 // Elastos/FrameworkDroid/Base/Core/car/accounts.car
-class CAccount 
+class CAccount
 {
     constructor();
 
@@ -679,7 +679,7 @@ class B : public A
 {
 public:
     B() {}
-    CARAPI constructor(Int32 i, Int64 l) 
+    CARAPI constructor(Int32 i, Int64 l)
     { FAIL_RETURN(A::constructor(i, l)); ... }
 }
 
@@ -687,7 +687,7 @@ class C : public B
 {
 public:
     C() {}
-    CARAPI constructor(Int32 i, Int64 l) 
+    CARAPI constructor(Int32 i, Int64 l)
     { FAIL_RETURN(B::constructor(i, l)); ... }
 }
 ```
@@ -806,10 +806,10 @@ __ICloneable__ 接口的实现需要特殊处理，由于Java程序中子类通�
         class Wrapper : IOnClickListener
         {
         private:
-            A* mHost;    
+            A* mHost;
         };
 
-    public: 
+    public:
         CARAPI Func()
         {
             mView->SetListener(mWrapper);
@@ -834,7 +834,7 @@ Libcore和Framework模块有各自的exception和error值的定义(Exceptions.ca
 ### Runnable类与HandlerRunnable类
 __Elastos::Droid::Os::Runnable__ 封装了IRunnable接口，可作为需实现IRunnable接口的类的基类以简化开发。
 
-同样的，__Elastos::Droid::Os::HandlerRunnable__ 可作为需同时实现IHandler与IRunnable接口的类的基类。 
+同样的，__Elastos::Droid::Os::HandlerRunnable__ 可作为需同时实现IHandler与IRunnable接口的类的基类。
 
 <span id="message"></span>
 ## 消息
@@ -846,7 +846,7 @@ Elastos预定义了若干宏以方便开发，说明如下：
 * __REFCOUNT_ADD__ 引用计数加一，__REFCOUNT_RELEASE__ 引用计数减一。
 * __CAR_INTERFACE_DECL__ 声明接口的四个基本方法，__CAR_INTERFACE_IMPL__ 及 __CAR_INTERFACE_IMPL_N__ 定义接口的四个基本方法，接口实现类(C++类或CAR类)可使用它们。
 * __CAR_OBJECT_DECL__ 声明非单例的CAR类的基本方法，__CAR_OBJECT_IMPL__ 定义非单例的CAR类的基本方法，非单例的CAR类可使用它们。
-* __CAR_SINGLETON_DECL__ 声明单例CAR类的基本方法，__CAR_SINGLETON_IMPL__ 定义单例CAR类的基本方法，单例的CAR类可使用它们。 
+* __CAR_SINGLETON_DECL__ 声明单例CAR类的基本方法，__CAR_SINGLETON_IMPL__ 定义单例CAR类的基本方法，单例的CAR类可使用它们。
 
 <span id="compile"></span>
 ## 编译
@@ -941,7 +941,7 @@ I/DEBUG   ( 1218):     #03  pc 0134e49c  /system/lib/Elastos.Droid.Core.eco
 ```
 arm-linux-androideabi-addr2line –e XXX.eco crash-address
 ```
-    
+
 针对例子中的地址执行：
 
 ```
@@ -968,83 +968,39 @@ I/DEBUG   ( 1218):     #03  pc 0134e49c  /system/lib/Elastos.Droid.Core.eco
 ### 定位内存泄漏
 定位Elastos程序内存泄漏的方法如下：
 
-1.将如下代码放到需要重复运行以便排查内存泄漏的地方：
+1.将Elastos5/Sources/Frameworks/Droid/DevSamples/MemoryDumper目录下的dump.cpp拷贝至需要定位内存泄漏的模块的编译路径下，并修改相应的sources将该.cpp加入编译，并将编译后的模块重新部署到设备上。例如，如果要定位Elastos.Droid.Server.eco的内存泄漏，则把该文件拷贝至Elastos5/Sources/Frameworks/Droid/Base/Services/Server/src/elastos/droid/server目录下，并在该目录下的sources文件中加入<code>SOURCES += dump.cpp</code>，增量编译Elastos.Droid.Server.eco，然后将该eco重新部署到设备上。
 
-``` cpp
-#include "os/CDebug.h"
+2.进入shell环境，执行<code>chmod 777 /data/debug</code>赋予/data/debug写权限。
 
-using Elastos::Droid::Os::IDebug;
-using Elastos::Droid::Os::CDebug;
-using Elastos::IO::IFile;
-using Elastos::IO::CFile;
-using Elastos::IO::IFileDescriptor;
-using Elastos::IO::CFileDescriptor;
-using Libcore::IO::IOsConstants;
-using Libcore::IO::COsConstants;
-using Libcore::IO::ILibcore;
-using Libcore::IO::CLibcore;
-using Libcore::IO::IOs;
-using Libcore::IO::IIoBridge;
-using Libcore::IO::CIoBridge;
+3.编译DevSample下面的MemoryDumper，将MemoryDumper拷贝到/data/debug目录下。
 
-static void MyDumpMemery()
-{
-    AutoPtr<IOsConstants> osConstans;
-    COsConstants::AcquireSingleton((IOsConstants**)&osConstans);
-    Int32 m1, m2, m3;
-    osConstans->GetOsConstant(String("O_RDWR"), &m1);
-    osConstans->GetOsConstant(String("O_CREAT"), &m2);
-    osConstans->GetOsConstant(String("O_TRUNC"), &m3);
-
-    AutoPtr<IFile> file;
-    CFile::New(String("/data/debug"), (IFile**)&file);
-    Boolean bval;
-    file->Exists(&bval);
-    if (!bval) {
-        file->Mkdirs(&bval);
-    }
-
-    AutoPtr<IFileDescriptor> ifd;
-    CFileDescriptor::New((IFileDescriptor**)&ifd);
-    AutoPtr<IIoBridge> ioBridge;
-    CIoBridge::AcquireSingleton((IIoBridge**)&ioBridge);
-    Int32 fd;
-    ioBridge->Open(String("/data/debug/1.txt"), m1 | m2 | m3, &fd);
-    ifd->SetDescriptor(fd);
-
-    AutoPtr<IDebug> dbg;
-    CDebug::AcquireSingleton((IDebug**)&dbg);
-    dbg->DumpHeap(ifd);
-}
-```
-
-2.进入shell环境，执行<code>chmod 777 /data/debug</code>赋予/data/debug写权限，然后启用内存调试开关：
+4.执行如下命令启用内存调试模式：
 
 ``` shell
-adb shell setprop libc.debug.malloc 15
+adb shell setprop libc.debug.malloc 1
 adb shell stop
 adb shell start
 ```
 
-3.杀死要调试的进程，让其自动重启。
-
-4.运行几次目标程序，将当前的内存信息保存下来，
+5.假设内存泄漏是因为执行了某个或某些步骤导致的，则在执行该步骤前先执行如下命令，该命令会在/data/debug/目录下生成内存泄漏前的堆内存分配情况文件 __memo_dump.txt__。执行<code>adb pull /data/debug/memo_dump.txt before.txt</code>将该文件从设备中拷贝出来放到当前目录下。
 
 ``` shell
-adb pull /data/debug/1.txt 1.txt
+adb shell
+cd /data/debug
+./MemoryDumper -t
 ```
 
-5.再次运行几次目标程序，将当前的内存信息保存下来
+6.执行会导致内存泄漏的步骤，然后再次执行如下命令，生成内存泄漏后的堆内存分配情况文件 __memo_dump.txt__。执行<code>adb pull /data/debug/memo_dump.txt after.txt</code>将该文件从设备中拷贝出来放到当前目录下。
 
 ``` shell
-adb pull /data/debug/1.txt 1.txt
+adb shell
+cd /data/debug
+./MemoryDumper -t
 ```
 
-6.使用文本比较工具，生成内存信息变动情况diff.txt，将diff.txt放到/data/debug目录下。
+7.使用文本比较工具比较 __before.txt__ 和 __after.txt__，生成内存信息变动情况 __diff.txt__，将diff.txt放到/data/debug目录下。
 
-7.编译DevSample下面的MemoryDummper，将MemoryDummper放到/data/debug目录下，运行 shell命令<code>clear</code>清屏，然后运行<code>./MemoryDummper 要调试的进程id</code>。
-
-8.将shell输出结果拷贝到result.txt，运行<code> MemDumpFormatter result.txt addr2line.txt</code>，分析生成的addr2line.txt中的源代码位置信息。
+8.执行如下命令，将输出结果拷贝到 __result.txt__，运行<code>MemDumpFormatter result.txt addr2line.txt</code>，分析生成的addr2line.txt中的源代码位置信息。
 
 为了调试方便，针对以上步骤制作了一个脚本: [loc_memleak](), 使用时需注意以下几点：
 
@@ -1105,23 +1061,23 @@ adb pull /data/debug/1.txt 1.txt
     ```
 
 * 用接口类型的输入参数去接收out参数是错的，当输入参数值不为NULL时会导致其原先指向的接口的引用计数泄漏，正确的做法是定义新的局部变量接收输入参数。例如：
- 
+
     ``` cpp
-    ECode CXXX::RegisterCallback( 
+    ECode CXXX::RegisterCallback(
         /* [in] */ IXXXCallback* callback,
         /* [in] */ IHandler* _handler)
-    {   
-        AutoPtr<IHandler> hander = _handler;_ 
+    {
+        AutoPtr<IHandler> hander = _handler;_
         if (callback == NULL) {
-            return E_ILLEGAL_ARGUMENT_EXCEPTION;    
-        }   
-        if (handler == NULL) { 
-            CHandler::New((IHandler**)&handler);   
-        }   
-        synchronized (mLock) {  
-            AddCallbackLocked(callback, handler);   
-        }   
-        return NOERROR; 
+            return E_ILLEGAL_ARGUMENT_EXCEPTION;
+        }
+        if (handler == NULL) {
+            CHandler::New((IHandler**)&handler);
+        }
+        synchronized (mLock) {
+            AddCallbackLocked(callback, handler);
+        }
+        return NOERROR;
     }
     ```
 

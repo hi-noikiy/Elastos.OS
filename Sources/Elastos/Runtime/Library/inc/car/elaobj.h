@@ -105,6 +105,9 @@ IObject : public IInterface
     virtual CARAPI GetClassID(
         /* [out] */ _ELASTOS ClassID* clsid) = 0;
 
+    virtual CARAPI GetClassInfo(
+        /* [out] */ IInterface** clsInfo) = 0;
+
     virtual CARAPI Equals(
         /* [in] */ IInterface* object,
         /* [out] */ _ELASTOS Boolean* equals) = 0;

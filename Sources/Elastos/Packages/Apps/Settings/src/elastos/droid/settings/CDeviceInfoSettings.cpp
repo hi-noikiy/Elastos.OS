@@ -229,6 +229,7 @@ const String CDeviceInfoSettings::KEY_BUILD_NUMBER("build_number");
 const String CDeviceInfoSettings::KEY_DEVICE_MODEL("device_model");
 const String CDeviceInfoSettings::KEY_SELINUX_STATUS("selinux_status");
 const String CDeviceInfoSettings::KEY_BASEBAND_VERSION("baseband_version");
+const String CDeviceInfoSettings::KEY_FIRMWARE_VERSION_ELASTOS("firmware_version_elastos");
 const String CDeviceInfoSettings::KEY_FIRMWARE_VERSION("firmware_version");
 const String CDeviceInfoSettings::KEY_UPDATE_SETTING("additional_system_update_settings");
 const String CDeviceInfoSettings::KEY_EQUIPMENT_ID("fcc_equipment_id");
@@ -270,8 +271,13 @@ ECode CDeviceInfoSettings::OnCreate(
 
     AddPreferencesFromResource(R::xml::device_info_settings);
 
-    SetStringSummary(KEY_FIRMWARE_VERSION, Build::VERSION::RELEASE);
+    SetStringSummary(KEY_FIRMWARE_VERSION_ELASTOS, String("5.0"));
     AutoPtr<IPreference> pref;
+    FindPreference(CoreUtils::Convert(KEY_FIRMWARE_VERSION_ELASTOS), (IPreference**)&pref);
+    pref->SetEnabled(TRUE);
+
+    SetStringSummary(KEY_FIRMWARE_VERSION, Build::VERSION::RELEASE);
+    pref = NULL;
     FindPreference(CoreUtils::Convert(KEY_FIRMWARE_VERSION), (IPreference**)&pref);
     pref->SetEnabled(TRUE);
     SetValueSummary(KEY_BASEBAND_VERSION, String("gsm.version.baseband"));

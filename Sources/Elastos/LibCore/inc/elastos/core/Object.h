@@ -48,6 +48,9 @@ public:
 
     CARAPI constructor();
 
+    CARAPI GetClassInfo(
+        /* [out] */ IInterface** clsInfo);
+
     CARAPI GetHashCode(
         /* [out] */ Int32* hashCode);
 
@@ -309,6 +312,7 @@ public:
 
 public:
     NativeObject* mNativeObject;
+    AutoPtr<IClassInfo> mClassInfo;
 };
 
 //====================================================================

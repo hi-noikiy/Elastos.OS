@@ -47,6 +47,9 @@ library
         GetClassID(
             [out] ClassID *clsid);
 
+        GetClassInfo(
+            [out] IInterface **clsInfo);
+
         GetHashCode(
             [out] Int32 * pHashCode);
 

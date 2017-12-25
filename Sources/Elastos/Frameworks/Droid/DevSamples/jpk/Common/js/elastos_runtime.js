@@ -137,6 +137,14 @@ function getCreateOnUIThread(as_ClassName) {
         bRet = true;
     }
 
+    if (as_ClassName == "CTableLayout") {
+        bRet = true;
+    }
+
+    if (as_ClassName == "CHorizontalScrollView") {
+        bRet = true;
+    }
+
     //if (as_ClassName == "Elastos.Droid.Widget.CEdgeEffect") {
     // if (as_ClassName == "CEdgeEffect") {
     //     bRet = true;
