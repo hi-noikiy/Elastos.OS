@@ -18,7 +18,6 @@
 #include <elastos/core/AutoLock.h>
 #include <elastos/utility/logging/Logger.h>
 
-#include <elastos/core/AutoLock.h>
 using Elastos::Core::AutoLock;
 using Elastos::Droid::Text::ISpanned;
 using Elastos::Droid::Text::Method::IKeyListener;
@@ -76,7 +75,8 @@ ECode EditableInputConnection::BeginBatchEdit(
 {
     VALIDATE_NOT_NULL(res);
 
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         if (mBatchEditNesting >= 0) {
             mTextView->BeginBatchEdit();
             mBatchEditNesting++;
@@ -93,7 +93,8 @@ ECode EditableInputConnection::EndBatchEdit(
 {
     VALIDATE_NOT_NULL(res);
 
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         if (mBatchEditNesting > 0) {
             // When the connection is reset by the InputMethodManager and reportFinish
             // is called, some endBatchEdit calls may still be asynchronously received from the
@@ -113,7 +114,8 @@ ECode EditableInputConnection::ReportFinish()
 {
     BaseInputConnection::ReportFinish();
 
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         while (mBatchEditNesting > 0) {
             Boolean res;
             EndBatchEdit(&res);

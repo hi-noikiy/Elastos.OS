@@ -107,7 +107,8 @@ AutoPtr<TextLine> TextLine::Recycle(
         tl->mReplacementSpanSpanSet->Recycle();
     }
 
-    {    AutoLock syncLock(sCachedLock);
+    {
+        AutoLock syncLock(sCachedLock);
         for (Int32 i = 0; i < sCached->GetLength(); ++i) {
             if ((*sCached)[i] == NULL) {
                 sCached->Set(i, tl);

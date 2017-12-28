@@ -31,8 +31,6 @@
 #include "CInputStreamReader.h"
 #include "NodeSet.h"
 
-#include <elastos/core/AutoLock.h>
-using Elastos::Core::AutoLock;
 using Elastos::Core::AutoLock;
 using Elastos::Core::StringUtils;
 using Elastos::Core::StringBuilder;
@@ -460,7 +458,8 @@ ECode XMLParser::LoadNode(
     entries->GetLength(&entryNumber);
     AutoPtr<AbstractPreferences> apf = (AbstractPreferences*)prefs;
     AutoPtr<Object> lock = &apf->mLock;
-    {    AutoLock syncLock(lock);
+    {
+        AutoLock syncLock(lock);
         if (apf->IsRemoved()) {
             return NOERROR;
         }

@@ -21,8 +21,6 @@
 #include <elastos/core/AutoLock.h>
 #include <elastos/utility/logging/Logger.h>
 
-#include <elastos/core/AutoLock.h>
-using Elastos::Core::AutoLock;
 using Elastos::Droid::App::IApplication;
 using Elastos::Droid::Content::ContextWrapper;
 using Elastos::Droid::Content::IContext;
@@ -104,7 +102,8 @@ ECode CIKeyguardService::SetOccluded(
     /* [out] */ Int32* result)
 {
     FAIL_RETURN(mHost->CheckPermission())
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         Boolean b;
         mHost->mKeyguardViewMediator->IsShowing(&b);
         if (isOccluded && b && !mIsOccluded) {

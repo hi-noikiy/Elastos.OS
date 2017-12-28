@@ -25,11 +25,10 @@
 #include <elastos/core/AutoLock.h>
 #include <elastos/utility/logging/Logger.h>
 
-#include <elastos/core/AutoLock.h>
-using Elastos::Core::AutoLock;
 using Elastos::Droid::Os::EIID_IBinder;
 using Elastos::Droid::Utility::CArrayMap;
 using Elastos::Droid::Utility::CSparseArray;
+using Elastos::Core::AutoLock;
 using Elastos::Core::CString;
 using Elastos::Core::ICharSequence;
 using Elastos::Core::CInteger32;
@@ -224,7 +223,8 @@ ECode CTvInputManager::TvInputClient::OnSessionCreated(
     /* [in] */ Int32 seq)
 {
     AutoPtr<ISparseArray> lock = mHost->mSessionCallbackRecordMap;
-    {    AutoLock syncLock(lock);
+    {
+        AutoLock syncLock(lock);
         AutoPtr<IInterface> obj;
         mHost->mSessionCallbackRecordMap->Get(seq, (IInterface**)&obj);
         AutoPtr<SessionCallbackRecord> record = (SessionCallbackRecord*)IObject::Probe(obj);
@@ -248,7 +248,8 @@ ECode CTvInputManager::TvInputClient::OnSessionReleased(
     /* [in] */ Int32 seq)
 {
     AutoPtr<ISparseArray> lock = mHost->mSessionCallbackRecordMap;
-    {    AutoLock syncLock(lock);
+    {
+        AutoLock syncLock(lock);
         AutoPtr<IInterface> obj;
         mHost->mSessionCallbackRecordMap->Get(seq, (IInterface**)&obj);
         AutoPtr<SessionCallbackRecord> record = (SessionCallbackRecord*)IObject::Probe(obj);
@@ -269,7 +270,8 @@ ECode CTvInputManager::TvInputClient::OnSessionEvent(
     /* [in] */ Int32 seq)
 {
     AutoPtr<ISparseArray> lock = mHost->mSessionCallbackRecordMap;
-    {    AutoLock syncLock(lock);
+    {
+        AutoLock syncLock(lock);
         AutoPtr<IInterface> obj;
         mHost->mSessionCallbackRecordMap->Get(seq, (IInterface**)&obj);
         AutoPtr<SessionCallbackRecord> record = (SessionCallbackRecord*)IObject::Probe(obj);
@@ -287,7 +289,8 @@ ECode CTvInputManager::TvInputClient::OnChannelRetuned(
     /* [in] */ Int32 seq)
 {
     AutoPtr<ISparseArray> lock = mHost->mSessionCallbackRecordMap;
-    {    AutoLock syncLock(lock);
+    {
+        AutoLock syncLock(lock);
         AutoPtr<IInterface> obj;
         mHost->mSessionCallbackRecordMap->Get(seq, (IInterface**)&obj);
         AutoPtr<SessionCallbackRecord> record = (SessionCallbackRecord*)IObject::Probe(obj);
@@ -305,7 +308,8 @@ ECode CTvInputManager::TvInputClient::OnTracksChanged(
     /* [in] */ Int32 seq)
 {
     AutoPtr<ISparseArray> lock = mHost->mSessionCallbackRecordMap;
-    {    AutoLock syncLock(lock);
+    {
+        AutoLock syncLock(lock);
         AutoPtr<IInterface> obj;
         mHost->mSessionCallbackRecordMap->Get(seq, (IInterface**)&obj);
         AutoPtr<SessionCallbackRecord> record = (SessionCallbackRecord*)IObject::Probe(obj);
@@ -324,7 +328,8 @@ ECode CTvInputManager::TvInputClient::OnTrackSelected(
     /* [in] */ Int32 seq)
 {
     AutoPtr<ISparseArray> lock = mHost->mSessionCallbackRecordMap;
-    {    AutoLock syncLock(lock);
+    {
+        AutoLock syncLock(lock);
         AutoPtr<IInterface> obj;
         mHost->mSessionCallbackRecordMap->Get(seq, (IInterface**)&obj);
         AutoPtr<SessionCallbackRecord> record = (SessionCallbackRecord*)IObject::Probe(obj);
@@ -341,7 +346,8 @@ ECode CTvInputManager::TvInputClient::OnVideoAvailable(
     /* [in] */ Int32 seq)
 {
     AutoPtr<ISparseArray> lock = mHost->mSessionCallbackRecordMap;
-    {    AutoLock syncLock(lock);
+    {
+        AutoLock syncLock(lock);
         AutoPtr<IInterface> obj;
         mHost->mSessionCallbackRecordMap->Get(seq, (IInterface**)&obj);
         AutoPtr<SessionCallbackRecord> record = (SessionCallbackRecord*)IObject::Probe(obj);
@@ -359,7 +365,8 @@ ECode CTvInputManager::TvInputClient::OnVideoUnavailable(
     /* [in] */ Int32 seq)
 {
     AutoPtr<ISparseArray> lock = mHost->mSessionCallbackRecordMap;
-    {    AutoLock syncLock(lock);
+    {
+        AutoLock syncLock(lock);
         AutoPtr<IInterface> obj;
         mHost->mSessionCallbackRecordMap->Get(seq, (IInterface**)&obj);
         AutoPtr<SessionCallbackRecord> record = (SessionCallbackRecord*)IObject::Probe(obj);
@@ -376,7 +383,8 @@ ECode CTvInputManager::TvInputClient::OnContentAllowed(
     /* [in] */ Int32 seq)
 {
     AutoPtr<ISparseArray> lock = mHost->mSessionCallbackRecordMap;
-    {    AutoLock syncLock(lock);
+    {
+        AutoLock syncLock(lock);
         AutoPtr<IInterface> obj;
         mHost->mSessionCallbackRecordMap->Get(seq, (IInterface**)&obj);
         AutoPtr<SessionCallbackRecord> record = (SessionCallbackRecord*)IObject::Probe(obj);
@@ -394,7 +402,8 @@ ECode CTvInputManager::TvInputClient::OnContentBlocked(
     /* [in] */ Int32 seq)
 {
     AutoPtr<ISparseArray> lock = mHost->mSessionCallbackRecordMap;
-    {    AutoLock syncLock(lock);
+    {
+        AutoLock syncLock(lock);
         AutoPtr<IInterface> obj;
         mHost->mSessionCallbackRecordMap->Get(seq, (IInterface**)&obj);
         AutoPtr<SessionCallbackRecord> record = (SessionCallbackRecord*)IObject::Probe(obj);
@@ -417,7 +426,8 @@ ECode CTvInputManager::TvInputClient::OnLayoutSurface(
     /* [in] */ Int32 seq)
 {
     AutoPtr<ISparseArray> lock = mHost->mSessionCallbackRecordMap;
-    {    AutoLock syncLock(lock);
+    {
+        AutoLock syncLock(lock);
         AutoPtr<IInterface> obj;
         mHost->mSessionCallbackRecordMap->Get(seq, (IInterface**)&obj);
         AutoPtr<SessionCallbackRecord> record = (SessionCallbackRecord*)IObject::Probe(obj);
@@ -449,7 +459,8 @@ ECode CTvInputManager::TvInputManagerCallback::OnInputStateChanged(
     /* [in] */ Int32 state)
 {
     Object& lock = mHost->mLock;
-    {    AutoLock syncLock(lock);
+    {
+        AutoLock syncLock(lock);
         AutoPtr<ICharSequence> csq;
         CString::New(inputId, (ICharSequence**)&csq);
         AutoPtr<IInteger32> i;
@@ -470,7 +481,8 @@ ECode CTvInputManager::TvInputManagerCallback::OnInputAdded(
     /* [in] */ const String& inputId)
 {
     Object& lock = mHost->mLock;
-    {    AutoLock syncLock(lock);
+    {
+        AutoLock syncLock(lock);
         AutoPtr<ICharSequence> csq;
         CString::New(inputId, (ICharSequence**)&csq);
         AutoPtr<IInteger32> i;
@@ -491,7 +503,8 @@ ECode CTvInputManager::TvInputManagerCallback::OnInputRemoved(
     /* [in] */ const String& inputId)
 {
     Object& lock = mHost->mLock;
-    {    AutoLock syncLock(lock);
+    {
+        AutoLock syncLock(lock);
         AutoPtr<ICharSequence> csq;
         CString::New(inputId, (ICharSequence**)&csq);
         mHost->mStateMap->Remove(csq);
@@ -510,7 +523,8 @@ ECode CTvInputManager::TvInputManagerCallback::OnInputUpdated(
     /* [in] */ const String& inputId)
 {
     Object& lock = mHost->mLock;
-    {    AutoLock syncLock(lock);
+    {
+        AutoLock syncLock(lock);
         AutoPtr<ArrayOf<IInterface *> > array;
         mHost->mCallbackRecords->ToArray((ArrayOf<IInterface *>**)&array);
         for (Int32 i = 0; i < array->GetLength(); i++) {
@@ -793,7 +807,8 @@ ECode CTvInputManager::GetInputState(
         // throw new IllegalArgumentException("inputId cannot be NULL");
         return E_ILLEGAL_ARGUMENT_EXCEPTION;
     }
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         AutoPtr<ICharSequence> csq;
         CString::New(inputId, (ICharSequence**)&csq);
         AutoPtr<IInterface> state;
@@ -819,7 +834,8 @@ ECode CTvInputManager::RegisterCallback(
         // throw new IllegalArgumentException("handler cannot be NULL");
         return E_ILLEGAL_ARGUMENT_EXCEPTION;
     }
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         AutoPtr<TvInputCallbackRecord> r = new TvInputCallbackRecord(callback, handler, this);
         mCallbackRecords->Add((IInterface*)(IObject*)r);
     }
@@ -833,7 +849,8 @@ ECode CTvInputManager::UnregisterCallback(
         // throw new IllegalArgumentException("callback cannot be NULL");
         return E_ILLEGAL_ARGUMENT_EXCEPTION;
     }
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         AutoPtr<ArrayOf<IInterface *> > array;
         mCallbackRecords->ToArray((ArrayOf<IInterface *>**)&array);
         for (Int32 i = 0 ; i < array->GetLength(); i++) {
@@ -977,7 +994,8 @@ ECode CTvInputManager::CreateSession(
         return E_ILLEGAL_ARGUMENT_EXCEPTION;
     }
     AutoPtr<SessionCallbackRecord> record = new SessionCallbackRecord(callback, handler, this);
-    {    AutoLock syncLock(mSessionCallbackRecordMap);
+    {
+        AutoLock syncLock(mSessionCallbackRecordMap);
         Int32 seq = mNextSeq++;
         mSessionCallbackRecordMap->Put(seq, (IInterface*)(IObject*)record);
         // try {

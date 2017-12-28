@@ -1916,7 +1916,8 @@ Boolean Settings::Secure::SetLocationModeForUser(
     /* [in] */ Int32 userId)
 {
     Boolean result = FALSE;
-    {    AutoLock syncLock(sLocationSettingsLock);
+    {
+        AutoLock syncLock(sLocationSettingsLock);
         Boolean gps = FALSE;
         Boolean network = FALSE;
         switch (mode) {
@@ -1933,7 +1934,7 @@ Boolean Settings::Secure::SetLocationModeForUser(
                 network = TRUE;
                 break;
             default:
-                Slogger::E("Settings::Secure", "Invalid location mode: %d" + mode);
+                Slogger::E("Settings::Secure", "Invalid location mode: %d", mode);
                 // return E_ILLEGAL_ARGUMENT_EXCEPTION;
                 return FALSE;
         }
@@ -1952,7 +1953,8 @@ Int32 Settings::Secure::GetLocationModeForUser(
     /* [in] */ IContentResolver* cr,
     /* [in] */ Int32 userId)
 {
-    {    AutoLock syncLock(sLocationSettingsLock);
+    {
+        AutoLock syncLock(sLocationSettingsLock);
         Boolean gpsEnabled = FALSE;
         Settings::Secure::IsLocationProviderEnabledForUser(
             cr, ILocationManager::GPS_PROVIDER, userId, &gpsEnabled);

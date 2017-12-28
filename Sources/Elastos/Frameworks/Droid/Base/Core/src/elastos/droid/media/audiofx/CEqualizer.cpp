@@ -19,7 +19,6 @@
 #include <elastos/core/AutoLock.h>
 #include <Elastos.CoreLibrary.Utility.h>
 
-#include <elastos/core/AutoLock.h>
 using Elastos::Core::AutoLock;
 using Elastos::Utility::IUUIDHelper;
 using Elastos::Utility::CUUIDHelper;

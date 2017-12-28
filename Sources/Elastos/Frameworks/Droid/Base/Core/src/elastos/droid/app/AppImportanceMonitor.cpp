@@ -21,7 +21,6 @@
 #include "elastos/droid/app/ActivityManagerNative.h"
 #include <elastos/core/AutoLock.h>
 
-#include <elastos/core/AutoLock.h>
 using Elastos::Core::AutoLock;
 using Elastos::Droid::Content::IContext;
 using Elastos::Droid::Os::IHandler;
@@ -78,7 +77,8 @@ ECode AppImportanceMonitor::ProcessObserver::OnProcessStateChanged(
     /* [in] */ Int32 procState)
 {
     Object& lock = mHost->mAppsLock;
-    {    AutoLock syncLock(lock);
+    {
+        AutoLock syncLock(lock);
         mHost->UpdateImportanceLocked(pid, uid,
             CActivityManagerRunningAppProcessInfo::ProcStateToImportance(procState), TRUE);
     }
@@ -90,7 +90,8 @@ ECode AppImportanceMonitor::ProcessObserver::OnProcessDied(
     /* [in] */ Int32 uid)
 {
     Object& lock = mHost->mAppsLock;
-    {    AutoLock syncLock(lock);
+    {
+        AutoLock syncLock(lock);
         mHost->UpdateImportanceLocked(pid, uid,
             IActivityManagerRunningAppProcessInfo::IMPORTANCE_GONE, TRUE);
     }

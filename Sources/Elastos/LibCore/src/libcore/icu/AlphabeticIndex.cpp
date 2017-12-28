@@ -22,7 +22,6 @@
 #include <unicode/alphaindex.h>
 #include <unicode/uniset.h>
 
-#include <elastos/core/AutoLock.h>
 using Elastos::Core::AutoLock;
 
 namespace Libcore {
@@ -57,7 +56,8 @@ ECode AlphabeticIndex::GetMaxLabelCount(
 {
     VALIDATE_NOT_NULL(count)
 
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         *count = GetMaxLabelCount(mPeer);
     }
     return NOERROR;
@@ -66,7 +66,8 @@ ECode AlphabeticIndex::GetMaxLabelCount(
 ECode AlphabeticIndex::SetMaxLabelCount(
     /* [in] */ Int32 count)
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         SetMaxLabelCount(mPeer, count);
     }
     return NOERROR;
@@ -77,7 +78,8 @@ ECode AlphabeticIndex::AddLabels(
 {
     VALIDATE_NOT_NULL(locale)
 
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         String s;
         locale->ToString(&s);
         AddLabels(mPeer, s);
@@ -89,7 +91,8 @@ ECode AlphabeticIndex::AddLabelRange(
     /* [in] */ Int32 codePointStart,
     /* [in] */ Int32 codePointEnd)
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         AddLabelRange(mPeer, codePointStart, codePointEnd);
     }
     return NOERROR;
@@ -100,7 +103,8 @@ ECode AlphabeticIndex::GetBucketCount(
 {
     VALIDATE_NOT_NULL(count)
 
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         *count = GetBucketCount(mPeer);
     }
     return NOERROR;
@@ -112,7 +116,8 @@ ECode AlphabeticIndex::GetBucketIndex(
 {
     VALIDATE_NOT_NULL(index)
 
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         *index = GetBucketIndex(mPeer, s);
     }
     return NOERROR;
@@ -124,7 +129,8 @@ ECode AlphabeticIndex::GetBucketLabel(
 {
     VALIDATE_NOT_NULL(label)
 
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         *label = GetBucketLabel(mPeer, index);
     }
     return NOERROR;
@@ -135,7 +141,8 @@ ECode AlphabeticIndex::GetImmutableIndex(
 {
     VALIDATE_NOT_NULL(index)
 
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         *index = new ImmutableIndex(BuildImmutableIndex(mPeer));
         REFCOUNT_ADD(*index);
     }

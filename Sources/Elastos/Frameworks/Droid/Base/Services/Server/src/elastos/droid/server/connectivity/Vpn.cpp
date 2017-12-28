@@ -60,8 +60,6 @@
 #include <linux/route.h>
 #include <linux/ipv6_route.h>
 
-#include <elastos/core/AutoLock.h>
-using Elastos::Core::AutoLock;
 using Elastos::Droid::R;
 using Elastos::Droid::Manifest;
 using Elastos::Droid::Os::UserHandle;
@@ -127,6 +125,7 @@ using Elastos::Droid::Internal::Net::ILegacyVpnInfoHelper;
 using Elastos::Droid::Internal::Net::CLegacyVpnInfoHelper;
 using Elastos::Droid::KeyStore::Security::ICredentials;
 
+using Elastos::Core::AutoLock;
 using Elastos::Core::CoreUtils;
 using Elastos::Core::StringUtils;
 using Elastos::Core::ICharSequence;
@@ -1444,7 +1443,7 @@ AutoPtr< ArrayOf<IUidRange*> > Vpn::UidRangesForUser(
         range->GetStart(&ls);
         range->GetStop(&le);
 
-        if (ls >= ls && le <= re) {
+        if (ls >= rs && le <= re) {
             ranges->Add(range);
         }
     }
@@ -1492,7 +1491,8 @@ ECode Vpn::OnUserAdded(
     /* [in] */ Int32 userHandle)
 {
     // If the user is restricted tie them to the owner's VPN
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         AutoPtr<IUserManagerHelper> helper;
         CUserManagerHelper::AcquireSingleton((IUserManagerHelper**)&helper);
         AutoPtr<IUserManager> mgr;
@@ -1523,7 +1523,8 @@ ECode Vpn::OnUserRemoved(
 {
     // clean up if restricted
     ECode ec = NOERROR;
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         AutoPtr<IUserManagerHelper> helper;
         CUserManagerHelper::AcquireSingleton((IUserManagerHelper**)&helper);
         AutoPtr<IUserManager> mgr;

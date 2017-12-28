@@ -19,7 +19,6 @@
 #include "elastos/droid/os/CommonClock.h"
 #include <elastos/core/AutoLock.h>
 
-#include <elastos/core/AutoLock.h>
 using Elastos::Core::AutoLock;
 
 namespace Elastos {
@@ -124,7 +123,8 @@ ECode CommonClock::GetMasterAddr(
 ECode CommonClock::SetTimelineChangedListener(
     /* [in] */ ICommonClockOnTimelineChangedListener* listener)
 {
-    {    AutoLock syncLock(mListenerLock);
+    {
+        AutoLock syncLock(mListenerLock);
         mTimelineChangedListener = listener;
     }
     return NOERROR;
@@ -133,7 +133,8 @@ ECode CommonClock::SetTimelineChangedListener(
 ECode CommonClock::SetServerDiedListener(
     /* [in] */ ICommonClockOnServerDiedListener* listener)
 {
-    {    AutoLock syncLock(mListenerLock);
+    {
+        AutoLock syncLock(mListenerLock);
         mServerDiedListener = listener;
     }
     return NOERROR;

@@ -152,7 +152,8 @@ ECode CDownloadInfo::Reader::UpdateFromDatabase(
     _info->mBypassRecommendedSizeLimit =
             GetInt32(IDownloadsImpl::COLUMN_BYPASS_RECOMMENDED_SIZE_LIMIT);
 
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         _info->mControl = GetInt32(IDownloadsImpl::COLUMN_CONTROL);
     }
     return NOERROR;
@@ -513,7 +514,8 @@ ECode CDownloadInfo::StartDownloadIfReady(
     /* [out] */ Boolean* result)
 {
     VALIDATE_NOT_NULL(result)
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         Boolean isReady = IsReadyToDownload();
         Boolean bIsDone = FALSE;
         Boolean isActive = mSubmittedTask != NULL && !(mSubmittedTask->IsDone(&bIsDone), bIsDone);
@@ -545,7 +547,8 @@ ECode CDownloadInfo::StartScanIfReady(
     /* [out] */ Boolean* result)
 {
     VALIDATE_NOT_NULL(result)
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         Boolean isReady = FALSE;
         ShouldScanFile(&isReady);
         if (isReady) {

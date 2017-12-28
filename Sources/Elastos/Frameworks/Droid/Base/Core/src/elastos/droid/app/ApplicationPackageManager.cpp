@@ -40,7 +40,6 @@
 #include <elastos/utility/logging/Slogger.h>
 #include <elastos/utility/logging/Logger.h>
 
-#include <elastos/core/AutoLock.h>
 using Elastos::Core::AutoLock;
 using Elastos::Droid::R;
 using Elastos::Droid::DroidRuntime;
@@ -102,7 +101,8 @@ ApplicationPackageManager::ApplicationPackageManager(
 
 AutoPtr<IUserManager> ApplicationPackageManager::GetUserManager()
 {
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         if (mUserManager == NULL) {
             mUserManager = CUserManager::Get(mContext);
         }
@@ -1795,27 +1795,19 @@ ECode ApplicationPackageManager::GetText(
     return NOERROR;
 
 ERROR:
-    switch(ec) {
-        case E_NAME_NOT_FOUND_EXCEPTION:
-        {
-            String pkgName;
-            IPackageItemInfo::Probe(appInfo)->GetPackageName(&pkgName);
-            Slogger::W("PackageManager", "Failure retrieving resources for %s",
-                pkgName.string());
-            ec = NOERROR;
-            break;
-        }
-        case E_RUNTIME_EXCEPTION:
-        {
-           // If an exception was thrown, fall through to return
-           // default icon.
-            Slogger::W("PackageManager", "Failure retrieving text 0x%08x  in package %s",
-                resid, packageName.string());
-            ec = NOERROR;
-            break;
-        }
+    if (ec == (ECode)E_NAME_NOT_FOUND_EXCEPTION) {
+        String pkgName;
+        IPackageItemInfo::Probe(appInfo)->GetPackageName(&pkgName);
+        Slogger::W("PackageManager", "Failure retrieving resources for %s",
+            pkgName.string());
     }
-    return ec;
+    if (ec == (ECode)E_RUNTIME_EXCEPTION) {
+        // If an exception was thrown, fall through to return
+       // default icon.
+        Slogger::W("PackageManager", "Failure retrieving text 0x%08x  in package %s",
+            resid, packageName.string());
+    }
+    return NOERROR;
 }
 
 ECode ApplicationPackageManager::GetXml(
@@ -2317,7 +2309,8 @@ ECode ApplicationPackageManager::GetPackageInstaller(
     VALIDATE_NOT_NULL(installer)
     *installer = NULL;
 
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         if (mInstaller == NULL) {
             // try {
             AutoPtr<IIPackageInstaller> pi;

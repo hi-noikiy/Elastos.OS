@@ -38,8 +38,6 @@
 #include <Elastos.CoreLibrary.Net.h>
 #include <Elastos.CoreLibrary.Utility.h>
 
-#include <elastos/core/AutoLock.h>
-using Elastos::Core::AutoLock;
 using Elastos::Droid::App::CNotification;
 using Elastos::Droid::App::CPendingIntentHelper;
 using Elastos::Droid::App::INotificationManager;
@@ -89,6 +87,7 @@ using Elastos::Droid::Server::IoThread;
 using Elastos::Droid::System::OsConstants;
 using Elastos::Droid::Wifi::IWifiManager;
 
+using Elastos::Core::AutoLock;
 using Elastos::Core::CInteger32;
 using Elastos::Core::CoreUtils;
 using Elastos::Core::CString;
@@ -2212,7 +2211,8 @@ void CTethering::SendUpstreamIfaceChangeBroadcast(
     Boolean usbTethered = FALSE;
     Boolean bluetoothTethered = FALSE;
 
-    {    AutoLock syncLock(mPublicSync);
+    {
+        AutoLock syncLock(mPublicSync);
         HashMap<String, AutoPtr<TetherInterfaceSM> >::Iterator it = mIfaces.Begin();
         for (; it != mIfaces.End(); ++it) {
             AutoPtr<TetherInterfaceSM> sm;

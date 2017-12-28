@@ -22,7 +22,6 @@
 #include "CSecurity.h"
 #include "CSecureRandom.h"
 #include "org/apache/harmony/security/fortress/CEngine.h"
-#include <elastos/core/AutoLock.h>
 
 using Elastos::Core::AutoLock;
 using Elastos::Core::StringUtils;
@@ -840,7 +839,8 @@ ECode Cipher::GetSpi(
         return NOERROR;
     }
 
-    {    AutoLock syncLock(mInitLock);
+    {
+        AutoLock syncLock(mInitLock);
         if (mSpiImpl != NULL && key == NULL) {
             *spi = mSpiImpl;
             REFCOUNT_ADD(*spi);

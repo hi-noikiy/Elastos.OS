@@ -642,7 +642,8 @@ ECode CDownloadService::Dump(
 {
     AutoPtr<IIndentingPrintWriter> pw;
     CIndentingPrintWriter::New(IWriter::Probe(writer), String("  "), (IIndentingPrintWriter**)&pw);
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         AutoPtr<ISet> s;
         mDownloads->GetKeySet((ISet**)&s);
         AutoPtr<IList> ids;

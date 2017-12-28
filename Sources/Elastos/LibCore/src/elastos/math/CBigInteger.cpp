@@ -25,7 +25,6 @@
 #include "StringUtils.h"
 #include "AutoLock.h"
 
-#include <elastos/core/AutoLock.h>
 using Elastos::Core::AutoLock;
 using Elastos::Core::Math;
 using Elastos::Core::Character;
@@ -132,7 +131,8 @@ ECode CBigInteger::constructor(
         AutoPtr<BigInt> prime = new BigInt();
         prime->PutULongInt(candidate, FALSE);
         SetBigInt(prime);
-    } else {
+    }
+    else {
         // We need a loop here to work around an OpenSSL bug; http://b/8588028.
         Int32 length;
         do {
@@ -275,7 +275,8 @@ AutoPtr<BigInt> CBigInteger::GetBigInt()
         return mBigInt;
     }
 
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         if (mNativeIsValid) {
             return mBigInt;
         }
@@ -287,7 +288,6 @@ AutoPtr<BigInt> CBigInteger::GetBigInt()
         SetBigInt(bigInt);
         return bigInt;
     }
-    return NOERROR;
 }
 
 void CBigInteger::SetJavaRepresentation(
@@ -320,7 +320,8 @@ void CBigInteger::PrepareJavaRepresentation()
         return;
     }
 
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         if (mJavaIsValid) {
             return;
         }
@@ -812,14 +813,17 @@ ECode CBigInteger::Equals(
     *result = FALSE;
     VALIDATE_NOT_NULL(other);
 
-    if (IBigInteger::Probe(other) == NULL) return NOERROR;
-
     CBigInteger* bi = (CBigInteger*)IBigInteger::Probe(other);
+    if (bi == NULL)
+        return E_ILLEGAL_ARGUMENT_EXCEPTION;
+
     if (this == bi) {
         *result = TRUE;
     }
     else {
-        *result = (BigInt::Cmp(*mBigInt, *bi->GetBigInt()) == 0);
+        AutoPtr<BigInt> myBitInt = GetBigInt();
+        AutoPtr<BigInt> biBitInt = bi->GetBigInt();
+        *result = Boolean(BigInt::Cmp(*myBitInt, *biBitInt) == 0);
     }
     return NOERROR;
 }

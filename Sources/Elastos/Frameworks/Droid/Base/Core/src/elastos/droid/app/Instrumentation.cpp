@@ -43,7 +43,6 @@
 #include <elastos/core/CoreUtils.h>
 #include <elastos/utility/logging/Slogger.h>
 
-#include <elastos/core/AutoLock.h>
 using Elastos::Core::AutoLock;
 using Elastos::Droid::App::Activity;
 using Elastos::Droid::App::Fragment;
@@ -131,7 +130,7 @@ ECode Instrumentation::InstrumentationThread::Run()
 // Instrumentation::EmptyRunnable
 //====================================================
 
-Instrumentation::EmptyRunnable::Run()
+ECode Instrumentation::EmptyRunnable::Run()
 {
     return NOERROR;
 }
@@ -146,7 +145,7 @@ Instrumentation::SyncRunnable::SyncRunnable(
     , mComplete(FALSE)
 {}
 
-Instrumentation::SyncRunnable::Run()
+ECode Instrumentation::SyncRunnable::Run()
 {
     mTarget->Run();
     AutoLock lock(this);
@@ -179,7 +178,7 @@ Instrumentation::ActivityGoing::ActivityGoing(
     , mHost(host)
 {}
 
-Instrumentation::ActivityGoing::QueueIdle(
+ECode Instrumentation::ActivityGoing::QueueIdle(
     /* [out] */ Boolean* res)
 {
     VALIDATE_NOT_NULL(res)
@@ -278,7 +277,7 @@ ECode Instrumentation::ContextMenuRunnable::Run()
 // Instrumentation::BlockPhoneCallRunnable
 //====================================================
 
-Instrumentation::BlockPhoneCallRunnable::Run()
+ECode Instrumentation::BlockPhoneCallRunnable::Run()
 {
     // SM: Not clear why there is this delay
     // try{

@@ -17,7 +17,6 @@
 #include <Elastos.CoreLibrary.Net.h>
 #include "elastos/droid/net/LocalSocketImpl.h"
 #include "elastos/droid/net/CCredentials.h"
-#include "elastos/droid/net/ReturnOutValue.h"
 #include "elastos/droid/os/Process.h"
 #include "elastos/droid/system/Os.h"
 #include "elastos/droid/system/OsConstants.h"
@@ -92,7 +91,8 @@ ECode LocalSocketImpl::SocketInputStream::Read(
     VALIDATE_NOT_NULL(result)
     *result = 0;
 
-    {    AutoLock syncLock(mHost->mReadMonitor);
+    {
+        AutoLock syncLock(mHost->mReadMonitor);
         AutoPtr<IFileDescriptor> myFd = mHost->mFd;
         if (myFd == NULL) {
             Logger::E("LocalSocketImpl", "socket closed");
@@ -122,7 +122,8 @@ ECode LocalSocketImpl::SocketInputStream::Read(
     VALIDATE_NOT_NULL(result)
     *result = 0;
 
-    {    AutoLock syncLock(mHost->mReadMonitor);
+    {
+        AutoLock syncLock(mHost->mReadMonitor);
         AutoPtr<IFileDescriptor> myFd = mHost->mFd;
         if (myFd == NULL) {
             Logger::E("LocalSocketImpl", "socket closed");
@@ -161,7 +162,8 @@ ECode LocalSocketImpl::SocketOutputStream::Write(
     /* [in] */ Int32 off,
     /* [in] */ Int32 len)
 {
-    {    AutoLock syncLock(mHost->mWriteMonitor);
+    {
+        AutoLock syncLock(mHost->mWriteMonitor);
         AutoPtr<IFileDescriptor> myFd = mHost->mFd;
         if (myFd == NULL) {
             Logger::E("LocalSocketImpl", "socket closed");
@@ -179,7 +181,8 @@ ECode LocalSocketImpl::SocketOutputStream::Write(
 ECode LocalSocketImpl::SocketOutputStream::Write(
     /* [in] */ Int32 b)
 {
-    {    AutoLock syncLock(mHost->mWriteMonitor);
+    {
+        AutoLock syncLock(mHost->mWriteMonitor);
         AutoPtr<IFileDescriptor> myFd = mHost->mFd;
         if (myFd == NULL) {
             Logger::E("LocalSocketImpl", "socket closed");
@@ -969,7 +972,8 @@ ECode LocalSocketImpl::Create(
 
 ECode LocalSocketImpl::Close()
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         if ((mFd == NULL) || ((mFdCreatedInternally == FALSE) && (mFdCreatedExternally == FALSE))) {
             mFd = NULL;
             return NOERROR;
@@ -1056,7 +1060,8 @@ ECode LocalSocketImpl::GetInputStream(
         return E_IO_EXCEPTION;
     }
 
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         if (mFis == NULL) {
             mFis = new SocketInputStream(this);
         }
@@ -1078,7 +1083,8 @@ ECode LocalSocketImpl::GetOutputStream(
         return E_IO_EXCEPTION;
     }
 
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         if (mFos == NULL) {
             mFos = new SocketOutputStream(this);
         }
@@ -1238,7 +1244,8 @@ ECode LocalSocketImpl::SetOption(
 ECode LocalSocketImpl::SetFileDescriptorsForSend(
     /* [in] */ ArrayOf<IFileDescriptor*>* fds)
 {
-    {    AutoLock syncLock(mWriteMonitor);
+    {
+        AutoLock syncLock(mWriteMonitor);
 
         mOutboundFileDescriptors = fds;
     }
@@ -1251,7 +1258,8 @@ ECode LocalSocketImpl::GetAncillaryFileDescriptors(
     VALIDATE_NOT_NULL(result)
 
     AutoPtr<ArrayOf<IFileDescriptor*> > rev;
-    {    AutoLock syncLock(mReadMonitor);
+    {
+        AutoLock syncLock(mReadMonitor);
         rev = mInboundFileDescriptors;
 
         mInboundFileDescriptors = NULL;

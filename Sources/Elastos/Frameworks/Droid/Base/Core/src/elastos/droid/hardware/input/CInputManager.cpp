@@ -171,7 +171,8 @@ ECode CInputManager::constructor()
 
 AutoPtr<IInputManager> CInputManager::GetInstance()
 {
-    {    AutoLock syncLock(sInstanceLock);
+    {
+        AutoLock syncLock(sInstanceLock);
         if (sInstance == NULL) {
             ASSERT_SUCCEEDED(CInputManager::New((IInputManager**)&sInstance));
         }
@@ -186,7 +187,8 @@ ECode CInputManager::GetInputDevice(
 {
     VALIDATE_NOT_NULL(device);
 
-    {    AutoLock syncLock(mInputDevicesLock);
+    {
+        AutoLock syncLock(mInputDevicesLock);
         FAIL_RETURN(PopulateInputDevicesLocked());
 
         HashMap<Int32, AutoPtr<IInputDevice> >::Iterator find = mInputDevices->Find(id);
@@ -224,7 +226,8 @@ ECode CInputManager::GetInputDeviceByDescriptor(
         return E_ILLEGAL_ARGUMENT_EXCEPTION;
     }
 
-    {    AutoLock syncLock(mInputDevicesLock);
+    {
+        AutoLock syncLock(mInputDevicesLock);
         PopulateInputDevicesLocked();
 
         HashMap<Int32, AutoPtr<IInputDevice> >::Iterator iter = mInputDevices->Begin();
@@ -232,7 +235,7 @@ ECode CInputManager::GetInputDeviceByDescriptor(
             AutoPtr<IInputDevice> inputDevice = iter->mSecond;
             if (inputDevice == NULL) {
                 Int32 id = iter->mFirst;
-                if (FAILED(mIm->GetInputDevice(id, (IInputDevice**)&inputDevice))); {
+                if (FAILED(mIm->GetInputDevice(id, (IInputDevice**)&inputDevice))) {
                     return E_REMOTE_EXCEPTION;
                 }
 
@@ -263,7 +266,8 @@ ECode CInputManager::GetInputDeviceIds(
 {
     VALIDATE_NOT_NULL(deviceIds);
 
-    {    AutoLock syncLock(mInputDevicesLock);
+    {
+        AutoLock syncLock(mInputDevicesLock);
         FAIL_RETURN(PopulateInputDevicesLocked());
 
         Int32 count = mInputDevices->GetSize();
@@ -299,7 +303,8 @@ ECode CInputManager::RegisterInputDeviceListener(
         handler->GetLooper((ILooper**)&looper);
     }
 
-    {    AutoLock syncLock(mInputDevicesLock);
+    {
+        AutoLock syncLock(mInputDevicesLock);
         List<AutoPtr<InputDeviceListenerDelegate> >::Iterator find =
             FindInputDeviceListenerLocked(listener);
         if (find == mInputDeviceListeners.End()) {
@@ -320,7 +325,8 @@ ECode CInputManager::UnregisterInputDeviceListener(
         return E_ILLEGAL_ARGUMENT_EXCEPTION;
     }
 
-    {    AutoLock syncLock(mInputDevicesLock);
+    {
+        AutoLock syncLock(mInputDevicesLock);
         List<AutoPtr<InputDeviceListenerDelegate> >::Iterator find =
             FindInputDeviceListenerLocked(listener);
         if (find != mInputDeviceListeners.End()) {
@@ -644,7 +650,8 @@ void CInputManager::OnInputDevicesChanged(
         Logger::D(TAG, "Received input devices changed.");
     }
 
-    {    AutoLock syncLock(mInputDevicesLock);
+    {
+        AutoLock syncLock(mInputDevicesLock);
         //TODO: from size - 1 to 0
         //
         HashMap<Int32, AutoPtr<IInputDevice> >::Iterator iter = mInputDevices->Begin();
@@ -685,7 +692,7 @@ void CInputManager::OnInputDevicesChanged(
             }
             else {
                 if (DEBUG) {
-                    Logger::D(TAG, "Device added: %d" + deviceId);
+                    Logger::D(TAG, "Device added: %d", deviceId);
                 }
                 (*mInputDevices)[deviceId] = NULL;
                 SendMessageToInputDeviceListenersLocked(MSG_DEVICE_ADDED, deviceId);

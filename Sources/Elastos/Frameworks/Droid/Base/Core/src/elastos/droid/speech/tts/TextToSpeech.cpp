@@ -27,11 +27,10 @@
 #include <elastos/core/AutoLock.h>
 #include <Elastos.CoreLibrary.Utility.h>
 
-#include <elastos/core/AutoLock.h>
 using Elastos::Core::AutoLock;
 using Elastos::Core::StringUtils;
-using Elastos::Utility::CLocale;
 using Elastos::Core::CString;
+using Elastos::Utility::CLocale;
 using Elastos::Utility::Logging::Logger;
 
 using Elastos::Droid::Os::CBundle;
@@ -445,9 +444,8 @@ ECode TextToSpeech::TextToSpeechConnection::constructor(
 }
 
 ECode TextToSpeech::TextToSpeechConnection::OnServiceConnected(
-    /* [in] */ IComponentName* name//,
-//    /* [in] */ IIBinder* service
-    )
+    /* [in] */ IComponentName* name,
+    /* [in] */ IBinder* service)
 {
     //Java:    Log.i(TAG, "Connected to " + name);
     String shortStringComponentName;

@@ -36,8 +36,6 @@
 #include <string.h>
 #include <errno.h>
 
-#include <elastos/core/AutoLock.h>
-using Elastos::Core::AutoLock;
 using Elastos::Droid::Content::CIntentFilter;
 using Elastos::Droid::Content::IIntent;
 using Elastos::Droid::Content::IIntentFilter;
@@ -56,21 +54,22 @@ using Elastos::Droid::Os::IServiceManager;
 using Elastos::Droid::Os::ISystemProperties;
 using Elastos::Droid::Os::Process;
 using Elastos::Droid::Os::SystemClock;
-using Elastos::Text::CSimpleDateFormat;
-using Elastos::Text::IDateFormat;
-using Elastos::Text::ISimpleDateFormat;
-using Elastos::IO::ICloseable;
-using Elastos::IO::CFile;
-using Elastos::IO::CFileWriter;
-using Elastos::IO::IFileWriter;
-using Elastos::IO::IWriter;
-using Elastos::Utility::CDate;
-using Elastos::Utility::IDate;
-using Elastos::Utility::Logging::Slogger;
+using Elastos::Core::AutoLock;
 using Elastos::Core::CSystem;
 using Elastos::Core::ISystem;
 using Elastos::Core::IThread;
 using Elastos::Core::StringBuilder;
+using Elastos::IO::ICloseable;
+using Elastos::IO::CFile;
+using Elastos::IO::CFileWriter;
+using Elastos::IO::IFileWriter;
+using Elastos::Text::CSimpleDateFormat;
+using Elastos::Text::IDateFormat;
+using Elastos::Text::ISimpleDateFormat;
+using Elastos::IO::IWriter;
+using Elastos::Utility::CDate;
+using Elastos::Utility::IDate;
+using Elastos::Utility::Logging::Slogger;
 
 namespace Elastos {
 namespace Droid {
@@ -387,7 +386,8 @@ ECode Watchdog::ProcessStarted(
     /* [in] */ Int32 pid)
 {
     Slogger::D(TAG, "ProcessStarted: %s, pid: %d", name.string(), pid);
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         // assert(0 && "TODO check namespace");
         if (name.Equals("com.android.phone")) {
             mPhonePid = pid;
@@ -399,7 +399,8 @@ ECode Watchdog::ProcessStarted(
 ECode Watchdog::SetActivityController(
     /* [in] */ IIActivityController* controller)
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         mController = controller;
     }
     return NOERROR;
@@ -408,7 +409,8 @@ ECode Watchdog::SetActivityController(
 ECode Watchdog::SetAllowRestart(
     /* [in] */ Boolean allowRestart)
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         mAllowRestart = allowRestart;
     }
     return NOERROR;
@@ -417,7 +419,8 @@ ECode Watchdog::SetAllowRestart(
 ECode Watchdog::AddMonitor(
     /* [in] */ IWatchdogMonitor* monitor)
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         Boolean bval;
         if (IsAlive(&bval), bval) {
             Slogger::E(TAG, "Monitors can't be added once the Watchdog is running");
@@ -438,7 +441,8 @@ ECode Watchdog::AddThread(
     /* [in] */ IHandler* thread,
     /* [in] */ Int64 timeoutMillis)
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         Boolean bval;
         if (IsAlive(&bval), bval) {
             Slogger::E(TAG, "Monitors can't be added once the Watchdog is running");
@@ -667,7 +671,8 @@ ECode Watchdog::Run()
         // } catch (InterruptedException ignored) {}
 
         AutoPtr<IIActivityController> controller;
-        {    AutoLock syncLock(this);
+        {
+            AutoLock syncLock(this);
             controller = mController;
         }
         if (controller != NULL) {

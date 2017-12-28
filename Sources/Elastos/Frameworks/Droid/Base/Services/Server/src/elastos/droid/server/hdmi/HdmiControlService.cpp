@@ -38,13 +38,11 @@
 #include <Elastos.Droid.Content.h>
 #include <Elastos.Droid.Internal.h>
 #include <Elastos.Droid.Provider.h>
-#include <elastos/droid/net/ReturnOutValue.h>
 #include <elastos/core/AutoLock.h>
 #include <Elastos.CoreLibrary.IO.h>
 #include <Elastos.Droid.Text.h>
 #include <Elastos.Droid.Media.h>
 
-#include <elastos/core/AutoLock.h>
 using Elastos::Core::AutoLock;
 using Elastos::Droid::Provider::Settings;
 using Elastos::Core::IThread;
@@ -128,7 +126,8 @@ HdmiControlService::VendorCommandListenerRecord::VendorCommandListenerRecord(
 
 ECode HdmiControlService::VendorCommandListenerRecord::ProxyDied()
 {
-    {    AutoLock syncLock(mHost->mLock);
+    {
+        AutoLock syncLock(mHost->mLock);
         mHost->mVendorCommandListenerRecords->Remove(TO_IINTERFACE(this));
     }
     return NOERROR;
@@ -255,7 +254,8 @@ HdmiControlService::HotplugEventListenerRecord::HotplugEventListenerRecord(
 
 ECode HdmiControlService::HotplugEventListenerRecord::ProxyDied()
 {
-    {    AutoLock syncLock(mHost->mLock);
+    {
+        AutoLock syncLock(mHost->mLock);
         mHost->mHotplugEventListenerRecords->Remove(TO_IINTERFACE(this));
     }
     return NOERROR;
@@ -275,7 +275,8 @@ HdmiControlService::DeviceEventListenerRecord::DeviceEventListenerRecord(
 
 ECode HdmiControlService::DeviceEventListenerRecord::ProxyDied()
 {
-    {    AutoLock syncLock(mHost->mLock);
+    {
+        AutoLock syncLock(mHost->mLock);
         mHost->mDeviceEventListenerRecords->Remove(TO_IINTERFACE(this));
     }
     return NOERROR;
@@ -295,7 +296,8 @@ HdmiControlService::SystemAudioModeChangeListenerRecord::SystemAudioModeChangeLi
 
 ECode HdmiControlService::SystemAudioModeChangeListenerRecord::ProxyDied()
 {
-    {    AutoLock syncLock(mHost->mLock);
+    {
+        AutoLock syncLock(mHost->mLock);
         mHost->mSystemAudioModeChangeListenerRecords->Remove(TO_IINTERFACE(this));
     }
     return NOERROR;
@@ -315,7 +317,8 @@ HdmiControlService::HdmiRecordListenerRecord::HdmiRecordListenerRecord(
 
 ECode HdmiControlService::HdmiRecordListenerRecord::ProxyDied()
 {
-    {    AutoLock syncLock(mHost->mLock);
+    {
+        AutoLock syncLock(mHost->mLock);
         mHost->mRecordListenerRecord = NULL;
     }
     return NOERROR;
@@ -547,7 +550,8 @@ ECode HdmiControlService::BinderService::GetInputDevices(
     // is preserved while the HDMI control is enabled.
     AutoPtr<IHdmiCecLocalDeviceTv> tv;
     mHost->Tv((IHdmiCecLocalDeviceTv**)&tv);
-    {    AutoLock syncLock(mHost->mLock);
+    {
+        AutoLock syncLock(mHost->mLock);
         AutoPtr<IList> cecDevices;
         if (tv == NULL) {
             AutoPtr<ICollections> helper;
@@ -722,7 +726,10 @@ ECode HdmiControlService::BinderService::Dump(
     }
     IPrintWriter::Probe(pw)->Println(String("mPortInfo: "));
     pw->IncreaseIndent();
-    FOR_EACH(it, mHost->mPortInfo) {
+    AutoPtr<IIterator> it;
+    mHost->mPortInfo->GetIterator((IIterator**)&it);
+    Boolean hasNext;
+    while (it->HasNext(&hasNext), hasNext) {
         AutoPtr<IInterface> obj;
         it->GetNext((IInterface**)&obj);
         AutoPtr<IHdmiPortInfo> hdmiPortInfo = IHdmiPortInfo::Probe(obj);
@@ -757,7 +764,8 @@ HdmiControlService::InputChangeListenerRecord::InputChangeListenerRecord(
 
 ECode HdmiControlService::InputChangeListenerRecord::ProxyDied()
 {
-    {    AutoLock syncLock(mHost->mLock);
+    {
+        AutoLock syncLock(mHost->mLock);
         mHost->mInputChangeListenerRecord = NULL;
     }
     return NOERROR;
@@ -1627,7 +1635,10 @@ ECode HdmiControlService::InitializeLocalDevices(
     // A container for [Device type, Local device info].
     AutoPtr<IArrayList> localDevices;
     CArrayList::New((IArrayList**)&localDevices);
-    FOR_EACH(it, mLocalDevices) {
+    AutoPtr<IIterator> it;
+    mLocalDevices->GetIterator((IIterator**)&it);
+    Boolean hasNext;
+    while (it->HasNext(&hasNext), hasNext) {
         AutoPtr<IInterface> obj;
         it->GetNext((IInterface**)&obj);
         Int32 type;
@@ -1656,7 +1667,10 @@ ECode HdmiControlService::AllocateLogicalAddress(
     AutoPtr<IArrayList> allocatedDevices;
     CArrayList::New((IArrayList**)&allocatedDevices);
     AutoPtr<ArrayOf<Int32> > finished = ArrayOf<Int32>::Alloc(1);
-    FOR_EACH(it, allocatingDevices) {
+    AutoPtr<IIterator> it;
+    allocatedDevices->GetIterator((IIterator**)&it);
+    Boolean hasNext;
+    while (it->HasNext(&hasNext), hasNext) {
         AutoPtr<IInterface> obj;
         it->GetNext((IInterface**)&obj);
         AutoPtr<IHdmiCecLocalDevice> localDevice = IHdmiCecLocalDevice::Probe(obj);
@@ -1675,7 +1689,10 @@ ECode HdmiControlService::NotifyAddressAllocated(
     /* [in] */ Int32 initiatedBy)
 {
     AssertRunOnServiceThread();
-    FOR_EACH(it, devices) {
+    AutoPtr<IIterator> it;
+    devices->GetIterator((IIterator**)&it);
+    Boolean hasNext;
+    while (it->HasNext(&hasNext), hasNext) {
         AutoPtr<IInterface> obj;
         it->GetNext((IInterface**)&obj);
         AutoPtr<IHdmiCecLocalDevice> device = IHdmiCecLocalDevice::Probe(obj);
@@ -2014,7 +2031,10 @@ ECode HdmiControlService::DispatchMessageToLocalDevice(
     AssertRunOnServiceThread();
     AutoPtr<IList> localDeviceList;
     mCecController->GetLocalDeviceList((IList**)&localDeviceList);
-    FOR_EACH(it, localDeviceList) {
+    AutoPtr<IIterator> it;
+    localDeviceList->GetIterator((IIterator**)&it);
+    Boolean hasNext;
+    while (it->HasNext(&hasNext), hasNext) {
         AutoPtr<IInterface> obj;
         it->GetNext((IInterface**)&obj);
         AutoPtr<IHdmiCecLocalDevice> device = IHdmiCecLocalDevice::Probe(obj);
@@ -2043,7 +2063,10 @@ ECode HdmiControlService::OnHotplug(
     AssertRunOnServiceThread();
     AutoPtr<IArrayList> localDevices;
     CArrayList::New((IArrayList**)&localDevices);
-    FOR_EACH(it, mLocalDevices) {
+    AutoPtr<IIterator> it;
+    mLocalDevices->GetIterator((IIterator**)&it);
+    Boolean hasNext;
+    while (it->HasNext(&hasNext), hasNext) {
         AutoPtr<IInterface> obj;
         it->GetNext((IInterface**)&obj);
         Int32 type;
@@ -2063,9 +2086,11 @@ ECode HdmiControlService::OnHotplug(
     AllocateLogicalAddress(localDevices, INITIATED_BY_HOTPLUG);
     AutoPtr<IList> localDeviceList;
     mCecController->GetLocalDeviceList((IList**)&localDeviceList);
-    FOR_EACH(iter, localDeviceList) {
+    it = NULL;
+    localDeviceList->GetIterator((IIterator**)&it);
+    while (it->HasNext(&hasNext), hasNext) {
         AutoPtr<IInterface> obj;
-        iter->GetNext((IInterface**)&obj);
+        it->GetNext((IInterface**)&obj);
         AutoPtr<IHdmiCecLocalDevice> device = IHdmiCecLocalDevice::Probe(obj);
         ((HdmiCecLocalDevice*) device.Get())->OnHotplug(portId, connected);
     }
@@ -2155,8 +2180,12 @@ ECode HdmiControlService::SetAudioStatus(
 ECode HdmiControlService::AnnounceSystemAudioModeChange(
     /* [in] */ Boolean enabled)
 {
-    {    AutoLock syncLock(mLock);
-        FOR_EACH(it, mSystemAudioModeChangeListenerRecords) {
+    {
+        AutoLock syncLock(mLock);
+        AutoPtr<IIterator> it;
+        mSystemAudioModeChangeListenerRecords->GetIterator((IIterator**)&it);
+        Boolean hasNext;
+        while (it->HasNext(&hasNext), hasNext) {
             AutoPtr<IInterface> obj;
             it->GetNext((IInterface**)&obj);
             AutoPtr<SystemAudioModeChangeListenerRecord> record = (SystemAudioModeChangeListenerRecord*) IObject::Probe(obj);
@@ -2305,7 +2334,8 @@ ECode HdmiControlService::UpdateSafeMhlInput()
             inputs->Add(deviceInfo);
         }
     }
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         mMhlDevices = inputs;
     }
     return NOERROR;
@@ -2378,7 +2408,8 @@ ECode HdmiControlService::AddHotplugEventListener(
             return ec;
     }
     // }
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         mHotplugEventListenerRecords->Add(TO_IINTERFACE(record));
     }
     return NOERROR;
@@ -2387,8 +2418,12 @@ ECode HdmiControlService::AddHotplugEventListener(
 ECode HdmiControlService::RemoveHotplugEventListener(
     /* [in] */ IIHdmiHotplugEventListener* listener)
 {
-    {    AutoLock syncLock(mLock);
-        FOR_EACH(it, mHotplugEventListenerRecords) {
+    {
+        AutoLock syncLock(mLock);
+        AutoPtr<IIterator> it;
+        mHotplugEventListenerRecords->GetIterator((IIterator**)&it);
+        Boolean hasNext;
+        while (it->HasNext(&hasNext), hasNext) {
             AutoPtr<IInterface> obj;
             it->GetNext((IInterface**)&obj);
             AutoPtr<HotplugEventListenerRecord> record = (HotplugEventListenerRecord*) IObject::Probe(obj);
@@ -2425,7 +2460,8 @@ ECode HdmiControlService::AddDeviceEventListener(
             return ec;
     }
     // }
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         mDeviceEventListenerRecords->Add(TO_IINTERFACE(record));
     }
     return NOERROR;
@@ -2435,8 +2471,12 @@ ECode HdmiControlService::InvokeDeviceEventListeners(
     /* [in] */ IHdmiDeviceInfo* device,
     /* [in] */ Int32 status)
 {
-    {    AutoLock syncLock(mLock);
-        FOR_EACH(it, mDeviceEventListenerRecords) {
+    {
+        AutoLock syncLock(mLock);
+        AutoPtr<IIterator> it;
+        mDeviceEventListenerRecords->GetIterator((IIterator**)&it);
+        Boolean hasNext;
+        while (it->HasNext(&hasNext), hasNext) {
             AutoPtr<IInterface> obj;
             it->GetNext((IInterface**)&obj);
             AutoPtr<DeviceEventListenerRecord> record = (DeviceEventListenerRecord*) IObject::Probe(obj);
@@ -2474,7 +2514,8 @@ ECode HdmiControlService::AddSystemAudioModeChangeListner(
         return ec;
     }
     // }
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         mSystemAudioModeChangeListenerRecords->Add(TO_IINTERFACE(record));
     }
     return NOERROR;
@@ -2483,8 +2524,12 @@ ECode HdmiControlService::AddSystemAudioModeChangeListner(
 ECode HdmiControlService::RemoveSystemAudioModeChangeListener(
     /* [in] */ IIHdmiSystemAudioModeChangeListener* listener)
 {
-    {    AutoLock syncLock(mLock);
-        FOR_EACH(it, mSystemAudioModeChangeListenerRecords) {
+    {
+        AutoLock syncLock(mLock);
+        AutoPtr<IIterator> it;
+        mSystemAudioModeChangeListenerRecords->GetIterator((IIterator**)&it);
+        Boolean hasNext;
+        while (it->HasNext(&hasNext), hasNext) {
             AutoPtr<IInterface> obj;
             it->GetNext((IInterface**)&obj);
             AutoPtr<SystemAudioModeChangeListenerRecord> record = (SystemAudioModeChangeListenerRecord*) IObject::Probe(obj);
@@ -2505,7 +2550,8 @@ ECode HdmiControlService::RemoveSystemAudioModeChangeListener(
 ECode HdmiControlService::SetInputChangeListener(
     /* [in] */ IIHdmiInputChangeListener* listener)
 {
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         mInputChangeListenerRecord = new InputChangeListenerRecord(this, listener);
         // try {
         ECode ec = NOERROR;
@@ -2528,7 +2574,8 @@ ECode HdmiControlService::SetInputChangeListener(
 ECode HdmiControlService::InvokeInputChangeListener(
     /* [in] */ IHdmiDeviceInfo* info)
 {
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         if (mInputChangeListenerRecord != NULL) {
             // try {
             ECode ec = mInputChangeListenerRecord->mListener->OnChanged(info);
@@ -2549,7 +2596,8 @@ ECode HdmiControlService::InvokeInputChangeListener(
 ECode HdmiControlService::SetHdmiRecordListener(
     /* [in] */ IIHdmiRecordListener* listener)
 {
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         mRecordListenerRecord = new HdmiRecordListenerRecord(this, listener);
         // try {
         ECode ec = NOERROR;
@@ -2576,7 +2624,8 @@ ECode HdmiControlService::InvokeRecordRequestListener(
     VALIDATE_NOT_NULL(result)
     *result = NULL;
 
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         if (mRecordListenerRecord != NULL) {
             // try {
             AutoPtr<ArrayOf<Byte> > oneTouchRecordSource;
@@ -2607,7 +2656,8 @@ ECode HdmiControlService::InvokeRecordRequestListener(
 ECode HdmiControlService::InvokeOneTouchRecordResult(
     /* [in] */ Int32 result)
 {
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         if (mRecordListenerRecord != NULL) {
             // try {
             ECode ec = mRecordListenerRecord->mListener->OnOneTouchRecordResult(result);
@@ -2628,7 +2678,8 @@ ECode HdmiControlService::InvokeOneTouchRecordResult(
 ECode HdmiControlService::InvokeTimerRecordingResult(
     /* [in] */ Int32 result)
 {
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         if (mRecordListenerRecord != NULL) {
             // try {
             ECode ec = mRecordListenerRecord->mListener->OnTimerRecordingResult(result);
@@ -2649,7 +2700,8 @@ ECode HdmiControlService::InvokeTimerRecordingResult(
 ECode HdmiControlService::InvokeClearTimerRecordingResult(
     /* [in] */ Int32 result)
 {
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         if (mRecordListenerRecord != NULL) {
             // try {
             ECode ec = mRecordListenerRecord->mListener->OnClearTimerRecordingResult(result);
@@ -2711,8 +2763,12 @@ ECode HdmiControlService::AnnounceHotplugEvent(
     // TODO: Waiting for CHdmiHotplugEvent
     assert(0);
     // CHdmiHotplugEvent::New(portId, connected, (IHdmiHotplugEvent**)&event);
-    {    AutoLock syncLock(mLock);
-        FOR_EACH(it, mHotplugEventListenerRecords) {
+    {
+        AutoLock syncLock(mLock);
+        AutoPtr<IIterator> it;
+        mHotplugEventListenerRecords->GetIterator((IIterator**)&it);
+        Boolean hasNext;
+        while (it->HasNext(&hasNext), hasNext) {
             AutoPtr<IInterface> obj;
             it->GetNext((IInterface**)&obj);
             AutoPtr<HotplugEventListenerRecord> record = (HotplugEventListenerRecord*) IObject::Probe(obj);
@@ -2794,7 +2850,8 @@ ECode HdmiControlService::IsControlEnabled(
 {
     VALIDATE_NOT_NULL(result)
 
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         *result = mHdmiControlEnabled;
     }
     return NOERROR;
@@ -2937,7 +2994,10 @@ ECode HdmiControlService::DisableDevices(
     if (mCecController != NULL) {
         AutoPtr<IList> localDeviceList;
         mCecController->GetLocalDeviceList((IList**)&localDeviceList);
-        FOR_EACH(it, localDeviceList) {
+        AutoPtr<IIterator> it;
+        localDeviceList->GetIterator((IIterator**)&it);
+        Boolean hasNext;
+        while (it->HasNext(&hasNext), hasNext) {
             AutoPtr<IInterface> obj;
             it->GetNext((IInterface**)&obj);
             AutoPtr<IHdmiCecLocalDevice> device = IHdmiCecLocalDevice::Probe(obj);
@@ -2974,7 +3034,10 @@ ECode HdmiControlService::OnStandbyCompleted()
     mPowerStatus = IHdmiControlManager::POWER_STATUS_STANDBY;
     AutoPtr<IList> localDeviceList;
     mCecController->GetLocalDeviceList((IList**)&localDeviceList);
-    FOR_EACH(it, localDeviceList) {
+    AutoPtr<IIterator> it;
+    localDeviceList->GetIterator((IIterator**)&it);
+    Boolean hasNext;
+    while (it->HasNext(&hasNext), hasNext) {
         AutoPtr<IInterface> obj;
         it->GetNext((IInterface**)&obj);
         AutoPtr<IHdmiCecLocalDevice> device = IHdmiCecLocalDevice::Probe(obj);
@@ -3004,7 +3067,8 @@ ECode HdmiControlService::AddVendorCommandListener(
         return ec;
     }
     // }
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         mVendorCommandListenerRecords->Add(TO_IINTERFACE(record));
     }
     return NOERROR;
@@ -3019,14 +3083,18 @@ ECode HdmiControlService::InvokeVendorCommandListeners(
 {
     VALIDATE_NOT_NULL(result)
 
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         Boolean isEmpty;
         mVendorCommandListenerRecords->IsEmpty(&isEmpty);
         if (isEmpty) {
             *result = FALSE;
             return NOERROR;
         }
-        FOR_EACH(it, mVendorCommandListenerRecords) {
+        AutoPtr<IIterator> it;
+        mVendorCommandListenerRecords->GetIterator((IIterator**)&it);
+        Boolean hasNext;
+        while (it->HasNext(&hasNext), hasNext) {
             AutoPtr<IInterface> obj;
             it->GetNext((IInterface**)&obj);
             AutoPtr<VendorCommandListenerRecord> record = (VendorCommandListenerRecord*) IObject::Probe(obj);
@@ -3069,7 +3137,8 @@ ECode HdmiControlService::AddHdmiMhlVendorCommandListener(
         return ec;
     }
     // }
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         mMhlVendorCommandListenerRecords->Add(TO_IINTERFACE(record));
     }
     return NOERROR;
@@ -3081,8 +3150,12 @@ ECode HdmiControlService::InvokeMhlVendorCommandListeners(
     /* [in] */ Int32 length,
     /* [in] */ ArrayOf<Byte>* data)
 {
-    {    AutoLock syncLock(mLock);
-        FOR_EACH(it, mMhlVendorCommandListenerRecords) {
+    {
+        AutoLock syncLock(mLock);
+        AutoPtr<IIterator> it;
+        mMhlVendorCommandListenerRecords->GetIterator((IIterator**)&it);
+        Boolean hasNext;
+        while (it->HasNext(&hasNext), hasNext) {
             AutoPtr<IInterface> obj;
             it->GetNext((IInterface**)&obj);
             AutoPtr<HdmiMhlVendorCommandListenerRecord> record = (HdmiMhlVendorCommandListenerRecord*) IObject::Probe(obj);
@@ -3107,7 +3180,8 @@ ECode HdmiControlService::IsProhibitMode(
 {
     VALIDATE_NOT_NULL(result)
 
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         *result = mProhibitMode;
     }
     return NOERROR;
@@ -3116,7 +3190,8 @@ ECode HdmiControlService::IsProhibitMode(
 ECode HdmiControlService::SetProhibitMode(
     /* [in] */ Boolean enabled)
 {
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         mProhibitMode = enabled;
     }
     return NOERROR;
@@ -3139,7 +3214,8 @@ ECode HdmiControlService::SetControlEnabled(
     ToInt32(enabled, &value);
     mCecController->SetOption(Constants::OPTION_CEC_ENABLE, value);
     mMhlController->SetOption(Constants::OPTION_MHL_ENABLE, value);
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         mHdmiControlEnabled = enabled;
     }
     if (enabled) {
@@ -3221,7 +3297,8 @@ ECode HdmiControlService::SetMhlInputChangeEnabled(
     Int32 iEnabled;
     ToInt32(enabled, &iEnabled);
     mMhlController->SetOption(Constants::OPTION_MHL_INPUT_SWITCHING, iEnabled);
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         mMhlInputChangeEnabled = enabled;
     }
     return NOERROR;
@@ -3232,7 +3309,8 @@ ECode HdmiControlService::IsMhlInputChangeEnabled(
 {
     VALIDATE_NOT_NULL(result)
 
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         *result = mMhlInputChangeEnabled;
     }
     return NOERROR;

@@ -20,7 +20,6 @@
 #include "_Org.Conscrypt.h"
 #include "elastos/droid/net/http/HttpsConnection.h"
 #include "elastos/droid/net/Proxy.h"
-#include "elastos/droid/net/ReturnOutValue.h"
 #include "elastos/droid/net/http/CCertificateChainValidator.h"
 #include "elastos/droid/net/http/CCertificateChainValidatorHelper.h"
 #include "elastos/droid/net/http/CElastosHttpClient.h"
@@ -35,13 +34,12 @@
 #include <elastos/core/StringUtils.h>
 #include <elastos/utility/logging/Logger.h>
 
-#include <elastos/core/AutoLock.h>
-using Elastos::Core::AutoLock;
 using Elastos::Droid::Content::IContext;
 using Elastos::Droid::Internal::Utility::IProtocol;
 using Elastos::Droid::Os::Handler;
 using Elastos::Droid::Utility::ILog;
 
+using Elastos::Core::AutoLock;
 using Elastos::Core::CObject;
 using Elastos::Core::StringUtils;
 using Elastos::IO::CFile;
@@ -109,7 +107,7 @@ ECode HttpsConnection::InnerSub_X509TrustManager::CheckClientTrusted(
 }
 
 ECode HttpsConnection::InnerSub_X509TrustManager::CheckServerTrusted(
-    /* [in] */ ArrayOf<ICertificate*>* chain,
+    /* [in] */ ArrayOf<IX509Certificate*>* chain,
     /* [in] */ const String& authType)
 {
     return NOERROR;
@@ -387,7 +385,8 @@ ECode HttpsConnection::OpenConnection(
         // then check if we're still suspended and only wait if we actually
         // need to.
         {
-            {    AutoLock syncLock(mSuspendLock);
+            {
+                AutoLock syncLock(mSuspendLock);
                 mSuspended = TRUE;
             }
         }
@@ -404,7 +403,8 @@ ECode HttpsConnection::OpenConnection(
         }
 
         {
-            {    AutoLock syncLock(mSuspendLock);
+            {
+                AutoLock syncLock(mSuspendLock);
                 if (mSuspended) {
                     // Put a limit on how long we are waiting; if the timeout
                     // expires (which should never happen unless you choose
@@ -482,7 +482,8 @@ ECode HttpsConnection::RestartConnection(
         HttpLog::V(String("HttpsConnection.restartConnection(): proceed: ") + StringUtils::BooleanToString(proceed));
     }
 
-    {    AutoLock syncLock(mSuspendLock);
+    {
+        AutoLock syncLock(mSuspendLock);
         if (mSuspended) {
             mSuspended = FALSE;
             mAborted = !proceed;

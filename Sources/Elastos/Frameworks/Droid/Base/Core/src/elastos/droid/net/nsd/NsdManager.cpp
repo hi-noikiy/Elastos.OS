@@ -16,7 +16,6 @@
 
 #include "elastos/droid/net/nsd/NsdManager.h"
 #include "elastos/droid/net/nsd/CNsdServiceInfo.h"
-#include "elastos/droid/net/ReturnOutValue.h"
 #include "elastos/droid/internal/utility/CAsyncChannel.h"
 #include "elastos/droid/os/CHandlerThread.h"
 #include "elastos/droid/os/Handler.h"
@@ -29,8 +28,6 @@
 #include <elastos/utility/logging/Logger.h>
 #include <elastos/utility/logging/Slogger.h>
 
-#include <elastos/core/AutoLock.h>
-using Elastos::Core::AutoLock;
 using Elastos::Droid::Content::IContext;
 using Elastos::Droid::Internal::Utility::CAsyncChannel;
 using Elastos::Droid::Internal::Utility::IAsyncChannel;
@@ -48,6 +45,7 @@ using Elastos::Droid::Text::TextUtils;
 using Elastos::Droid::Utility::CSparseArray;
 using Elastos::Droid::Utility::ILog;
 
+using Elastos::Core::AutoLock;
 using Elastos::Core::CObject;
 using Elastos::Core::IThread;
 using Elastos::Core::Thread;
@@ -98,7 +96,8 @@ ECode NsdManager::PutListener(
     }
 
     Int32 key = 0;
-    {    AutoLock syncLock(mMapLock);
+    {
+        AutoLock syncLock(mMapLock);
         Int32 valueIndex;
         mListenerMap->IndexOfValue(listener, &valueIndex);
         if (valueIndex != -1) {
@@ -128,7 +127,8 @@ ECode NsdManager::GetListener(
         return NOERROR;
     }
 
-    {    AutoLock syncLock(mMapLock);
+    {
+        AutoLock syncLock(mMapLock);
         mListenerMap->Get(key, result);
     }
 
@@ -142,7 +142,8 @@ ECode NsdManager::GetNsdService(
 {
     VALIDATE_NOT_NULL(result)
 
-    {    AutoLock syncLock(mMapLock);
+    {
+        AutoLock syncLock(mMapLock);
         AutoPtr<IInterface> obj;
         mServiceMap->Get(key, (IInterface**)&obj);
         *result = INsdServiceInfo::Probe(obj);
@@ -157,7 +158,8 @@ ECode NsdManager::RemoveListener(
 {
     if (key == INVALID_LISTENER_KEY) return NOERROR;
 
-    {    AutoLock syncLock(mMapLock);
+    {
+        AutoLock syncLock(mMapLock);
         mListenerMap->Remove(key);
         mServiceMap->Remove(key);
     }
@@ -171,7 +173,8 @@ ECode NsdManager::GetListenerKey(
 {
     VALIDATE_NOT_NULL(result)
 
-    {    AutoLock syncLock(mMapLock);
+    {
+        AutoLock syncLock(mMapLock);
         Int32 valueIndex;
         mListenerMap->IndexOfValue(listener, &valueIndex);
         if (valueIndex != -1) {
@@ -386,8 +389,14 @@ ECode NsdManager::GetMessenger(
 
     // try {
     AutoPtr<IMessenger> messenger;
-    mService->GetMessenger((IMessenger**)&messenger);
-    FUNC_RETURN(messenger);
+    ECode ec = mService->GetMessenger((IMessenger**)&messenger);
+    if (ec == (ECode)E_REMOTE_EXCEPTION) {
+        *result = NULL;
+        return NOERROR;
+    }
+    *result = messenger;
+    REFCOUNT_ADD(*result);
+    return NOERROR;
     // } catch (RemoteException e) {
     //     return NULL;
     // }

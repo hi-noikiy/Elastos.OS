@@ -67,7 +67,8 @@ ECode FlpHardwareProvider::FusedLocationHardwareService::constructor(
 ECode FlpHardwareProvider::FusedLocationHardwareService::RegisterSink(
     /* [in] */ IIFusedLocationHardwareSink* eventSink)
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         // only one sink is allowed at the moment
         if (mHost->mLocationSink != NULL) {
             Logger::E(TAG, "Replacing an existing IFusedLocationHardware sink");
@@ -81,7 +82,8 @@ ECode FlpHardwareProvider::FusedLocationHardwareService::RegisterSink(
 ECode FlpHardwareProvider::FusedLocationHardwareService::UnregisterSink(
     /* [in] */ IIFusedLocationHardwareSink* eventSink)
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         // don't throw if the sink is not registered, simply make it a no-op
         if ((mHost->mLocationSink).Get() == eventSink) {
             mHost->mLocationSink = NULL;
@@ -349,7 +351,8 @@ void FlpHardwareProvider::OnLocationReport(
     }
 
     AutoPtr<IIFusedLocationHardwareSink> sink;
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         sink = mLocationSink;
     }
     if (sink != NULL) {
@@ -364,7 +367,8 @@ void FlpHardwareProvider::OnDataReport(
     /* [in] */ const String& data)
 {
     AutoPtr<IIFusedLocationHardwareSink> sink;
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         sink = mLocationSink;
     }
     if (mLocationSink != NULL) {

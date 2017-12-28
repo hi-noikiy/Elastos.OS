@@ -107,7 +107,8 @@ CTorchService::KillRunnable::KillRunnable(
 
 ECode CTorchService::KillRunnable::Run()
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         mHost->mTorchEnabled = FALSE;
     }
     mHost->UpdateFlashlight(TRUE /* forceDisable */);
@@ -256,7 +257,8 @@ CTorchService::BinderDeathRecipient::BinderDeathRecipient(
 
 ECode CTorchService::BinderDeathRecipient::ProxyDied()
 {
-    {    AutoLock syncLock(mHost->mCamerasInUse);
+    {
+        AutoLock syncLock(mHost->mCamerasInUse);
         if (DEBUG) Logger::D(TAG, "Camera %d client died", mCameraId);
         mHost->RemoveCameraUserLocked(mToken, mCameraId);
     }
@@ -321,7 +323,8 @@ ECode CTorchService::OnCameraOpened(
     if (DEBUG) Logger::D(TAG, "onCameraOpened(token= %p, cameraId=%d)", token, cameraId);
     Boolean needTorchShutdown = FALSE;
 
-    {    AutoLock syncLock(mCamerasInUse);
+    {
+        AutoLock syncLock(mCamerasInUse);
         if (mTorchAppUid != -1 && Binder::GetCallingUid() == mTorchAppUid) {
             if (DEBUG) Logger::D(TAG, "Camera was opened by torch app");
             mTorchCameraId = cameraId;
@@ -536,7 +539,8 @@ void CTorchService::UpdateFlashlight(
     /* [in] */ Boolean forceDisable)
 {
     Boolean enabled;
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         enabled = mTorchEnabled && !forceDisable;
     }
     if (enabled) {
@@ -603,7 +607,8 @@ void CTorchService::TeardownTorch()
 
 void CTorchService::HandleError()
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         mTorchEnabled = FALSE;
     }
     DispatchError();
@@ -632,7 +637,8 @@ void CTorchService::DispatchListeners(
     /* [in] */ Int32 message,
     /* [in] */ Boolean argument)
 {
-    {    AutoLock syncLock(mListeners);
+    {
+        AutoLock syncLock(mListeners);
         Int32 N = 0;
         mListeners->BeginBroadcast(&N);
         for(Int32 i = 0; i < N; i++) {

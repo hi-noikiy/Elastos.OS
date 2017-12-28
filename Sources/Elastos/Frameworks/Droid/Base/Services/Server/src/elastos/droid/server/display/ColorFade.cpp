@@ -29,8 +29,6 @@
 #include <elastos/core/AutoLock.h>
 #include <elastos/core/Math.h>
 
-#include <elastos/core/AutoLock.h>
-using Elastos::Core::AutoLock;
 using Elastos::Droid::R;
 using Elastos::Droid::Os::IBinder;
 using Elastos::Droid::Content::IContext;
@@ -53,6 +51,7 @@ using Elastos::Droid::View::ISurfaceControlHelper;
 using Elastos::Droid::View::CSurfaceControlHelper;
 using Elastos::Droid::View::CSurfaceSession;
 
+using Elastos::Core::AutoLock;
 using Elastos::IO::IInputStream;
 using Elastos::IO::IReader;
 using Elastos::IO::IInputStreamReader;
@@ -99,7 +98,8 @@ ColorFade::NaturalSurfaceLayout::~NaturalSurfaceLayout()
 
 void ColorFade::NaturalSurfaceLayout::Dispose()
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         mSurfaceControl = NULL;
     }
     mDisplayManagerInternal->UnregisterDisplayTransactionListener(this);
@@ -107,7 +107,8 @@ void ColorFade::NaturalSurfaceLayout::Dispose()
 
 ECode ColorFade::NaturalSurfaceLayout::OnDisplayTransaction()
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         if (mSurfaceControl == NULL) {
             return NOERROR;
         }

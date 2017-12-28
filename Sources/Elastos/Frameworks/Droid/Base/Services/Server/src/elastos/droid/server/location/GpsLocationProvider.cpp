@@ -486,7 +486,8 @@ ECode GpsLocationProvider::MyBroadcastReceiver::OnReceive(
         phone->GetSimOperator(&mccMnc);
         if (!TextUtils::IsEmpty(mccMnc)) {
             Logger::D(TAG, "SIM MCC/MNC is available: %s", mccMnc.string());
-            {    AutoLock syncLock(this);
+            {
+                AutoLock syncLock(this);
                 mHost->ReloadGpsProperties(context, mHost->mProperties);
                 mHost->mNIHandler->SetSuplEsEnabled(mHost->mSuplEsEnabled);
             }
@@ -1431,7 +1432,8 @@ void GpsLocationProvider::HandleUpdateLocation(
 
 ECode GpsLocationProvider::Enable()
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         if (mEnabled) return E_NULL_POINTER_EXCEPTION;
         mEnabled = TRUE;
     }
@@ -1509,7 +1511,8 @@ void GpsLocationProvider::HandleEnable()
         }
     }
     else {
-        {    AutoLock syncLock(this);
+        {
+            AutoLock syncLock(this);
             mEnabled = FALSE;
         }
         Logger::W(TAG, "Failed to enable location provider");
@@ -1518,7 +1521,8 @@ void GpsLocationProvider::HandleEnable()
 
 ECode GpsLocationProvider::Disable()
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         if (!mEnabled) return E_NULL_POINTER_EXCEPTION;
         mEnabled = FALSE;
     }
@@ -1546,7 +1550,8 @@ ECode GpsLocationProvider::IsEnabled(
     /* [out] */ Boolean* result)
 {
     VALIDATE_NOT_NULL(result)
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         *result = mEnabled;
     }
     return NOERROR;
@@ -1931,7 +1936,8 @@ void GpsLocationProvider::ReportLocation(
 {
     if (VERBOSE) Logger::V(TAG, "reportLocation lat: %lf long: %lf timestamp: %lld", latitude,longitude,timestamp);
 
-    {    AutoLock syncLock(mLocation);
+    {
+        AutoLock syncLock(mLocation);
         mLocationFlags = flags;
         if ((flags & LOCATION_HAS_LAT_LONG) == LOCATION_HAS_LAT_LONG) {
             mLocation->SetLatitude(latitude);

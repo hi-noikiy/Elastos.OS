@@ -120,7 +120,8 @@ ECode StackTapPointerEventListener::OnPointerEvent(
 void StackTapPointerEventListener::SetTouchExcludeRegion(
     /* [in] */ IRegion* newRegion)
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         Boolean result;
         mTouchExcludeRegion->Set(newRegion, &result);
     }

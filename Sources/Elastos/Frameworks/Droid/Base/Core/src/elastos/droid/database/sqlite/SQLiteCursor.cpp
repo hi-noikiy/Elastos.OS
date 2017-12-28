@@ -20,7 +20,6 @@
 #include <elastos/core/AutoLock.h>
 #include <elastos/utility/logging/Slogger.h>
 
-#include <elastos/core/AutoLock.h>
 using Elastos::Core::AutoLock;
 using Elastos::Utility::Logging::Slogger;
 
@@ -239,7 +238,8 @@ ECode SQLiteCursor::Close()
     AbstractWindowedCursor::Close();
 
     ECode ec = NOERROR;
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         ICloseable::Probe(mQuery)->Close();
         ec = mDriver->CursorClosed();
     }
@@ -257,7 +257,8 @@ ECode SQLiteCursor::Requery(
         return NOERROR;
     }
 
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         AutoPtr<ISQLiteDatabase> database = ((CSQLiteQuery*)mQuery.Get())->GetDatabase();
         Boolean isOpened;
         if (database->IsOpen(&isOpened), !isOpened) {

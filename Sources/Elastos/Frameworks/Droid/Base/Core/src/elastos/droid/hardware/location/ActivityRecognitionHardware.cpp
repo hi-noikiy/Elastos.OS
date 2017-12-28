@@ -29,7 +29,6 @@
 #include "hardware/activity_recognition.h"
 #include "hardware/hardware.h"
 
-#include <elastos/core/AutoLock.h>
 using Elastos::Core::AutoLock;
 using Elastos::Droid::Os::CRemoteCallbackList;
 using Elastos::Droid::Text::TextUtils;
@@ -83,7 +82,8 @@ ECode ActivityRecognitionHardware::GetInstance(
 {
     VALIDATE_NOT_NULL(instance);
 
-    {    AutoLock syncLock(sSingletonInstanceLock);
+    {
+        AutoLock syncLock(sSingletonInstanceLock);
         if (sSingletonInstance == NULL) {
             sSingletonInstance = new ActivityRecognitionHardware(context);
         }

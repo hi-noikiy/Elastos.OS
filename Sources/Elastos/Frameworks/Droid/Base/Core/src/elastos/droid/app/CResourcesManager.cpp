@@ -99,7 +99,8 @@ ECode CResourcesManager::constructor()
 
 AutoPtr<IResourcesManager> CResourcesManager::GetInstance()
 {
-    {    AutoLock syncLock(sLock);
+    {
+        AutoLock syncLock(sLock);
         if (sResourcesManager == NULL) {
             CResourcesManager::New((IResourcesManager**)&sResourcesManager);
         }

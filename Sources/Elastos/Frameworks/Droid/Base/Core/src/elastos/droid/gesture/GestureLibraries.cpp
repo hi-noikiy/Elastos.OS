@@ -225,15 +225,10 @@ ECode GestureLibraries::FileGestureLibrary::GetGestures(
     return GestureLibrary::GetGestures(entryName, gestures);
 }
 
-CARAPI GestureLibraries::FileGestureLibrary::GetLearner(
+ECode GestureLibraries::FileGestureLibrary::GetLearner(
     /* [out] */ ILearner** learner)
 {
-    AutoPtr<ILearner> lnr;
-
-    lnr = GestureLibrary::GetLearner();
-    *learner = lnr;
-    REFCOUNT_ADD(*learner)
-    return  NOERROR;
+    return GestureLibrary::GetLearner(learner);
 }
 
 GestureLibraries::ResourceGestureLibrary::ResourceGestureLibrary(
@@ -358,15 +353,10 @@ ECode GestureLibraries::ResourceGestureLibrary::GetGestures(
     return GestureLibrary::GetGestures(entryName, gestures);
 }
 
-CARAPI GestureLibraries::ResourceGestureLibrary::GetLearner(
+ECode GestureLibraries::ResourceGestureLibrary::GetLearner(
     /* [out] */ ILearner** learner)
 {
-    AutoPtr<ILearner> lnr;
-
-    lnr = GestureLibrary::GetLearner();
-    *learner = lnr;
-    REFCOUNT_ADD(*learner)
-    return  NOERROR;
+    return GestureLibrary::GetLearner(learner);
 }
 
 } // namespace Gesture

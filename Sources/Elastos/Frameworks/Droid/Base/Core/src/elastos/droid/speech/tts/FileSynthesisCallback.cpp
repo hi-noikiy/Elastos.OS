@@ -24,17 +24,16 @@
 #include "Elastos.CoreLibrary.IO.h"
 #include "Elastos.CoreLibrary.Libcore.h"
 
-#include <elastos/core/AutoLock.h>
+using Elastos::Droid::Os::FileUtils;
 using Elastos::Core::AutoLock;
 using Elastos::Core::StringUtils;
 using Elastos::IO::CRandomAccessFile;
 using Elastos::IO::IByteBuffer;
 using Elastos::IO::IByteBufferHelper;
 using Elastos::IO::CByteBufferHelper;
-using Elastos::Utility::Logging::Logger;
-using Elastos::Droid::Os::FileUtils;
 using Elastos::IO::IBuffer;
 using Elastos::IO::Channels::IFileChannel;
+using Elastos::Utility::Logging::Logger;
 
 namespace Elastos {
 namespace Droid {
@@ -150,7 +149,8 @@ ECode FileSynthesisCallback::Start(
 
     AutoPtr<IFileChannel> fileChannel;
 
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         if (mStatusCode == ITextToSpeech::STOPPED) {
             if (DBG) {
                 Logger::D(TAG, "Request has been aborted.");
@@ -190,7 +190,8 @@ ECode FileSynthesisCallback::Start(
 
     if (FAILED(ec)) {
         Logger::E(TAG, "Failed to write wav header to output file descriptor");
-        {    AutoLock syncLock(this);
+        {
+            AutoLock syncLock(this);
             CleanUp();
             mStatusCode = ITextToSpeech::ERROR_OUTPUT;
         }
@@ -199,7 +200,8 @@ ECode FileSynthesisCallback::Start(
     }
 
     Logger::E(TAG, "Failed to write wav header to output file descriptor");
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         CleanUp();
         mStatusCode = ITextToSpeech::ERROR_OUTPUT;
     }
@@ -220,7 +222,8 @@ ECode FileSynthesisCallback::AudioAvailable(
 
     AutoPtr<IFileChannel> fileChannel;
 
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         if (mStatusCode == ITextToSpeech::STOPPED) {
             if (DBG) {
                 Logger::D(TAG, "Request has been aborted.");
@@ -258,7 +261,8 @@ ECode FileSynthesisCallback::AudioAvailable(
 
     if (FAILED(ec)) {
         Logger::E(TAG, "Failed to write to output file descriptor");
-        {    AutoLock syncLock(this);
+        {
+            AutoLock syncLock(this);
             CleanUp();
             mStatusCode = ITextToSpeech::ERROR_OUTPUT;
         }
@@ -284,7 +288,8 @@ ECode FileSynthesisCallback::Done(
     Int32 audioFormat = 0;
     Int32 channelCount = 0;
 
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         if (mDone) {
             if (DBG){
                 //Java:    Log.d(TAG, "Duplicate call to done()");
@@ -333,7 +338,8 @@ ECode FileSynthesisCallback::Done(
     Int32 dataLength = (Int32) (size - WAV_HEADER_LENGTH);
     fileChannel->Write(MakeWavHeader(sampleRateInHz, audioFormat, channelCount, dataLength), &number);
 
-    {    AutoLock syncLock(mStateLock);
+    {
+        AutoLock syncLock(mStateLock);
         CloseFile();
         if (mDispatcher != NULL) {
             mDispatcher->DispatchOnSuccess();
@@ -344,7 +350,8 @@ ECode FileSynthesisCallback::Done(
 
     if (FAILED(ec)) {
         Logger::E(TAG, "Failed to write to output file descriptor");
-        {    AutoLock syncLock(this);
+        {
+            AutoLock syncLock(this);
             CleanUp();
         }
         *ret = TextToSpeech::TTS_ERROR;
@@ -387,7 +394,8 @@ ECode FileSynthesisCallback::HasStarted(
 ECode FileSynthesisCallback::HasFinished(
     /* [out] */ Boolean* finished)
 {
-    {    AutoLock syncLock(mStateLock);
+    {
+        AutoLock syncLock(mStateLock);
         *finished = mDone;
     }
     return NOERROR;

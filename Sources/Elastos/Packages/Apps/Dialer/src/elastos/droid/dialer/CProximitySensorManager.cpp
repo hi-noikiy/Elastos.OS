@@ -65,7 +65,8 @@ ECode CProximitySensorManager::ProximitySensorEventListener::OnSensorChanged(
     Float value = (*values)[0];
     // Convert the sensor into a NEAR/FAR state.
     IProximitySensorManager::State state = GetStateFromValue(value);
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         // No change in state, do nothing.
         if (state == mLastState) {
             return NOERROR;

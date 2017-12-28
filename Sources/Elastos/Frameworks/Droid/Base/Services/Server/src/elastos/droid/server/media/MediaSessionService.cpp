@@ -225,7 +225,8 @@ AutoPtr<IIAudioService> MediaSessionService::GetAudioService()
 void MediaSessionService::UpdateSession(
     /* [in] */ MediaSessionRecord* record)
 {
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         if (Find(mAllSessions.Begin(), mAllSessions.End(), AutoPtr<MediaSessionRecord>(record)) == mAllSessions.End()) {
             Slogger::D(TAG, "Unknown session updated. Ignoring.");
             return;
@@ -241,7 +242,8 @@ void MediaSessionService::OnSessionPlaystateChange(
     /* [in] */ Int32 newState)
 {
     Boolean updateSessions = FALSE;
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         if (Find(mAllSessions.Begin(), mAllSessions.End(), AutoPtr<MediaSessionRecord>(record)) == mAllSessions.End()) {
             Slogger::D(TAG, "Unknown session changed playback state. Ignoring.");
             return;
@@ -256,7 +258,8 @@ void MediaSessionService::OnSessionPlaystateChange(
 void MediaSessionService::OnSessionPlaybackTypeChanged(
     /* [in] */ MediaSessionRecord* record)
 {
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         if (Find(mAllSessions.Begin(), mAllSessions.End(), AutoPtr<MediaSessionRecord>(record)) == mAllSessions.End()) {
             Slogger::D(TAG, "Unknown session changed playback type. Ignoring.");
             return;
@@ -282,7 +285,8 @@ ECode MediaSessionService::OnSwitchUser(
 ECode MediaSessionService::OnStopUser(
     /* [in] */ Int32 userHandle)
 {
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         HashMap<Int32, AutoPtr<UserRecord> >::Iterator it = mUserRecords.Find(userHandle);
         AutoPtr<UserRecord> user;
         if (it != mUserRecords.End()) {
@@ -297,7 +301,8 @@ ECode MediaSessionService::OnStopUser(
 
 ECode MediaSessionService::Monitor()
 {
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         // Check for deadlock
     }
     return NOERROR;
@@ -334,7 +339,8 @@ void MediaSessionService::DestroySession(
 
 void MediaSessionService::UpdateUser()
 {
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         AutoPtr<IActivityManagerHelper> helper;
         CActivityManagerHelper::AcquireSingleton((IActivityManagerHelper**)&helper);
         Int32 userId;
@@ -360,7 +366,8 @@ void MediaSessionService::UpdateUser()
 
 void MediaSessionService::UpdateActiveSessionListeners()
 {
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         List<AutoPtr<SessionsListenerRecord> >::ReverseIterator rit = mSessionsListeners.RBegin();
         while (rit != mSessionsListeners.REnd()) {
             AutoPtr<SessionsListenerRecord> listener = *rit;
@@ -552,7 +559,8 @@ ECode MediaSessionService::CreateSessionInternal(
 {
     VALIDATE_NOT_NULL(record)
     ECode ec;
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         ec = CreateSessionLocked(callerPid, callerUid, userId, callerPackageName, cb, tag, record);
     }
     return ec;
@@ -640,7 +648,8 @@ Boolean MediaSessionService::IsSessionDiscoverable(
 void MediaSessionService::PushSessionsChanged(
     /* [in] */ Int32 userId)
 {
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         AutoPtr<List<AutoPtr<MediaSessionRecord> > > records = mPriorityStack->GetActiveSessions(userId);
         if (records->IsEmpty() == FALSE) {
             RememberMediaButtonReceiverLocked((*records->Begin()));

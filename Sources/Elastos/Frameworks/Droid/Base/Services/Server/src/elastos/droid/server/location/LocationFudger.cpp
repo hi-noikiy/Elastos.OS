@@ -124,7 +124,8 @@ ECode LocationFudger::GetOrCreate(
     VALIDATE_NOT_NULL(outLocation)
     *outLocation = NULL;
 
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         AutoPtr<ILocation> coarse;
         location->GetExtraLocation(ILocation::EXTRA_COARSE_LOCATION, (ILocation**)&coarse);
         if (coarse == NULL) {
@@ -330,7 +331,8 @@ void LocationFudger::SetAccuracyInMetersLocked(
 void LocationFudger::SetAccuracyInMeters(
     /* [in] */ Float accuracyInMeters)
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         SetAccuracyInMetersLocked(accuracyInMeters);
     }
 }

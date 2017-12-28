@@ -37,8 +37,6 @@
 #include <elastos/core/Thread.h>
 #include <elastos/utility/logging/Logger.h>
 
-#include <elastos/core/AutoLock.h>
-using Elastos::Core::AutoLock;
 using Elastos::Droid::App::ActivityManagerNative;
 using Elastos::Droid::App::CActivityManagerWaitResult;
 using Elastos::Droid::App::CProfilerInfo;
@@ -163,7 +161,8 @@ ECode Am::MyActivityController::GdbRunnable::Run()
     String line;
     Int32 count = 0;
     while (TRUE) {
-        {    AutoLock syncLock(mHost);
+        {
+            AutoLock syncLock(mHost);
             if (mHost->mGdbThread == NULL) {
                 return NOERROR;
             }
@@ -216,7 +215,8 @@ ECode Am::MyActivityController::ActivityResuming(
     /* [out] */ Boolean* result)
 {
     VALIDATE_NOT_NULL(result);
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         System::Out->Println(String("** Activity resuming: ") + pkg);
     }
     *result = TRUE;
@@ -230,7 +230,8 @@ ECode Am::MyActivityController::ActivityStarting(
     /* [out] */ Boolean* result)
 {
     VALIDATE_NOT_NULL(result);
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         System::Out->Println(String("** Activity starting: ") + pkg);
     }
     *result = TRUE;
@@ -247,7 +248,8 @@ ECode Am::MyActivityController::AppCrashed(
     /* [out] */ Boolean* result)
 {
     VALIDATE_NOT_NULL(result);
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         System::Out->Println(String("** ERROR: PROCESS CRASHED"));
         System::Out->Println(String("processName: ") + processName);
         System::Out->Println(String("processPid: ") + StringUtils::ToString(pid));
@@ -271,7 +273,8 @@ ECode Am::MyActivityController::AppEarlyNotResponding(
     /* [out] */ Int32* result)
 {
     VALIDATE_NOT_NULL(result);
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         System::Out->Println(String("** ERROR: EARLY PROCESS NOT RESPONDING"));
         System::Out->Println(String("processName: ") + processName);
         System::Out->Println(String("processPid: ") + StringUtils::ToString(pid));
@@ -290,7 +293,8 @@ ECode Am::MyActivityController::AppNotResponding(
     /* [out] */ Int32* result)
 {
     VALIDATE_NOT_NULL(result);
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         System::Out->Println(String("** ERROR: PROCESS NOT RESPONDING"));
         System::Out->Println(String("processName: ") + processName);
         System::Out->Println(String("processPid: ") + StringUtils::ToString(pid));
@@ -317,7 +321,8 @@ ECode Am::MyActivityController::SystemNotResponding(
     /* [out] */ Int32* result)
 {
     VALIDATE_NOT_NULL(result);
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         System::Out->Println(String("** ERROR: PROCESS NOT RESPONDING"));
         System::Out->Println(String("message: ") + message);
         System::Out->Println(String("#"));
@@ -402,7 +407,8 @@ void Am::MyActivityController::WaitControllerLocked(
 void Am::MyActivityController::ResumeController(
     /* [in] */ Int32 result)
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         mState = STATE_NORMAL;
         mResult = result;
         NotifyAll();
@@ -502,7 +508,8 @@ ECode Am::MyActivityController::Run()
             System::Out->Println(String("Invalid command: ") + line);
         }
 
-        {    AutoLock syncLock(this);
+        {
+            AutoLock syncLock(this);
             if (addNewline) {
                 System::Out->Println(String(""));
             }
@@ -646,7 +653,8 @@ ECode Am::InstrumentationWatcher::InstrumentationFinished(
 {
     VALIDATE_NOT_NULL(results);
 
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         // pretty printer mode?
         String pretty;
         if (!mRawMode && results != NULL) {
@@ -699,7 +707,8 @@ ECode Am::InstrumentationWatcher::WaitForFinish(
     /* [out] */ Boolean* result)
 {
     VALIDATE_NOT_NULL(result);
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         while (!mFinished) {
             // try {
             // if (!mAm.asBinder().pingBinder()) {

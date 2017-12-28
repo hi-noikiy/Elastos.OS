@@ -31,8 +31,6 @@
 #include <Elastos.CoreLibrary.Utility.h>
 #include <Elastos.CoreLibrary.Utility.Concurrent.h>
 
-#include <elastos/core/AutoLock.h>
-using Elastos::Core::AutoLock;
 using Elastos::Droid::Os::IHandlerThread;
 using Elastos::Droid::Os::CHandlerThread;
 using Elastos::Droid::Os::EIID_IHandlerCallback;
@@ -46,6 +44,7 @@ using Elastos::Droid::Net::ILocalSocket;
 using Elastos::Droid::Net::CLocalSocket;
 using Elastos::Droid::Net::CLocalSocketAddress;
 using Elastos::Droid::Net::LocalSocketAddressNamespace_RESERVED;
+using Elastos::Core::AutoLock;
 using Elastos::Core::CoreUtils;
 using Elastos::Core::StringUtils;
 using Elastos::Core::StringBuilder;

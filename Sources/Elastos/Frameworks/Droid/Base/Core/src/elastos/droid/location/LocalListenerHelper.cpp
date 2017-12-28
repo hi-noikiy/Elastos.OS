@@ -49,7 +49,8 @@ ECode LocalListenerHelper::Add(
 {
     VALIDATE_NOT_NULL(result)
     FAIL_RETURN(Preconditions::CheckNotNull(listener));
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         // we need to register with the service first, because we need to find out if the
         // service will actually support the request before we attempt anything
         Boolean isEmpty = FALSE;
@@ -85,7 +86,8 @@ ECode LocalListenerHelper::Remove(
     /* [in] */ IInterface* listener)
 {
     FAIL_RETURN(Preconditions::CheckNotNull(listener));
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         Boolean removed = FALSE;
         mListeners->Remove(listener, &removed);
         Boolean isEmpty = FALSE;
@@ -105,7 +107,8 @@ ECode LocalListenerHelper::Foreach(
     /* [in] */ ILocalListenerHelperListenerOperation* operation)
 {
     AutoPtr<ICollection> listeners;
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         AutoPtr<ICollection> coll = ICollection::Probe(mListeners);
         AutoPtr<IArrayList> al;
         CArrayList::New(coll, (IArrayList**)&al);

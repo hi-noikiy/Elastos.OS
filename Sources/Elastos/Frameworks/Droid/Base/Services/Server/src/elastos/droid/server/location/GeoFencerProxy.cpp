@@ -20,12 +20,11 @@
 #include <elastos/core/AutoLock.h>
 #include <elastos/utility/logging/Logger.h>
 
-#include <elastos/core/AutoLock.h>
-using Elastos::Core::AutoLock;
 using Elastos::Droid::Content::CIntent;
 using Elastos::Droid::Content::EIID_IServiceConnection;
 using Elastos::Droid::Location::EIID_IIGeoFenceListener;
 using Elastos::Droid::Os::EIID_IBinder;
+using Elastos::Core::AutoLock;
 using Elastos::Utility::Logging::Logger;
 
 namespace Elastos {
@@ -44,7 +43,8 @@ ECode GeoFencerProxy::ServiceConnection::OnServiceConnected(
     /* [in] */ IComponentName* className,
     /* [in] */ IBinder* service)
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         mHost->mGeoFencer = IIGeoFencer::Probe(service);
         NotifyAll();
     }
@@ -55,7 +55,8 @@ ECode GeoFencerProxy::ServiceConnection::OnServiceConnected(
 ECode GeoFencerProxy::ServiceConnection::OnServiceDisconnected(
     /* [in] */ IComponentName* className)
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         mHost->mGeoFencer = NULL;
     }
     Logger::V(TAG, "onServiceDisconnected");
@@ -130,7 +131,8 @@ void GeoFencerProxy::RemoveCaller(
 Boolean GeoFencerProxy::EnsureGeoFencer()
 {
     if (mGeoFencer == NULL) {
-        {    AutoLock syncLock(mServiceConnection);
+        {
+            AutoLock syncLock(mServiceConnection);
             Logv(String("waiting..."));
             if (FAILED(mServiceConnection->Wait(60000))) {
                 Logger::W(TAG, "Interrupted while waiting for GeoFencer");

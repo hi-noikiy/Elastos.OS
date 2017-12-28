@@ -26,8 +26,6 @@
 #include <elastos/core/AutoLock.h>
 #include <elastos/utility/logging/Slogger.h>
 
-#include <elastos/core/AutoLock.h>
-using Elastos::Core::AutoLock;
 using Elastos::Droid::App::ActivityManagerNative;
 using Elastos::Droid::App::IAppOpsManagerHelper;
 using Elastos::Droid::App::CAppOpsManagerHelper;
@@ -49,6 +47,7 @@ using Elastos::Droid::Os::SystemClock;
 using Elastos::Droid::Os::IBatteryStats;
 using Elastos::Droid::Provider::Settings;
 using Elastos::Droid::Provider::ISettingsGlobal;
+using Elastos::Core::AutoLock;
 using Elastos::Utility::Logging::Slogger;
 
 namespace Elastos {
@@ -428,7 +427,8 @@ void Notifier::OnUserActivity(
     //     // Ignore
     // }
 
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         if (!mUserActivityPending) {
             mUserActivityPending = TRUE;
             AutoPtr<IMessage> msg;
@@ -485,7 +485,8 @@ void Notifier::SendUserActivity()
 void Notifier::SendNextBroadcast()
 {
     Int32 powerState;
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         if (mBroadcastedPowerState == POWER_STATE_UNKNOWN) {
             // Broadcasted power state is unknown.  Send wake up.
             mPendingWakeUpBroadcast = FALSE;

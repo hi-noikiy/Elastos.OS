@@ -22,7 +22,6 @@
 #include "elastos/utility/logging/Logger.h"
 #include "elastos/utility/Collections.h"
 
-#include <elastos/core/AutoLock.h>
 using Elastos::Core::AutoLock;
 using Elastos::Utility::CArrayList;
 using Elastos::Utility::CDate;
@@ -50,7 +49,8 @@ CAR_INTERFACE_IMPL(BasicCookieStore, Object, IAuthenticationHandler)
 ECode BasicCookieStore::AddCookie(
     /* [in] */ ICookie* cookie)
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         if (cookie != NULL) {
             // first remove any old cookie that is equivalent
             AutoPtr<IIterator> it;
@@ -79,7 +79,8 @@ ECode BasicCookieStore::AddCookie(
 void BasicCookieStore::AddCookies(
     /* [in] */ ArrayOf<ICookie*>* cookies)
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         if (cookies != NULL) {
             for (Int32 i = 0; i < cookies->GetLength(); ++i) {
                 AddCookie((*cookies)[i]);
@@ -92,7 +93,8 @@ ECode BasicCookieStore::GetCookies(
     /* [out] */ IList** cookies)
 {
     VALIDATE_NOT_NULL(cookies)
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         Collections::UnmodifiableList(IList::Probe(mCookies), cookies);
     }
     return NOERROR;
@@ -103,7 +105,8 @@ ECode BasicCookieStore::ClearExpired(
     /* [out] */ Boolean* purged)
 {
     VALIDATE_NOT_NULL(purged)
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         if (date == NULL) {
             *purged = FALSE;
             return NOERROR;
@@ -136,7 +139,8 @@ ECode BasicCookieStore::ToString(
 
 ECode BasicCookieStore::Clear()
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         mCookies->Clear();
     }
     return NOERROR;

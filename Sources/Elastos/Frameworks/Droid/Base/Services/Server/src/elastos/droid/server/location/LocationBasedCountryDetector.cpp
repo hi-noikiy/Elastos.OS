@@ -18,8 +18,6 @@
 #include <elastos/core/AutoLock.h>
 #include <elastos/utility/logging/Slogger.h>
 
-#include <elastos/core/AutoLock.h>
-using Elastos::Core::AutoLock;
 using Elastos::Droid::Location::CCountry;
 using Elastos::Droid::Location::CGeocoder;
 using Elastos::Droid::Location::EIID_ILocationListener;

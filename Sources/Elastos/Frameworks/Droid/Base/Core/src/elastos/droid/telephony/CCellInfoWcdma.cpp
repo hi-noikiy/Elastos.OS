@@ -57,7 +57,9 @@ ECode CCellInfoWcdma::constructor(
     ci->GetCellIdentity((ICellIdentityWcdma**)&cWcdma);
     ci->GetCellSignalStrength((ICellSignalStrengthWcdma**)&sWcdma);
     cWcdma->Copy((ICellIdentityWcdma**)&mCellIdentityWcdma);
-    sWcdma->Copy((ICellSignalStrengthWcdma**)&mCellSignalStrengthWcdma);
+    AutoPtr<ICellSignalStrength> strength;
+    ICellSignalStrength::Probe(sWcdma)->Copy((ICellSignalStrength**)&strength);
+    mCellSignalStrengthWcdma = ICellSignalStrengthWcdma::Probe(strength);
     return NOERROR;
 }
 
@@ -165,7 +167,7 @@ ECode CCellInfoWcdma::ReadFromParcel(
 ECode CCellInfoWcdma::WriteToParcel(
     /* [in] */ IParcel* dest)
 {
-    CellInfo::WriteToParcel(dest, TYPE_WCDMA);
+    CellInfo::WriteToParcel(dest);
     dest->WriteInterfacePtr(mCellIdentityWcdma);
     dest->WriteInterfacePtr(mCellSignalStrengthWcdma);
     return NOERROR;

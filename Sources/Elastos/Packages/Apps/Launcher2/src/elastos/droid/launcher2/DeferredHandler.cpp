@@ -20,7 +20,6 @@
 #include <elastos/core/AutoLock.h>
 #include <elastos/core/CoreUtils.h>
 
-#include <elastos/core/AutoLock.h>
 using Elastos::Core::AutoLock;
 using Elastos::Droid::Os::EIID_IIdleHandler;
 using Elastos::Droid::Os::CLooperHelper;
@@ -54,7 +53,8 @@ ECode DeferredHandler::Impl::HandleMessage(
 {
     AutoPtr<IPair> p;
     AutoPtr<IRunnable> r;
-    {    AutoLock syncLock(mHost->mQueueLock);
+    {
+        AutoLock syncLock(mHost->mQueueLock);
         Int32 size;
         IList::Probe(mHost->mQueue)->GetSize(&size);
         if (size == 0) {
@@ -68,7 +68,8 @@ ECode DeferredHandler::Impl::HandleMessage(
         r = IRunnable::Probe(tmp);
     }
     r->Run();
-    {    AutoLock syncLock(mHost->mQueueLock);
+    {
+        AutoLock syncLock(mHost->mQueueLock);
         mHost->ScheduleNextLocked();
     }
     return NOERROR;
@@ -116,7 +117,8 @@ ECode DeferredHandler::Post(
     /* [in] */ IRunnable* runnable,
     /* [in] */ Int32 type)
 {
-    {    AutoLock syncLock(mQueueLock);
+    {
+        AutoLock syncLock(mQueueLock);
         AutoPtr<IInteger32> obj = CoreUtils::Convert(type);
         AutoPtr<IPair> pair;
         CPair::New(TO_IINTERFACE(runnable), TO_IINTERFACE(obj), (IPair**)&pair);
@@ -147,7 +149,8 @@ ECode DeferredHandler::PostIdle(
 ECode DeferredHandler::CancelRunnable(
     /* [in] */ IRunnable* runnable)
 {
-    {    AutoLock syncLock(mQueueLock);
+    {
+        AutoLock syncLock(mQueueLock);
         while (mQueue->Remove(TO_IINTERFACE(runnable))) { }
     }
     return NOERROR;
@@ -156,7 +159,8 @@ ECode DeferredHandler::CancelRunnable(
 ECode DeferredHandler::CancelAllRunnablesOfType(
     /* [in] */ Int32 type)
 {
-    {    AutoLock syncLock(mQueueLock);
+    {
+        AutoLock syncLock(mQueueLock);
         AutoPtr<IListIterator> iter;
         mQueue->GetListIterator((IListIterator**)&iter);
         AutoPtr<IPair> p;
@@ -182,7 +186,8 @@ ECode DeferredHandler::CancelAllRunnablesOfType(
 
 ECode DeferredHandler::Cancel()
 {
-    {    AutoLock syncLock(mQueueLock);
+    {
+        AutoLock syncLock(mQueueLock);
         mQueue->Clear();
     }
     return NOERROR;
@@ -192,7 +197,8 @@ ECode DeferredHandler::Flush()
 {
     AutoPtr<ILinkedList> queue;
     CLinkedList::New((ILinkedList**)&queue);
-    {    AutoLock syncLock(mQueueLock);
+    {
+        AutoLock syncLock(mQueueLock);
         queue->AddAll(ICollection::Probe(mQueue));
         mQueue->Clear();
     }

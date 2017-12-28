@@ -47,8 +47,6 @@
 #include <media/IMediaHTTPService.h>
 #include <media/mediaplayer.h>
 
-#include <elastos/core/AutoLock.h>
-using Elastos::Core::AutoLock;
 using Elastos::Droid::App::CActivityThread;
 using Elastos::Droid::App::IApplication;
 using Elastos::Droid::App::IAppOpsManager;
@@ -67,6 +65,7 @@ using Elastos::Droid::Os::Process;
 using Elastos::Droid::Os::ServiceManager;
 using Elastos::Droid::System::OsConstants;
 using Elastos::Droid::View::Surface;
+using Elastos::Core::AutoLock;
 using Elastos::Core::CString;
 using Elastos::Core::ICharSequence;
 using Elastos::Core::IThread;
@@ -471,7 +470,8 @@ ECode CMediaPlayer::TimeProvider::Close()
 ECode CMediaPlayer::TimeProvider::OnPaused(
     /* [in] */ Boolean paused)
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         if (DEBUG) Logger::D(TAG, "onPaused: %d", paused);
         if (mStopped) { // handle as seek if we were stopped
             mStopped = FALSE;
@@ -489,7 +489,8 @@ ECode CMediaPlayer::TimeProvider::OnPaused(
 
 ECode CMediaPlayer::TimeProvider::OnStopped()
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         if (DEBUG) Logger::D(TAG, "onStopped");
         mPaused = TRUE;
         mStopped = TRUE;
@@ -502,7 +503,8 @@ ECode CMediaPlayer::TimeProvider::OnStopped()
 ECode CMediaPlayer::TimeProvider::OnSeekComplete(
     /* [in] */ IMediaPlayer* mp)
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         mStopped = FALSE;
         mSeeking = TRUE;
         ScheduleNotification(NOTIFY_SEEK, 0 /* delay */);
@@ -513,7 +515,8 @@ ECode CMediaPlayer::TimeProvider::OnSeekComplete(
 ECode CMediaPlayer::TimeProvider::OnNewPlayer()
 {
     if (mRefresh) {
-        {    AutoLock syncLock(this);
+        {
+            AutoLock syncLock(this);
             mStopped = FALSE;
             mSeeking = TRUE;
             ScheduleNotification(NOTIFY_SEEK, 0 /* delay */);
@@ -526,7 +529,8 @@ ECode CMediaPlayer::TimeProvider::NotifyAt(
     /* [in] */ Int64 timeUs,
     /* [in] */ IMediaTimeProviderOnMediaTimeListener* listener)
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         if (DEBUG) Logger::D(TAG, "notifyAt %lld", timeUs);
         mTimes->Set(RegisterListener(listener), timeUs);
         ScheduleNotification(NOTIFY_TIME, 0 /* delay */);
@@ -537,7 +541,8 @@ ECode CMediaPlayer::TimeProvider::NotifyAt(
 ECode CMediaPlayer::TimeProvider::ScheduleUpdate(
     /* [in] */ IMediaTimeProviderOnMediaTimeListener* listener)
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         if (DEBUG) Logger::D(TAG, "scheduleUpdate");
         Int32 i = RegisterListener(listener);
 
@@ -552,7 +557,8 @@ ECode CMediaPlayer::TimeProvider::ScheduleUpdate(
 ECode CMediaPlayer::TimeProvider::CancelNotifications(
     /* [in] */ IMediaTimeProviderOnMediaTimeListener* listener)
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         Int32 i = 0;
         for (; i < mListeners->GetLength(); i++) {
             if ((*mListeners)[i] == listener) {
@@ -582,7 +588,8 @@ ECode CMediaPlayer::TimeProvider::GetCurrentTimeUs(
     /* [out] */ Int64* result)
 {
     VALIDATE_NOT_NULL(result)
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         // we always refresh the time when the paused-state changes, because
         // we expect to have received the pause-change event delayed.
         if (mPaused && !refreshTime) {
@@ -1081,7 +1088,8 @@ Int32 CMediaPlayer::HandlerRunnable::AddTrack()
     String contents;
     tmp->Next(&contents);
     AutoPtr<IVector> lock = mHost->mOpenSubtitleSources;
-    {    AutoLock syncLock(lock);
+    {
+        AutoLock syncLock(lock);
         mHost->mOpenSubtitleSources->Remove(mIs);
     }
     scanner->Close();
@@ -2200,7 +2208,8 @@ ECode CMediaPlayer::NativeRelease()
 ECode CMediaPlayer::Reset()
 {
     mSelectedSubtitleTrackIndex = -1;
-    {    AutoLock syncLock(mOpenSubtitleSources);
+    {
+        AutoLock syncLock(mOpenSubtitleSources);
         Int32 size;
         mOpenSubtitleSources->GetSize(&size);
         for (Int32 i = 0; i < size; i++) {
@@ -2637,7 +2646,8 @@ ECode CMediaPlayer::AddSubtitleSource(
 
     // Ensure all input streams are closed.  It is also a handy
     // way to implement timeouts in the future.
-    {    AutoLock syncLock(mOpenSubtitleSources);
+    {
+        AutoLock syncLock(mOpenSubtitleSources);
         mOpenSubtitleSources->Add(is);
     }
 
@@ -2665,7 +2675,8 @@ void CMediaPlayer::ScanInternalSubtitleTracks()
 
     AutoPtr<ArrayOf<IMediaPlayerTrackInfo*> > tracks;
     GetInbandTrackInfo((ArrayOf<IMediaPlayerTrackInfo*>**)&tracks);
-    {    AutoLock syncLock(mInbandSubtitleLock);
+    {
+        AutoLock syncLock(mInbandSubtitleLock);
         AutoPtr<ArrayOf<ISubtitleTrack*> > inbandTracks = ArrayOf<ISubtitleTrack*>::Alloc(tracks->GetLength());
         for (Int32 i = 0; i < tracks->GetLength(); i++) {
             Int32 type;
@@ -2886,7 +2897,8 @@ ECode CMediaPlayer::SelectOrDeselectTrack(
 {
     // handle subtitle track through subtitle controller
     AutoPtr<ISubtitleTrack> track;
-    {    AutoLock syncLock(mInbandSubtitleLock);
+    {
+        AutoLock syncLock(mInbandSubtitleLock);
         if (mInbandSubtitleTracks->GetLength() == 0) {
             AutoPtr<ArrayOf<IMediaPlayerTrackInfo*> > tracks;
             GetInbandTrackInfo((ArrayOf<IMediaPlayerTrackInfo*>**)&tracks);

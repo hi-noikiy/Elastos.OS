@@ -21,8 +21,6 @@
 #include "elastos/droid/widget/ExpandableListView.h"
 #include "elastos/core/AutoLock.h"
 
-#include <elastos/core/AutoLock.h>
-using Elastos::Core::AutoLock;
 using Elastos::Droid::Widget::CExpandableListPosition;
 using Elastos::Droid::Widget::EIID_IExpandableListPosition;
 using Elastos::Droid::Widget::ExpandableListView;

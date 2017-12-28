@@ -502,7 +502,8 @@ ECode AbstractCursor::GetNotificationUri(
 {
     VALIDATE_NOT_NULL(uri)
 
-    {    AutoLock syncLock(mSelfObserverLock);
+    {
+        AutoLock syncLock(mSelfObserverLock);
         *uri = mNotifyUri;
         REFCOUNT_ADD(*uri)
     }

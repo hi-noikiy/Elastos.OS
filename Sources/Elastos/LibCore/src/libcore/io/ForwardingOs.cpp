@@ -34,7 +34,6 @@ ForwardingOs::ForwardingOs(
     : mOs(os)
 {}
 
-
 ECode ForwardingOs::Accept(
     /* [in] */ IFileDescriptor* fd,
     /* [in] */ IInetSocketAddress* peerAddress,

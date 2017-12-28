@@ -50,7 +50,8 @@ ECode SSLContext::GetDefault(
 {
     VALIDATE_NOT_NULL(context)
 
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         if (sDEFAULT == NULL) {
             FAIL_RETURN(SSLContext::GetInstance(String("Default"), (ISSLContext**)&sDEFAULT))
         }
@@ -68,7 +69,8 @@ ECode SSLContext::SetDefault(
         //throw new NullPointerException("sslContext == null");
         return E_NULL_POINTER_EXCEPTION;
     }
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         sDEFAULT = sslContext;
     }
     return NOERROR;

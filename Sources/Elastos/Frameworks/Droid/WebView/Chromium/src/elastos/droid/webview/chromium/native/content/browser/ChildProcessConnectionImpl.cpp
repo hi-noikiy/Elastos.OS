@@ -27,7 +27,6 @@ using Elastos::Droid::Webkit::Webview::Chromium::Base::TraceEvent;
 using Elastos::Droid::Webkit::Webview::Chromium::Base::ThreadUtils;
 using Elastos::Core::AutoLock;
 using Elastos::Core::StringUtils;
-using Elastos::Core::AutoLock;
 using Elastos::Utility::Logging::Logger;
 
 namespace Elastos {

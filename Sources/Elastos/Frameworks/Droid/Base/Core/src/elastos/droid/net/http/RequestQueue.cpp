@@ -21,7 +21,6 @@
 #include "elastos/droid/net/Network.h"
 #include "elastos/droid/net/NetworkInfo.h"
 #include "elastos/droid/net/Proxy.h"
-#include "elastos/droid/net/ReturnOutValue.h"
 #include "elastos/droid/net/WebAddress.h"
 #include "elastos/droid/net/http/CLoggingEventHandler.h"
 #include "elastos/droid/net/http/CRequestHandle.h"
@@ -42,8 +41,6 @@
 #include <elastos/utility/etl/List.h>
 #include <elastos/utility/logging/Logger.h>
 
-#include <elastos/core/AutoLock.h>
-using Elastos::Core::AutoLock;
 using Elastos::Droid::Content::CIntent;
 using Elastos::Droid::Content::CIntentFilter;
 using Elastos::Droid::Content::IBroadcastReceiver;
@@ -58,6 +55,7 @@ using Elastos::Droid::Os::Build;
 using Elastos::Droid::Os::Handler;
 using Elastos::Droid::Utility::ILog;
 
+using Elastos::Core::AutoLock;
 using Elastos::Core::CObject;
 using Elastos::Core::CString;
 using Elastos::Core::ICharSequence;
@@ -129,7 +127,8 @@ ECode RequestQueue::ActivePool::Shutdown()
 
 ECode RequestQueue::ActivePool::StartConnectionThread()
 {
-    {    AutoLock syncLock(mHost);
+    {
+        AutoLock syncLock(mHost);
         mHost->Notify();
     }
     return NOERROR;
@@ -207,7 +206,8 @@ ECode RequestQueue::ActivePool::GetThread(
 {
     VALIDATE_NOT_NULL(thread);
 
-    {    AutoLock syncLock(mHost);
+    {
+        AutoLock syncLock(mHost);
         for (Int32 i = 0; i < mThreads->GetLength(); i++) {
             ConnectionThread* ct = (*mThreads)[i];
             Connection* connection = (Connection*)ct->mConnection.Get();
@@ -254,7 +254,9 @@ ECode RequestQueue::ActivePool::RecycleConnection(
 {
     VALIDATE_NOT_NULL(result)
 
-    return mIdleCache->CacheConnection(Ptr((Connection*)connection)->Func(((Connection*)connection)->GetHost), connection, result);
+    AutoPtr<IHttpHost> host;
+    ((Connection*)connection)->GetHost((IHttpHost**)&host);
+    return mIdleCache->CacheConnection(host, connection, result);
 }
 
 //===============================================
@@ -350,7 +352,8 @@ ECode RequestQueue::constructor(
 
 ECode RequestQueue::EnablePlatformNotifications()
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         if (HttpLog::LOGV) {
             HttpLog::V(String("RequestQueue.enablePlatformNotifications() network"));
         }
@@ -370,7 +373,8 @@ ECode RequestQueue::EnablePlatformNotifications()
 
 ECode RequestQueue::DisablePlatformNotifications()
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         if (HttpLog::LOGV) {
             HttpLog::V(String("RequestQueue.disablePlatformNotifications() network"));
         }
@@ -387,9 +391,11 @@ ECode RequestQueue::SetProxyConfig()
 {
     AutoPtr<INetworkInfo> info;
     mConnectivityManager->GetActiveNetworkInfo((INetworkInfo**)&info);
-    if (info != NULL && Ptr(info)->Func(INetworkInfo::GetType) == IConnectivityManager::TYPE_WIFI) {
+    Int32 type;
+    if (info != NULL && (info->GetType(&type), type == IConnectivityManager::TYPE_WIFI)) {
         mProxyHost = NULL;
-    } else {
+    }
+    else {
         String host;
         Proxy::GetHost(mContext, &host);
         if (HttpLog::LOGV) {
@@ -554,15 +560,18 @@ ECode RequestQueue::RequestsPending(
 {
     VALIDATE_NOT_NULL(result);
 
-    {    AutoLock syncLock(this);
-        *result = !Ptr(mPending)->Func(ILinkedHashMap::IsEmpty);
+    {
+        AutoLock syncLock(this);
+        mPending->IsEmpty(result);
+        *result = !*result;
     }
     return NOERROR;
 }
 
 ECode RequestQueue::Dump()
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         HttpLog::V(String("dump()"));
         StringBuilder dump;
         Int32 count = 0;
@@ -617,11 +626,12 @@ ECode RequestQueue::GetRequest(
 {
     VALIDATE_NOT_NULL(req);
 
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
 
         AutoPtr<IRequest> ret;
-
-        if (!Ptr(mPending)->Func(mPending->IsEmpty)) {
+        Boolean empty;
+        if (mPending->IsEmpty(&empty), !empty) {
             ret = RemoveFirst(IHashMap::Probe(mPending));
         }
         if (HttpLog::LOGV) {
@@ -639,7 +649,8 @@ ECode RequestQueue::GetRequest(
 {
     VALIDATE_NOT_NULL(req);
 
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         AutoPtr<IRequest> ret;
 
         Boolean isContain;
@@ -651,7 +662,8 @@ ECode RequestQueue::GetRequest(
             obj = NULL;
             reqList->RemoveFirst((IInterface**)&obj);
             ret = IRequest::Probe(obj);
-            if (Ptr(reqList)->Func(reqList->IsEmpty)) {
+            Boolean empty;
+            if (reqList->IsEmpty(&empty), empty) {
                 mPending->Remove(IInterface::Probe(host));
             }
         }
@@ -674,7 +686,8 @@ ECode RequestQueue::HaveRequest(
 {
     VALIDATE_NOT_NULL(result);
 
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         mPending->ContainsKey(IInterface::Probe(host), result);
     }
     return NOERROR;
@@ -695,7 +708,8 @@ ECode RequestQueue::QueueRequest(
     /* [in] */ IRequest* request,
     /* [in] */ Boolean head)
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         AutoPtr<IHttpHost> host = ((Request*)request)->mProxyHost == NULL
             ? ((Request*)request)->mHost : ((Request*)request)->mProxyHost;
         AutoPtr<ILinkedList> reqList;
@@ -732,18 +746,26 @@ AutoPtr<IRequest> RequestQueue::RemoveFirst(
     /* [in] */ IHashMap* requestQueue)
 {
     AutoPtr<IRequest> ret;
-    AutoPtr<IIterator> iter;
-    Ptr(requestQueue)->Func(requestQueue->GetEntrySet)->GetIterator((IIterator**)&iter);
-    if (Ptr(iter)->Func(iter->HasNext)) {
+    AutoPtr<ISet> entries;
+    requestQueue->GetEntrySet((ISet**)&entries);
+    AutoPtr<IIterator> it;
+    entries->GetIterator((IIterator**)&it);
+    Boolean hasNext;
+    if (it->HasNext(&hasNext), hasNext) {
         AutoPtr<IInterface> obj;
-        iter->GetNext((IInterface**)&obj);
+        it->GetNext((IInterface**)&obj);
         AutoPtr<IMapEntry> entry = IMapEntry::Probe(obj);
-        AutoPtr<ILinkedList> reqList = ILinkedList::Probe(Ptr(entry)->Func(entry->GetValue));
+        AutoPtr<IInterface> value;
+        entry->GetValue((IInterface**)&value);
+        AutoPtr<ILinkedList> reqList = ILinkedList::Probe(value);
         obj = NULL;
         reqList->RemoveFirst((IInterface**)&obj);
         ret = IRequest::Probe(obj);
-        if(Ptr(reqList)->Func(reqList->IsEmpty)) {
-            requestQueue->Remove(Ptr(entry)->Func(entry->GetKey));
+        Boolean empty;
+        if(reqList->IsEmpty(&empty), empty) {
+            AutoPtr<IInterface> key;
+            entry->GetKey((IInterface**)&key);
+            requestQueue->Remove(key);
         }
     }
     return ret;

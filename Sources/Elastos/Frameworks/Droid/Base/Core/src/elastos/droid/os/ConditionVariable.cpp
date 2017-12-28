@@ -39,7 +39,8 @@ ConditionVariable::ConditionVariable(
 
 ECode ConditionVariable::Open()
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         Boolean old = mCondition;
         mCondition = TRUE;
         if (!old) {
@@ -51,7 +52,8 @@ ECode ConditionVariable::Open()
 
 ECode ConditionVariable::Close()
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         mCondition = FALSE;
     }
     return NOERROR;
@@ -59,7 +61,8 @@ ECode ConditionVariable::Close()
 
 ECode ConditionVariable::Block()
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         while (!mCondition) {
             // try {
                 this->Wait();
@@ -82,7 +85,8 @@ ECode ConditionVariable::Block(
     // call the other block() method in that case.  It simplifies
     // this code for the common case.
     if (timeout != 0) {
-        {    AutoLock syncLock(this);
+        {
+            AutoLock syncLock(this);
             AutoPtr<ISystem> system;
             CSystem::AcquireSingleton((ISystem**)&system);
             Int64 now;

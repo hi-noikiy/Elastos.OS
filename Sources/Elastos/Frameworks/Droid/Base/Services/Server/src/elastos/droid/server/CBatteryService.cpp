@@ -36,8 +36,6 @@
 #include <binder/IServiceManager.h>
 #include <batteryservice/IBatteryPropertiesRegistrar.h>
 
-#include <elastos/core/AutoLock.h>
-using Elastos::Core::AutoLock;
 using Elastos::Droid::R;
 using Elastos::Droid::Manifest;
 using Elastos::Droid::App::ActivityManagerNative;
@@ -71,6 +69,7 @@ using Elastos::Droid::Server::Am::CBatteryStatsService;
 using Elastos::Droid::Server::Lights::LightsManager;
 using Elastos::Droid::Server::Lights::EIID_ILightsManager;
 
+using Elastos::Core::AutoLock;
 using Elastos::Core::StringUtils;
 using Elastos::Core::StringBuilder;
 using Elastos::Core::EIID_IRunnable;
@@ -99,7 +98,8 @@ CBatteryService::BootPhaseContentObserver::BootPhaseContentObserver(
 ECode CBatteryService::BootPhaseContentObserver::OnChange(
     /* [in] */ Boolean selfChange)
 {
-    {    AutoLock syncLock(mHost->mLock);
+    {
+        AutoLock syncLock(mHost->mLock);
         mHost->UpdateBatteryWarningLevelLocked();
     }
     return NOERROR;
@@ -415,7 +415,8 @@ ECode CBatteryService::LocalService::IsPowered(
     /* [out] */ Boolean* result)
 {
     VALIDATE_NOT_NULL(result)
-    {    AutoLock syncLock(mHost->mLock);
+    {
+        AutoLock syncLock(mHost->mLock);
         *result = mHost->IsPoweredLocked(plugTypeSet);
     }
     return NOERROR;
@@ -426,7 +427,8 @@ ECode CBatteryService::LocalService::GetPlugType(
     /* [out] */ Int32* result)
 {
     VALIDATE_NOT_NULL(result)
-    {    AutoLock syncLock(mHost->mLock);
+    {
+        AutoLock syncLock(mHost->mLock);
         *result = mHost->mPlugType;
     }
     return NOERROR;
@@ -437,7 +439,8 @@ ECode CBatteryService::LocalService::GetBatteryLevel(
     /* [out] */ Int32* result)
 {
     VALIDATE_NOT_NULL(result)
-    {    AutoLock syncLock(mHost->mLock);
+    {
+        AutoLock syncLock(mHost->mLock);
         mHost->mBatteryProps->GetBatteryLevel(result);
     }
     return NOERROR;
@@ -448,7 +451,8 @@ ECode CBatteryService::LocalService::GetBatteryLevelLow(
     /* [out] */ Boolean* result)
 {
     VALIDATE_NOT_NULL(result)
-    {    AutoLock syncLock(mHost->mLock);
+    {
+        AutoLock syncLock(mHost->mLock);
         *result = mHost->mBatteryLevelLow;
     }
     return NOERROR;
@@ -459,7 +463,8 @@ ECode CBatteryService::LocalService::GetInvalidCharger(
     /* [out] */ Int32* result)
 {
     VALIDATE_NOT_NULL(result)
-    {    AutoLock syncLock(mHost->mLock);
+    {
+        AutoLock syncLock(mHost->mLock);
         *result = mHost->mInvalidCharger;
     }
     return NOERROR;
@@ -723,7 +728,8 @@ ECode CBatteryService::OnBootPhase(
 {
     if (phase == PHASE_ACTIVITY_MANAGER_READY) {
         // check our power situation now that it is safe to display the shutdown dialog.
-        {    AutoLock syncLock(mLock);
+        {
+            AutoLock syncLock(mLock);
             AutoPtr<BootPhaseContentObserver> obs = new BootPhaseContentObserver(this);
             obs->constructor(mHandler);
 

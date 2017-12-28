@@ -21,10 +21,9 @@
 
 #include <media/AudioSystem.h>
 
-#include <elastos/core/AutoLock.h>
-using Elastos::Core::AutoLock;
 using Elastos::Droid::Os::IMessage;
 using Elastos::Droid::Os::Looper;
+using Elastos::Core::AutoLock;
 using Elastos::Utility::Logging::Logger;
 using Elastos::Utility::CArrayList;
 
@@ -134,7 +133,7 @@ ECode AudioPortEventHandler::EventHandler::HandleMessage(
         }
     }
     Boolean b;
-    if (listeners == NULL || listeners->IsEmpty(&b), b) {
+    if (listeners == NULL || (listeners->IsEmpty(&b), b)) {
         return NOERROR;
     }
     // reset audio port cache if the event corresponds to a change coming

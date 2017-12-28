@@ -35,8 +35,6 @@
 #include <elastos/core/StringUtils.h>
 #include <elastos/core/AutoLock.h>
 
-#include <elastos/core/AutoLock.h>
-using Elastos::Core::AutoLock;
 using Elastos::Droid::Content::Res::IResources;
 using Elastos::Droid::Internal::Telephony::IITelephony;
 using Elastos::Droid::Internal::Telephony::IPhoneConstants;
@@ -52,6 +50,7 @@ using Elastos::Droid::Os::INetworkActivityListener;
 using Elastos::Droid::Os::IServiceManager;
 using Elastos::Droid::Utility::CArrayMap;
 
+using Elastos::Core::AutoLock;
 using Elastos::Core::IThread;
 using Elastos::Core::StringUtils;
 using Elastos::Net::CInetAddressHelper;
@@ -432,7 +431,8 @@ ECode CConnectivityManager::StartUsingNetworkFeature(
     }
 
     AutoPtr<INetworkRequest> request;
-    {    AutoLock syncLock(sLegacyRequests);
+    {
+        AutoLock syncLock(sLegacyRequests);
         if (LEGACY_DBG) {
             String s;
             IObject::Probe(netCap)->ToString(&s);
@@ -508,7 +508,8 @@ ECode CConnectivityManager::StartUsingNetworkFeatureForSubscription(
 
     netCap->SetNetworkSpecifier(subId);
     AutoPtr<INetworkRequest> request;
-    {    AutoLock syncLock(sLegacyRequests);
+    {
+        AutoLock syncLock(sLegacyRequests);
         if (LEGACY_DBG) {
             String s;
             IObject::Probe(netCap)->ToString(&s);
@@ -862,7 +863,8 @@ ECode CConnectivityManager::FindRequestForFeature(
     *result = NULL;
     VALIDATE_NOT_NULL(netCap)
 
-    {    AutoLock syncLock(sLegacyRequests);
+    {
+        AutoLock syncLock(sLegacyRequests);
         AutoPtr<IInterface> l;
         sLegacyRequests->Get(netCap, (IInterface**)&l);
         if (l != NULL) {
@@ -894,7 +896,8 @@ ECode CConnectivityManager::ExpireRequest(
     VALIDATE_NOT_NULL(netCap)
 
     Int32 ourSeqNum = -1;
-    {    AutoLock syncLock(sLegacyRequests);
+    {
+        AutoLock syncLock(sLegacyRequests);
         AutoPtr<IInterface> l;
         sLegacyRequests->Get(netCap, (IInterface**)&l);
         LegacyRequest* lr = (LegacyRequest*) IObject::Probe(l.Get());
@@ -968,7 +971,8 @@ ECode CConnectivityManager::RemoveRequestForFeature(
     *result = NULL;
     VALIDATE_NOT_NULL(netCap)
 
-    {    AutoLock syncLock(sLegacyRequests);
+    {
+        AutoLock syncLock(sLegacyRequests);
         AutoPtr<IInterface> pl;
         FAIL_RETURN(sLegacyRequests->Remove(netCap, (IInterface**)&pl))
         LegacyRequest* l = (LegacyRequest*) IObject::Probe(pl);
@@ -1077,7 +1081,8 @@ ECode CConnectivityManager::GetNetworkManagementService(
     VALIDATE_NOT_NULL(result)
     *result = NULL;
 
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         if (mNMService != NULL) {
             *result = mNMService;
             REFCOUNT_ADD(*result)
@@ -1329,7 +1334,7 @@ ECode CConnectivityManager::IsTetheringSupported(
     /* [out] */ Boolean* result)
 {
     VALIDATE_NOT_NULL(result);
-    result = FALSE;
+    *result = FALSE;
 
     ECode ec = mService->IsTetheringSupported(result);
     if ((ECode)E_REMOTE_EXCEPTION == ec) {
@@ -1766,7 +1771,8 @@ ECode CConnectivityManager::RegisterNetworkAgent(
 
 ECode CConnectivityManager::IncCallbackHandlerRefCount()
 {
-    {    AutoLock syncLock(sCallbackRefCount);
+    {
+        AutoLock syncLock(sCallbackRefCount);
         Int32 num;
         FAIL_RETURN(sCallbackRefCount->IncrementAndGet(&num))
         if (1 == num) {
@@ -1784,7 +1790,8 @@ ECode CConnectivityManager::IncCallbackHandlerRefCount()
 
 ECode CConnectivityManager::DecCallbackHandlerRefCount()
 {
-    {    AutoLock syncLock(sCallbackRefCount);
+    {
+        AutoLock syncLock(sCallbackRefCount);
         Int32 num;
         FAIL_RETURN(sCallbackRefCount->DecrementAndGet(&num))
         if (0 == num) {
@@ -1798,12 +1805,12 @@ ECode CConnectivityManager::DecCallbackHandlerRefCount()
 }
 
 ECode CConnectivityManager::SendRequestForNetwork(
-        /* [in] */ INetworkCapabilities* need,
-        /* [in] */ IConnectivityManagerNetworkCallback* networkCallback,
-        /* [in] */ Int32 timeoutSec,
-        /* [in] */ Int32 action,
-        /* [in] */ Int32 legacyType,
-        /* [out] */ INetworkRequest** result)
+    /* [in] */ INetworkCapabilities* need,
+    /* [in] */ IConnectivityManagerNetworkCallback* networkCallback,
+    /* [in] */ Int32 timeoutSec,
+    /* [in] */ Int32 action,
+    /* [in] */ Int32 legacyType,
+    /* [out] */ INetworkRequest** result)
 {
     VALIDATE_NOT_NULL(result)
     *result = NULL;
@@ -1821,7 +1828,8 @@ ECode CConnectivityManager::SendRequestForNetwork(
     if (FAILED(ec) && ec != (ECode)E_REMOTE_EXCEPTION) {
         return ec;
     }
-    {    AutoLock syncLock(sNetworkCallback);
+    {
+        AutoLock syncLock(sNetworkCallback);
         AutoPtr<IMessenger> msg;
         AutoPtr<IBinder> binder;
         CMessenger::New(sCallbackHandler, (IMessenger**)&msg);
@@ -1869,9 +1877,9 @@ ECode CConnectivityManager::RequestNetwork(
 }
 
 ECode CConnectivityManager::RequestNetwork(
-        /* [in] */ INetworkRequest* request,
-        /* [in] */ IConnectivityManagerNetworkCallback* networkCallback,
-        /* [in] */ Int32 timeoutMs)
+    /* [in] */ INetworkRequest* request,
+    /* [in] */ IConnectivityManagerNetworkCallback* networkCallback,
+    /* [in] */ Int32 timeoutMs)
 {
     VALIDATE_NOT_NULL(request)
     VALIDATE_NOT_NULL(networkCallback)
@@ -1887,8 +1895,8 @@ ECode CConnectivityManager::RequestNetwork(
 }
 
 ECode CConnectivityManager::RequestNetwork(
-        /* [in] */ INetworkRequest* request,
-        /* [in] */ IPendingIntent* operation)
+    /* [in] */ INetworkRequest* request,
+    /* [in] */ IPendingIntent* operation)
 {
     VALIDATE_NOT_NULL(request)
     VALIDATE_NOT_NULL(operation)
@@ -1951,8 +1959,8 @@ ECode CConnectivityManager::UnregisterNetworkCallback(
 }
 
 ECode CConnectivityManager::SetProcessDefaultNetwork(
-        /* [in] */ INetwork* network,
-        /* [out] */ Boolean* result)
+    /* [in] */ INetwork* network,
+    /* [out] */ Boolean* result)
 {
     VALIDATE_NOT_NULL(result)
     *result = FALSE;
@@ -2114,7 +2122,8 @@ ECode CConnectivityManager::CallbackHandler::HandleMessage(
             AutoPtr<IInterface> request;
             GetObject(message, String("CNetworkRequest"), (IInterface**)&request);
             AutoPtr<IInterface> callbacks = NULL;
-            {    AutoLock syncLock(mCallbackMap);
+            {
+                AutoLock syncLock(mCallbackMap);
                 mCallbackMap->Get(request, (IInterface**)&callbacks);
             }
             if (callbacks != NULL) {
@@ -2166,11 +2175,13 @@ ECode CConnectivityManager::CallbackHandler::HandleMessage(
             AutoPtr<IInterface> req;
             GetObject(message, String("CNetworkRequest"), (IInterface**)&req);
             AutoPtr<IInterface> callbacks = NULL;
-            {    AutoLock syncLock(mCallbackMap);
+            {
+                AutoLock syncLock(mCallbackMap);
                 mCallbackMap->Remove(req, (IInterface**)&callbacks);
             }
             if (callbacks != NULL) {
-                {    AutoLock syncLock(mRefCount);
+                {
+                    AutoLock syncLock(mRefCount);
                     Int32 count;
                     mRefCount->DecrementAndGet(&count);
                     if (0 == count) {
@@ -2205,7 +2216,7 @@ ECode CConnectivityManager::CallbackHandler::HandleMessage(
 }
 
 CConnectivityManager::LegacyRequest::InnerSub_ConnectivityManagerNetworkCallback::InnerSub_ConnectivityManagerNetworkCallback(LegacyRequest* const host)
-    :   mHost(host)
+    : mHost(host)
 {}
 
 ECode CConnectivityManager::LegacyRequest::InnerSub_ConnectivityManagerNetworkCallback::OnAvailable(
@@ -2256,13 +2267,14 @@ ECode CConnectivityManager::CallbackHandler::GetObject(
 
 ECode CConnectivityManager::CallbackHandler::GetCallbacks(
     /* [in] */ INetworkRequest* req,
-   /* [out] */ IConnectivityManagerNetworkCallback** result)
+    /* [out] */ IConnectivityManagerNetworkCallback** result)
 {
     VALIDATE_NOT_NULL(result)
     *result = NULL;
     VALIDATE_NOT_NULL(req)
 
-    {    AutoLock syncLock(mCallbackMap);
+    {
+        AutoLock syncLock(mCallbackMap);
         AutoPtr<IInterface> value;
         mCallbackMap->Get(req, (IInterface**)&value);
         *result = IConnectivityManagerNetworkCallback::Probe(value);

@@ -415,7 +415,8 @@ Int64 NativeBreakIterator::GetSentenceInstanceImpl(
 void NativeBreakIterator::CloseImpl(
     /* [in] */ Int64 address)
 {
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         delete toBreakIterator(address);
     }
 }
@@ -424,7 +425,8 @@ Int64 NativeBreakIterator::CloneImpl(
     /* [in] */ Int64 address)
 {
     Int64 rev=0;
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         BreakIteratorAccessor it(address);
         rev = reinterpret_cast<uintptr_t>(it->clone());
     }
@@ -435,7 +437,8 @@ void NativeBreakIterator::SetTextImpl(
     /* [in] */ Int64 address,
     /* [in] */ const String& text)
 {
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         BreakIteratorAccessor it(address, text, true);
     }
 }
@@ -446,7 +449,8 @@ Boolean NativeBreakIterator::IsBoundaryImpl(
     /* [in] */ Int32 offset)
 {
     Boolean rev = false;
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         BreakIteratorAccessor it(address, text, false);
         rev = it->isBoundary(offset);
     }
@@ -458,7 +462,8 @@ Int32 NativeBreakIterator::NextImpl(
     /* [in] */ const String& text,
     /* [in] */ Int32 n)
 {
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         BreakIteratorAccessor it(address, text, false);
         if (n < 0) {
             while (n++ < -1) {
@@ -480,12 +485,13 @@ Int32 NativeBreakIterator::NextImpl(
 }
 
 Int32 NativeBreakIterator::PrecedingImpl(
-        /* [in] */ Int64 address,
-        /* [in] */ const String& text,
-        /* [in] */ Int32 offset)
+    /* [in] */ Int64 address,
+    /* [in] */ const String& text,
+    /* [in] */ Int32 offset)
 {
     Int32 rev = 0;
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         BreakIteratorAccessor it(address, text, false);
         rev = it->preceding(offset);
     }
@@ -497,7 +503,8 @@ Int32 NativeBreakIterator::CurrentImpl(
     /* [in] */ const String& text)
 {
     Int32 rev = 0;
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         BreakIteratorAccessor it(address, text, false);
         rev = it->current();
     }
@@ -505,11 +512,12 @@ Int32 NativeBreakIterator::CurrentImpl(
 }
 
 Int32 NativeBreakIterator::FirstImpl(
-        /* [in] */ Int64 address,
-        /* [in] */ const String& text)
+    /* [in] */ Int64 address,
+    /* [in] */ const String& text)
 {
     Int32 rev = 0;
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         BreakIteratorAccessor it(address, text, false);
         rev = it->first();
     }
@@ -522,7 +530,8 @@ Int32 NativeBreakIterator::FollowingImpl(
     /* [in] */ Int32 offset)
 {
     Int32 rev = 0;
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         BreakIteratorAccessor it(address, text, false);
         rev = it->following(offset);
     }
@@ -530,11 +539,12 @@ Int32 NativeBreakIterator::FollowingImpl(
 }
 
 Int32 NativeBreakIterator::PreviousImpl(
-        /* [in] */ Int64 address,
-        /* [in] */ const String& text)
+    /* [in] */ Int64 address,
+    /* [in] */ const String& text)
 {
     Int32 rev = 0;
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         BreakIteratorAccessor it(address, text, false);
         rev = it->previous();
     }
@@ -546,7 +556,8 @@ Int32 NativeBreakIterator::LastImpl(
     /* [in] */ const String& text)
 {
     Int32 rev = 0;
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         BreakIteratorAccessor it(address, text, false);
         rev = it->last();
     }

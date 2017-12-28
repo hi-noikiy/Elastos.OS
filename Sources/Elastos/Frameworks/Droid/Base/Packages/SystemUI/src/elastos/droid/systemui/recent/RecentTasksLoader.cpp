@@ -761,7 +761,8 @@ void RecentTasksLoader::CancelLoadingThumbnailsAndIcons()
 
 void RecentTasksLoader::ClearFirstTask()
 {
-    {    AutoLock syncLock(mFirstTaskLock);
+    {
+        AutoLock syncLock(mFirstTaskLock);
         mFirstTask = NULL;
         mFirstTaskLoaded = FALSE;
     }
@@ -770,7 +771,8 @@ void RecentTasksLoader::ClearFirstTask()
 ECode RecentTasksLoader::PreloadFirstTask()
 {
     AutoPtr<BgLoadThread> bgLoad = new BgLoadThread(this);
-    {    AutoLock syncLock(mFirstTaskLock);
+    {
+        AutoLock syncLock(mFirstTaskLock);
         if (!mPreloadingFirstTask) {
             ClearFirstTask();
             mPreloadingFirstTask = TRUE;
@@ -782,7 +784,8 @@ ECode RecentTasksLoader::PreloadFirstTask()
 
 ECode RecentTasksLoader::CancelPreloadingFirstTask()
 {
-    {    AutoLock syncLock(mFirstTaskLock);
+    {
+        AutoLock syncLock(mFirstTaskLock);
         if (mPreloadingFirstTask) {
             mCancelPreloadingFirstTask = TRUE;
         }

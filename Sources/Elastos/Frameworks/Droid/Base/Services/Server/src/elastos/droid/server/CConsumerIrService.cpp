@@ -23,11 +23,10 @@
 #include <Elastos.Droid.Content.h>
 #include <Elastos.Droid.Hardware.h>
 
-#include <elastos/core/AutoLock.h>
-using Elastos::Core::AutoLock;
 using Elastos::Droid::Manifest;
 using Elastos::Droid::Hardware::EIID_IIConsumerIrService;
 using Elastos::Droid::Os::EIID_IBinder;
+using Elastos::Core::AutoLock;
 using Elastos::Utility::Logging::Slogger;
 
 namespace Elastos {
@@ -127,11 +126,12 @@ ECode CConsumerIrService::Transmit(
     FAIL_RETURN(ThrowIfNoIrEmitter())
 
     // Right now there is no mechanism to ensure fair queing of IR requests
-    {    AutoLock syncLock(mHalLock);
+    {
+        AutoLock syncLock(mHalLock);
         Int32 err = HalTransmit(mNativeHal, carrierFrequency, pattern);
 
         if (err < 0) {
-            Slogger::E(TAG, "Error transmitting: " + err);
+            Slogger::E(TAG, "Error transmitting: %d", err);
         }
     }
     return NOERROR;
@@ -153,7 +153,8 @@ ECode CConsumerIrService::GetCarrierFrequencies(
 
     FAIL_RETURN(ThrowIfNoIrEmitter())
 
-    {    AutoLock syncLock(mHalLock);
+    {
+        AutoLock syncLock(mHalLock);
         AutoPtr<ArrayOf<Int32> > array = HalGetCarrierFrequencies(mNativeHal);
         *result = array;
         REFCOUNT_ADD(*result)

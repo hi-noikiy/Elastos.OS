@@ -21,10 +21,8 @@
 #include "elastos/droid/internal/utility/ArrayUtils.h"
 #include <elastos/core/AutoLock.h>
 
-#include <elastos/core/AutoLock.h>
 using Elastos::Core::AutoLock;
 using Elastos::Droid::Internal::Utility::ArrayUtils;
-using Elastos::Core::AutoLock;
 
 namespace Elastos {
 namespace Droid {

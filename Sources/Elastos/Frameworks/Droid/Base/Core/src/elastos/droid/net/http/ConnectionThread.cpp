@@ -21,20 +21,18 @@
 #include "elastos/droid/net/http/Connection.h"
 #include "elastos/droid/net/http/HttpLog.h"
 #include "elastos/droid/net/http/Request.h"
-#include "elastos/droid/net/ReturnOutValue.h"
 #include "elastos/droid/os/Process.h"
 #include "elastos/droid/os/SystemClock.h"
 #include <elastos/core/AutoLock.h>
 #include <elastos/core/StringUtils.h>
 #include <elastos/core/Thread.h>
 
-#include <elastos/core/AutoLock.h>
-using Elastos::Core::AutoLock;
 using Elastos::Droid::Content::IContext;
 using Elastos::Droid::Os::Process;
 using Elastos::Droid::Os::IProcess;
 using Elastos::Droid::Os::SystemClock;
 
+using Elastos::Core::AutoLock;
 using Elastos::Core::StringUtils;
 using Elastos::Core::Thread;
 
@@ -71,7 +69,8 @@ ECode ConnectionThread::constructor(
 
 ECode ConnectionThread::RequestStop()
 {
-    {    AutoLock syncLock(mRequestFeeder);
+    {
+        AutoLock syncLock(mRequestFeeder);
         mRunning = FALSE;
         ISynchronize::Probe(mRequestFeeder)->Notify();
     }
@@ -103,7 +102,8 @@ ECode ConnectionThread::Run()
 
         /* wait for work */
         if (request == NULL) {
-            {    AutoLock syncLock(mRequestFeeder);
+            {
+                AutoLock syncLock(mRequestFeeder);
                 if (HttpLog::LOGV) HttpLog::V("ConnectionThread: Waiting for work");
                 mWaiting = TRUE;
                 ISynchronize::Probe(mRequestFeeder)->Wait();
@@ -122,7 +122,9 @@ ECode ConnectionThread::Run()
 
             mConnectionManager->GetConnection(mContext, ((Request*)request.Get())->mHost, (IConnection**)&mConnection);
             ((Connection*)mConnection.Get())->ProcessRequests(request);
-            if (Ptr((Connection*)mConnection.Get())->Func(((Connection*)mConnection.Get())->GetCanPersist)) {
+            Boolean canPersist;
+            ((Connection*)mConnection.Get())->GetCanPersist(&canPersist);
+            if (canPersist) {
                 Boolean isRecycleConnectionOk;
                 mConnectionManager->RecycleConnection(mConnection, &isRecycleConnectionOk);
                 if (!isRecycleConnectionOk) {

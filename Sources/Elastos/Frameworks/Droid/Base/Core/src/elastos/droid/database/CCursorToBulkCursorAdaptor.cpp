@@ -229,14 +229,12 @@ ECode CCursorToBulkCursorAdaptor::GetWindow(
     // }
     *result = window;
     REFCOUNT_ADD(*result)
-
     return NOERROR;
 }
 
 ECode CCursorToBulkCursorAdaptor::OnMove(
     /* [in] */ Int32 position)
 {
-    ECode ec = NOERROR;
     AutoLock syncLock(mLock);
     FAIL_RETURN(ThrowIfCursorIsClosed())
     Int32 mPosition;

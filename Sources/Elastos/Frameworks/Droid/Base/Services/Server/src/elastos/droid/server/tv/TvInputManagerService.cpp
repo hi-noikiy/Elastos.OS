@@ -27,22 +27,23 @@
 #include <elastos/utility/Arrays.h>
 #include <elastos/utility/logging/Logger.h>
 #include <elastos/utility/logging/Slogger.h>
-#include <elastos/droid/net/ReturnOutValue.h>
 #include <Elastos.Droid.View.h>
 #include <Elastos.CoreLibrary.IO.h>
 #include <elastos/droid/server/IoThread.h>
 #include <Elastos.Droid.App.h>
-
 #include <elastos/core/AutoLock.h>
+
 using Elastos::Core::AutoLock;
 using Elastos::Droid::View::IInputChannelHelper;
 using Elastos::Droid::View::CInputChannelHelper;
 using Elastos::Core::CString;
 using Elastos::Droid::Server::IoThread;
+using Elastos::Droid::Content::IContentProviderOperation;
 using Elastos::Droid::Content::IContentProviderOperationHelper;
 using Elastos::Droid::Content::CContentProviderOperationHelper;
 using Elastos::Droid::Content::IContentProviderOperationBuilder;
 using Elastos::Droid::Content::IContentProviderResult;
+using Elastos::Droid::Content::Pm::IApplicationInfo;
 using Elastos::Core::CInteger32;
 using Elastos::Droid::Hardware::Hdmi::IHdmiControlManager;
 using Elastos::IO::IWriter;
@@ -108,6 +109,7 @@ using Elastos::Utility::CArrayList;
 using Elastos::Utility::CHashMap;
 using Elastos::Utility::CHashSet;
 using Elastos::Utility::IArrayList;
+using Elastos::Utility::ICollection;
 using Elastos::Utility::IIterator;
 using Elastos::Utility::IMapEntry;
 using Elastos::Utility::Logging::Logger;
@@ -143,7 +145,8 @@ ECode TvInputManagerService::BinderService::GetTvInputList(
     Int64 identity = Binder::ClearCallingIdentity();
     // try {
     ECode ec;
-    {    AutoLock syncLock(mHost->mLock);
+    {
+        AutoLock syncLock(mHost->mLock);
         do {
             AutoPtr<UserState> userState;
             ec = mHost->GetUserStateLocked(resolvedUserId, (UserState**)&userState);
@@ -151,11 +154,20 @@ ECode TvInputManagerService::BinderService::GetTvInputList(
 
             AutoPtr<IList> inputList;
             CArrayList::New((IList**)&inputList);
-            FOR_EACH(iter, Ptr(userState->mInputMap)->Func(IMap::GetValues)) {
-                AutoPtr<TvInputState> state = (TvInputState*) IObject::Probe(Ptr(iter)->Func(iter->GetNext));
+            AutoPtr<ICollection> values;
+            userState->mInputMap->GetValues((ICollection**)&values);
+            AutoPtr<IIterator> it;
+            values->GetIterator((IIterator**)&it);
+            Boolean hasNext;
+            while (it->HasNext(&hasNext), hasNext) {
+                AutoPtr<IInterface> obj;
+                it->GetNext((IInterface**)&obj);
+                TvInputState* state = (TvInputState*)IObject::Probe(obj);
                 inputList->Add(TO_IINTERFACE(state->mInfo));
             }
-            FUNC_RETURN(inputList);
+            *result = inputList;
+            REFCOUNT_ADD(*result);
+            return NOERROR;
         } while(FALSE);
     }
     // } finally {
@@ -178,16 +190,20 @@ ECode TvInputManagerService::BinderService::GetTvInputInfo(
     Int64 identity = Binder::ClearCallingIdentity();
     // try {
     ECode ec;
-    {    AutoLock syncLock(mHost->mLock);
+    {
+        AutoLock syncLock(mHost->mLock);
         do {
             AutoPtr<UserState> userState;
             ec = mHost->GetUserStateLocked(resolvedUserId, (UserState**)&userState);
             if (FAILED(ec)) break;
             AutoPtr<IInterface> obj;
             ec = userState->mInputMap->Get(StringUtils::ParseCharSequence(inputId), (IInterface**)&obj);
-            AutoPtr<TvInputState> state = (TvInputState*) IObject::Probe(obj);
             if (FAILED(ec)) break;
-            FUNC_RETURN(state == NULL ? NULL : state->mInfo)
+            AutoPtr<TvInputState> state = (TvInputState*) IObject::Probe(obj);
+            if (state != NULL) {
+                *result = state->mInfo;
+                REFCOUNT_ADD(*result);
+            }
         } while(FALSE);
     }
     // } finally {
@@ -209,12 +225,14 @@ ECode TvInputManagerService::BinderService::GetTvContentRatingSystemList(
     Int64 identity = Binder::ClearCallingIdentity();
     // try {
     ECode ec;
-    {    AutoLock syncLock(mHost->mLock);
+    {
+        AutoLock syncLock(mHost->mLock);
         do {
             AutoPtr<UserState> userState;
             ec = mHost->GetUserStateLocked(resolvedUserId, (UserState**)&userState);
             if (FAILED(ec)) break;
-            FUNC_RETURN(userState->mContentRatingSystemList)
+            *result = userState->mContentRatingSystemList;
+            REFCOUNT_ADD(*result);
         } while(FALSE);
     }
     // } finally {
@@ -233,7 +251,8 @@ ECode TvInputManagerService::BinderService::RegisterCallback(
     Int64 identity = Binder::ClearCallingIdentity();
     // try {
     ECode ec;
-    {    AutoLock syncLock(mHost->mLock);
+    {
+        AutoLock syncLock(mHost->mLock);
         do {
             AutoPtr<UserState> userState;
             ec = mHost->GetUserStateLocked(resolvedUserId, (UserState**)&userState);
@@ -248,13 +267,23 @@ ECode TvInputManagerService::BinderService::RegisterCallback(
                     Slogger::E(TAG, "client process has already died %d", ec);
                     ec = NOERROR;
                 }
-                else
+                else {
                     break;
+                }
             }
             // }
-            FOR_EACH(iter, Ptr(userState->mInputMap)->Func(IMap::GetValues)) {
-                AutoPtr<TvInputState> state = (TvInputState*) IObject::Probe(Ptr(iter)->Func(iter->GetNext));
-                ec = mHost->NotifyInputStateChangedLocked(userState, Ptr(state->mInfo)->Func(ITvInputInfo::GetId), state->mState,
+            AutoPtr<ICollection> values;
+            userState->mInputMap->GetValues((ICollection**)&values);
+            AutoPtr<IIterator> it;
+            values->GetIterator((IIterator**)&it);
+            Boolean hasNext;
+            while (it->HasNext(&hasNext), hasNext) {
+                AutoPtr<IInterface> obj;
+                it->GetNext((IInterface**)&obj);
+                TvInputState* state = (TvInputState*)IObject::Probe(obj);
+                String id;
+                state->mInfo->GetId(&id);
+                ec = mHost->NotifyInputStateChangedLocked(userState, id, state->mState,
                         callback);
                 if (FAILED(ec)) break;
             }
@@ -276,7 +305,8 @@ ECode TvInputManagerService::BinderService::UnregisterCallback(
     Int64 identity = Binder::ClearCallingIdentity();
     // try {
     ECode ec;
-    {    AutoLock syncLock(mHost->mLock);
+    {
+        AutoLock syncLock(mHost->mLock);
         do {
             AutoPtr<UserState> userState;
             ec = mHost->GetUserStateLocked(resolvedUserId, (UserState**)&userState);
@@ -303,7 +333,8 @@ ECode TvInputManagerService::BinderService::IsParentalControlsEnabled(
     Int64 identity = Binder::ClearCallingIdentity();
     // try {
     ECode ec;
-    {    AutoLock syncLock(mHost->mLock);
+    {
+        AutoLock syncLock(mHost->mLock);
         do {
             AutoPtr<UserState> userState;
             ec = mHost->GetUserStateLocked(resolvedUserId, (UserState**)&userState);
@@ -328,7 +359,8 @@ ECode TvInputManagerService::BinderService::SetParentalControlsEnabled(
     Int64 identity = Binder::ClearCallingIdentity();
     // try {
     ECode ec;
-    {    AutoLock syncLock(mHost->mLock);
+    {
+        AutoLock syncLock(mHost->mLock);
         do {
             AutoPtr<UserState> userState;
             ec = mHost->GetUserStateLocked(resolvedUserId, (UserState**)&userState);
@@ -356,7 +388,8 @@ ECode TvInputManagerService::BinderService::IsRatingBlocked(
     Int64 identity = Binder::ClearCallingIdentity();
     // try {
     ECode ec;
-    {    AutoLock syncLock(mHost->mLock);
+    {
+        AutoLock syncLock(mHost->mLock);
         do {
             AutoPtr<UserState> userState;
             ec = mHost->GetUserStateLocked(resolvedUserId, (UserState**)&userState);
@@ -388,7 +421,8 @@ ECode TvInputManagerService::BinderService::GetBlockedRatings(
     Int64 identity = Binder::ClearCallingIdentity();
     // try {
     ECode ec;
-    {    AutoLock syncLock(mHost->mLock);
+    {
+        AutoLock syncLock(mHost->mLock);
         do {
             AutoPtr<UserState> userState;
             ec = mHost->GetUserStateLocked(resolvedUserId, (UserState**)&userState);
@@ -400,9 +434,12 @@ ECode TvInputManagerService::BinderService::GetBlockedRatings(
             if (FAILED(ec)) break;
             for (Int32 i = 0; i < blockedRatings->GetLength(); ++i) {
                 AutoPtr<ITvContentRating> rating = (*blockedRatings)[i];
-                ratings->Add(StringUtils::ParseCharSequence(Ptr(rating)->Func(rating->FlattenToString)));
+                String str;
+                rating->FlattenToString(&str);
+                ratings->Add(StringUtils::ParseCharSequence(str));
             }
-            FUNC_RETURN(ratings)
+            *result = ratings;
+            REFCOUNT_ADD(*result);
         } while(FALSE);
     }
     // } finally {
@@ -422,7 +459,8 @@ ECode TvInputManagerService::BinderService::AddBlockedRating(
     Int64 identity = Binder::ClearCallingIdentity();
     // try {
     ECode ec;
-    {    AutoLock syncLock(mHost->mLock);
+    {
+        AutoLock syncLock(mHost->mLock);
         do {
             AutoPtr<UserState> userState;
             ec = mHost->GetUserStateLocked(resolvedUserId, (UserState**)&userState);
@@ -452,7 +490,8 @@ ECode TvInputManagerService::BinderService::RemoveBlockedRating(
     Int64 identity = Binder::ClearCallingIdentity();
     // try {
     ECode ec;
-    {    AutoLock syncLock(mHost->mLock);
+    {
+        AutoLock syncLock(mHost->mLock);
         do {
             AutoPtr<UserState> userState;
             ec = mHost->GetUserStateLocked(resolvedUserId, (UserState**)&userState);
@@ -497,7 +536,8 @@ ECode TvInputManagerService::BinderService::CreateSession(
     // try {
     ECode ec;
     do {
-        {    AutoLock syncLock(mHost->mLock);
+        {
+            AutoLock syncLock(mHost->mLock);
             AutoPtr<UserState> userState;
             ec = mHost->GetUserStateLocked(resolvedUserId, (UserState**)&userState);
             if (FAILED(ec)) break;
@@ -511,12 +551,14 @@ ECode TvInputManagerService::BinderService::CreateSession(
                 return NOERROR;
             }
             AutoPtr<ITvInputInfo> info = inputState->mInfo;
+            AutoPtr<IComponentName> component;
+            info->GetComponent((IComponentName**)&component);
             obj = NULL;
-            userState->mServiceStateMap->Get(Ptr(info)->Func(info->GetComponent), (IInterface**)&obj);
+            userState->mServiceStateMap->Get(component, (IInterface**)&obj);
             AutoPtr<ServiceState> serviceState = (ServiceState*)IObject::Probe(obj);
             if (serviceState == NULL) {
-                serviceState = new ServiceState(mHost, Ptr(info)->Func(info->GetComponent), resolvedUserId);
-                userState->mServiceStateMap->Put(Ptr(info)->Func(info->GetComponent), TO_IINTERFACE(serviceState));
+                serviceState = new ServiceState(mHost, component, resolvedUserId);
+                userState->mServiceStateMap->Put(component, TO_IINTERFACE(serviceState));
             }
             // Send a null token immediately while reconnecting.
             if (serviceState->mReconnecting == TRUE) {
@@ -538,7 +580,7 @@ ECode TvInputManagerService::BinderService::CreateSession(
                         resolvedUserId);
                 if (FAILED(ec)) break;
             } else {
-                ec = mHost->UpdateServiceConnectionLocked(Ptr(info)->Func(info->GetComponent), resolvedUserId);
+                ec = mHost->UpdateServiceConnectionLocked(component, resolvedUserId);
                 if (FAILED(ec)) break;
             }
         }
@@ -563,7 +605,8 @@ ECode TvInputManagerService::BinderService::ReleaseSession(
     Int64 identity = Binder::ClearCallingIdentity();
     // try {
     ECode ec;
-    {    AutoLock syncLock(mHost->mLock);
+    {
+        AutoLock syncLock(mHost->mLock);
         ec = mHost->ReleaseSessionLocked(sessionToken, callingUid, resolvedUserId);
     }
     // } finally {
@@ -586,7 +629,8 @@ ECode TvInputManagerService::BinderService::SetMainSession(
     Int64 identity = Binder::ClearCallingIdentity();
     // try {
     ECode ec;
-    {    AutoLock syncLock(mHost->mLock);
+    {
+        AutoLock syncLock(mHost->mLock);
         do {
             AutoPtr<UserState> userState;
             ec = mHost->GetUserStateLocked(resolvedUserId, (UserState**)&userState);
@@ -629,7 +673,8 @@ ECode TvInputManagerService::BinderService::SetSurface(
     Int64 identity = Binder::ClearCallingIdentity();
     // try {
     ECode ec;
-    {    AutoLock syncLock(mHost->mLock);
+    {
+        AutoLock syncLock(mHost->mLock);
         do {
             // try {
             do {
@@ -685,7 +730,8 @@ ECode TvInputManagerService::BinderService::DispatchSurfaceChanged(
     // try {
     ECode ec;
     do {
-        {    AutoLock syncLock(mHost->mLock);
+        {
+            AutoLock syncLock(mHost->mLock);
             // try {
             do {
                 AutoPtr<SessionState> sessionState;
@@ -735,7 +781,8 @@ ECode TvInputManagerService::BinderService::SetVolume(
     // try {
     ECode ec;
     do {
-        {    AutoLock syncLock(mHost->mLock);
+        {
+            AutoLock syncLock(mHost->mLock);
             // try {
             do {
                 AutoPtr<SessionState> sessionState;
@@ -786,7 +833,8 @@ ECode TvInputManagerService::BinderService::Tune(
     // try {
     ECode ec;
     do {
-        {    AutoLock syncLock(mHost->mLock);
+        {
+            AutoLock syncLock(mHost->mLock);
             // try {
             do {
                 AutoPtr<IITvInputSession> session;
@@ -813,10 +861,16 @@ ECode TvInputManagerService::BinderService::Tune(
                 AutoPtr<ISomeArgsHelper> args_helper;
                 AutoPtr<ISomeArgs> args;
                 args_helper->Obtain((ISomeArgs**)&args);
-                args->SetObjectArg(1, StringUtils::ParseCharSequence(Ptr(sessionState->mInfo)->GetPtr(ITvInputInfo::GetComponent)->Func(IComponentName::GetPackageName)));
+                AutoPtr<IComponentName> component;
+                sessionState->mInfo->GetComponent((IComponentName**)&component);
+                String packageName;
+                component->GetPackageName(&packageName);
+                args->SetObjectArg(1, StringUtils::ParseCharSequence(packageName));
                 AutoPtr<ISystem> system_helper;
                 CSystem::AcquireSingleton((ISystem**)&system_helper);
-                args->SetInt32Arg(2, (Int32)Ptr(system_helper)->Func(ISystem::GetCurrentTimeMillis));
+                Int64 currTime;
+                system_helper->GetCurrentTimeMillis(&currTime);
+                args->SetInt32Arg(2, currTime);
                 AutoPtr<IContentUris> uris_helper;
                 CContentUris::AcquireSingleton((IContentUris**)&uris_helper);
                 Int64 i64;
@@ -857,7 +911,8 @@ ECode TvInputManagerService::BinderService::RequestUnblockContent(
     // try {
     ECode ec;
     do {
-        {    AutoLock syncLock(mHost->mLock);
+        {
+            AutoLock syncLock(mHost->mLock);
             // try {
             AutoPtr<IITvInputSession> tvInputSession;
             ec = mHost->GetSessionLocked(sessionToken, callingUid, resolvedUserId, (IITvInputSession**)&tvInputSession);
@@ -890,7 +945,8 @@ ECode TvInputManagerService::BinderService::SetCaptionEnabled(
     // try {
     ECode ec;
     do {
-        {    AutoLock syncLock(mHost->mLock);
+        {
+            AutoLock syncLock(mHost->mLock);
             // try {
             do {
                 AutoPtr<IITvInputSession> tvInputSession;
@@ -926,7 +982,8 @@ ECode TvInputManagerService::BinderService::SelectTrack(
     // try {
     ECode ec;
     do {
-        {    AutoLock syncLock(mHost->mLock);
+        {
+            AutoLock syncLock(mHost->mLock);
             // try {
             do {
                 AutoPtr<IITvInputSession> tvInputSession;
@@ -962,7 +1019,8 @@ ECode TvInputManagerService::BinderService::SendAppPrivateCommand(
     // try {
     ECode ec;
     do {
-        {    AutoLock syncLock(mHost->mLock);
+        {
+            AutoLock syncLock(mHost->mLock);
             // try {
             do {
                 AutoPtr<IITvInputSession> tvInputSession;
@@ -997,7 +1055,8 @@ ECode TvInputManagerService::BinderService::CreateOverlayView(
     Int64 identity = Binder::ClearCallingIdentity();
     // try {
     ECode ec;
-    {    AutoLock syncLock(mHost->mLock);
+    {
+        AutoLock syncLock(mHost->mLock);
         // try {
         do {
             AutoPtr<IITvInputSession> tvInputSession;
@@ -1030,7 +1089,8 @@ ECode TvInputManagerService::BinderService::RelayoutOverlayView(
     Int64 identity = Binder::ClearCallingIdentity();
     // try {
     ECode ec;
-    {    AutoLock syncLock(mHost->mLock);
+    {
+        AutoLock syncLock(mHost->mLock);
         // try {
         do {
             AutoPtr<IITvInputSession> tvInputSession;
@@ -1062,7 +1122,8 @@ ECode TvInputManagerService::BinderService::RemoveOverlayView(
     Int64 identity = Binder::ClearCallingIdentity();
     // try {
     ECode ec;
-    {    AutoLock syncLock(mHost->mLock);
+    {
+        AutoLock syncLock(mHost->mLock);
         // try {
         do {
             AutoPtr<IITvInputSession> tvInputSession;
@@ -1210,8 +1271,9 @@ ECode TvInputManagerService::BinderService::CaptureFrame(
     // try {
     ECode ec;
     do {
-        String hardwareInputId = String(NULL);
-        {    AutoLock syncLock(mHost->mLock);
+        String hardwareInputId(NULL);
+        {
+            AutoLock syncLock(mHost->mLock);
             AutoPtr<UserState> userState;
             ec = mHost->GetUserStateLocked(resolvedUserId, (UserState**)&userState);
             if (FAILED(ec)) break;
@@ -1222,9 +1284,18 @@ ECode TvInputManagerService::BinderService::CaptureFrame(
                 *result = FALSE;
                 return NOERROR;
             }
-            FOR_EACH(iter, Ptr(userState->mSessionStateMap)->Func(IMap::GetValues)) {
-                AutoPtr<SessionState> sessionState = (SessionState*) IObject::Probe(Ptr(iter)->Func(iter->GetNext));
-                if (Ptr(sessionState->mInfo)->Func(ITvInputInfo::GetId).Equals(inputId)
+            AutoPtr<ICollection> values;
+            userState->mSessionStateMap->GetValues((ICollection**)&values);
+            AutoPtr<IIterator> it;
+            values->GetIterator((IIterator**)&it);
+            Boolean hasNext;
+            while (it->HasNext(&hasNext), hasNext) {
+                AutoPtr<IInterface> obj;
+                it->GetNext((IInterface**)&obj);
+                AutoPtr<SessionState> sessionState = (SessionState*) IObject::Probe(obj);
+                String id;
+                sessionState->mInfo->GetId(&id);
+                if (id.Equals(inputId)
                         && sessionState->mHardwareSessionToken != NULL) {
                     obj = NULL;
                     userState->mSessionStateMap->Get(
@@ -1259,18 +1330,24 @@ ECode TvInputManagerService::BinderService::IsSingleSessionActive(
     // try {
     ECode ec;
     do {
-        {    AutoLock syncLock(mHost->mLock);
+        {
+            AutoLock syncLock(mHost->mLock);
             AutoPtr<UserState> userState;
             ec = mHost->GetUserStateLocked(resolvedUserId, (UserState**)&userState);
             if (FAILED(ec)) break;
-            if (Ptr(userState->mSessionStateMap)->Func(IMap::GetSize) == 1) {
+            Int32 size;
+            userState->mSessionStateMap->GetSize(&size);
+            if (size == 1) {
                 *result = TRUE;
                 return NOERROR;
             }
-            else if (Ptr(userState->mSessionStateMap)->Func(IMap::GetSize) == 2) {
+            else if (size == 2) {
+                AutoPtr<ICollection> values;
+                userState->mSessionStateMap->GetValues((ICollection**)&values);
+                AutoPtr<ArrayOf<IInterface*> > array = ArrayOf<IInterface*>::Alloc(0);
                 AutoPtr<ArrayOf<IInterface*> > sessionStates;
-                Ptr(userState->mSessionStateMap)->Func(IMap::GetValues)->ToArray(
-                        ArrayOf<IInterface*>::Alloc(0), (ArrayOf<IInterface*>**)&sessionStates);
+                values->ToArray(
+                        array , (ArrayOf<IInterface*>**)&sessionStates);
                 // Check if there is a wrapper input.
                 if (((SessionState*) IObject::Probe((*sessionStates)[0]))->mHardwareSessionToken != NULL
                         || ((SessionState*) IObject::Probe((*sessionStates)[1]))->mHardwareSessionToken != NULL) {
@@ -1304,18 +1381,21 @@ ECode TvInputManagerService::BinderService::Dump(
         IPrintWriter::Probe(pw)->Println(s);
         return NOERROR;
     }
-    {    AutoLock syncLock(mHost->mLock);
+    {
+        AutoLock syncLock(mHost->mLock);
         String s;
         s.AppendFormat("User Ids (Current user: %d):", mHost->mCurrentUserId);
         IPrintWriter::Probe(pw)->Println(s);
         pw->IncreaseIndent();
-        for (Int32 i = 0; i < Ptr(mHost->mUserStates)->Func(mHost->mUserStates->GetSize); i++) {
+        Int32 size;
+        mHost->mUserStates->GetSize(&size);
+        for (Int32 i = 0; i < size; i++) {
             Int32 userId;
             mHost->mUserStates->KeyAt(i, &userId);
             IPrintWriter::Probe(pw)->Println(StringUtils::ToString(userId));
         }
         pw->DecreaseIndent();
-        for (Int32 i = 0; i < Ptr(mHost->mUserStates)->Func(mHost->mUserStates->GetSize); i++) {
+        for (Int32 i = 0; i < size; i++) {
             Int32 userId;
             mHost->mUserStates->KeyAt(i, &userId);
             AutoPtr<UserState> userState;
@@ -1326,38 +1406,62 @@ ECode TvInputManagerService::BinderService::Dump(
             pw->IncreaseIndent();
             IPrintWriter::Probe(pw)->Println(String("inputMap: inputId -> TvInputState"));
             pw->IncreaseIndent();
-            FOR_EACH(it, Ptr(userState->mInputMap)->Func(IMap::GetEntrySet)) {
-                AutoPtr<IMapEntry> entry = IMapEntry::Probe(Ptr(it)->Func(IIterator::GetNext));
+            AutoPtr<ISet> entries;
+            userState->mInputMap->GetEntrySet((ISet**)&entries);
+            AutoPtr<IIterator> it;
+            entries->GetIterator((IIterator**)&it);
+            Boolean hasNext;
+            while (it->HasNext(&hasNext), hasNext) {
+                AutoPtr<IInterface> obj;
+                it->GetNext((IInterface**)&obj);
+                IMapEntry* entry = IMapEntry::Probe(obj);
+                AutoPtr<IInterface> key, value;
+                entry->GetKey((IInterface**)&key);
+                entry->GetValue((IInterface**)&value);
                 String s;
-                s.AppendFormat("%s:%s",
-                        Object::ToString(Ptr(entry)->Func(entry->GetKey)).string(),
-                        Object::ToString(Ptr(entry)->Func(entry->GetValue)).string());
+                s.AppendFormat("%s:%s", TO_CSTR(key), TO_CSTR(value));
                 IPrintWriter::Probe(pw)->Println(s);
             }
             pw->DecreaseIndent();
             IPrintWriter::Probe(pw)->Println(String("packageSet:"));
             pw->IncreaseIndent();
-            FOR_EACH(iter, userState->mPackageSet) {
+            it = NULL;
+            userState->mPackageSet->GetIterator((IIterator**)&it);
+            while (it->HasNext(&hasNext), hasNext) {
+                AutoPtr<IInterface> obj;
+                it->GetNext((IInterface**)&obj);
                 String packageName;
-                IObject::Probe(Ptr(iter)->Func(iter->GetNext))->ToString(&packageName);
+                ICharSequence::Probe(obj)->ToString(&packageName);
                 IPrintWriter::Probe(pw)->Println(packageName);
             }
             pw->DecreaseIndent();
             IPrintWriter::Probe(pw)->Println(String("clientStateMap: ITvInputClient -> ClientState"));
             pw->IncreaseIndent();
-            FOR_EACH(set_iter, Ptr(userState->mClientStateMap)->Func(IMap::GetEntrySet)) {
-                AutoPtr<IMapEntry> entry = IMapEntry::Probe(Ptr(set_iter)->Func(set_iter->GetNext));
+            entries = NULL;
+            userState->mClientStateMap->GetEntrySet((ISet**)&entries);
+            it = NULL;
+            entries->GetIterator((IIterator**)&it);
+            while (it->HasNext(&hasNext), hasNext) {
                 AutoPtr<IInterface> obj;
+                it->GetNext((IInterface**)&obj);
+                AutoPtr<IMapEntry> entry = IMapEntry::Probe(obj);
+                obj = NULL;
                 entry->GetValue((IInterface**)&obj);
                 AutoPtr<ClientState> client = (ClientState*) IObject::Probe(obj);
+                AutoPtr<IInterface> key;
+                entry->GetKey((IInterface**)&key);
                 String s;
-                s.AppendFormat("%s:%s", Object::ToString(Ptr(entry)->Func(entry->GetKey)).string(), TO_CSTR(client));
+                s.AppendFormat("%s:%s", TO_CSTR(key), TO_CSTR(client));
                 IPrintWriter::Probe(pw)->Println(s);
                 pw->IncreaseIndent();
                 IPrintWriter::Probe(pw)->Println(String("sessionTokens:"));
                 pw->IncreaseIndent();
-                FOR_EACH(token_it, client->mSessionTokens) {
-                    AutoPtr<IBinder> token = IBinder::Probe(Ptr(token_it)->Func(IIterator::GetNext));
+                AutoPtr<IIterator> it2;
+                client->mSessionTokens->GetIterator((IIterator**)&it2);
+                Boolean hasNext2;
+                while (it2->HasNext(&hasNext2), hasNext2) {
+                    AutoPtr<IInterface> token;
+                    it2->GetNext((IInterface**)&token);
                     IPrintWriter::Probe(pw)->Println(Object::ToString(token));
                 }
                 pw->DecreaseIndent();
@@ -1372,9 +1476,15 @@ ECode TvInputManagerService::BinderService::Dump(
             pw->DecreaseIndent();
             IPrintWriter::Probe(pw)->Println(String("serviceStateMap: ComponentName -> ServiceState"));
             pw->IncreaseIndent();
-            FOR_EACH(service_it, Ptr(userState->mServiceStateMap)->Func(IMap::GetEntrySet)) {
-                AutoPtr<IMapEntry> entry = IMapEntry::Probe(Ptr(service_it)->Func(IIterator::GetNext));
+            entries = NULL;
+            userState->mServiceStateMap->GetEntrySet((ISet**)&entries);
+            it = NULL;
+            entries->GetIterator((IIterator**)&it);
+            while (it->HasNext(&hasNext), hasNext) {
                 AutoPtr<IInterface> obj;
+                it->GetNext((IInterface**)&obj);
+                AutoPtr<IMapEntry> entry = IMapEntry::Probe(obj);
+                obj = NULL;
                 entry->GetValue((IInterface**)&obj);
                 AutoPtr<ServiceState> service = (ServiceState*) IObject::Probe(obj);
                 obj = NULL;
@@ -1385,8 +1495,12 @@ ECode TvInputManagerService::BinderService::Dump(
                 pw->IncreaseIndent();
                 IPrintWriter::Probe(pw)->Println(String("sessionTokens:"));
                 pw->IncreaseIndent();
-                FOR_EACH(token_it, service->mSessionTokens) {
-                    AutoPtr<IBinder> token = IBinder::Probe(Ptr(token_it)->Func(IIterator::GetNext));
+                AutoPtr<IIterator> it2;
+                service->mSessionTokens->GetIterator((IIterator**)&it2);
+                Boolean hasNext2;
+                while (it2->HasNext(&hasNext2), hasNext2) {
+                    AutoPtr<IInterface> token;
+                    it2->GetNext((IInterface**)&token);
                     IPrintWriter::Probe(pw)->Println(String("") + Object::ToString(token));
                 }
                 pw->DecreaseIndent();
@@ -1399,9 +1513,15 @@ ECode TvInputManagerService::BinderService::Dump(
             pw->DecreaseIndent();
             IPrintWriter::Probe(pw)->Println(String("sessionStateMap: ITvInputSession -> SessionState"));
             pw->IncreaseIndent();
-            FOR_EACH(entry_it, Ptr(userState->mSessionStateMap)->Func(IMap::GetEntrySet)) {
-                AutoPtr<IMapEntry> entry = IMapEntry::Probe(Ptr(entry_it)->Func(IIterator::GetNext));
+            entries = NULL;
+            userState->mSessionStateMap->GetEntrySet((ISet**)&entries);
+            it = NULL;
+            entries->GetIterator((IIterator**)&it);
+            while (it->HasNext(&hasNext), hasNext) {
                 AutoPtr<IInterface> obj;
+                it->GetNext((IInterface**)&obj);
+                AutoPtr<IMapEntry> entry = IMapEntry::Probe(obj);
+                obj = NULL;
                 entry->GetValue((IInterface**)&obj);
                 AutoPtr<SessionState> session = (SessionState*) IObject::Probe(obj);
                 obj = NULL;
@@ -1422,8 +1542,11 @@ ECode TvInputManagerService::BinderService::Dump(
             pw->DecreaseIndent();
             IPrintWriter::Probe(pw)->Println(String("callbackSet:"));
             pw->IncreaseIndent();
-            FOR_EACH(callback_it, userState->mCallbackSet) {
-                AutoPtr<IITvInputManagerCallback> callback = IITvInputManagerCallback::Probe(Ptr(callback_it)->Func(IIterator::GetNext));
+            it = NULL;
+            userState->mCallbackSet->GetIterator((IIterator**)&it);
+            while (it->HasNext(&hasNext), hasNext) {
+                AutoPtr<IInterface> callback;
+                it->GetNext((IInterface**)&callback);
                 IPrintWriter::Probe(pw)->Println(Object::ToString(callback));
             }
             pw->DecreaseIndent();
@@ -1488,7 +1611,8 @@ ECode TvInputManagerService::ClientState::IsEmpty(
 
 ECode TvInputManagerService::ClientState::ProxyDied()
 {
-    {    AutoLock syncLock(mHost->mLock);
+    {
+        AutoLock syncLock(mHost->mLock);
         AutoPtr<UserState> userState;
         mHost->GetUserStateLocked(mUserId, (UserState**)&userState);
         // DO NOT remove the client state of clientStateMap in this method. It will be
@@ -1497,7 +1621,8 @@ ECode TvInputManagerService::ClientState::ProxyDied()
         userState->mClientStateMap->Get(mClientToken, (IInterface**)&obj);
         AutoPtr<ClientState> clientState = (ClientState*) IObject::Probe(obj);
         if (clientState != NULL) {
-            while (Ptr(clientState->mSessionTokens)->Func(IList::GetSize) > 0) {
+            Int32 size;
+            while (clientState->mSessionTokens->GetSize(&size), size > 0) {
                 obj = NULL;
                 clientState->mSessionTokens->Get(0, (IInterface**)&obj);
                 mHost->ReleaseSessionLocked(IBinder::Probe(obj), IProcess::SYSTEM_UID, mUserId);
@@ -1524,7 +1649,9 @@ TvInputManagerService::ServiceState::ServiceState(
     CArrayList::New((IList**)&mSessionTokens);
     CArrayList::New((IList**)&mInputList);
     mConnection = new InputServiceConnection(mHost, component, userId);
-    mIsHardware = HasHardwarePermission(Ptr(mHost->mContext)->Func(mHost->mContext->GetPackageManager), component);
+    AutoPtr<IPackageManager> pm;
+    mHost->mContext->GetPackageManager((IPackageManager**)&pm);
+    mIsHardware = HasHardwarePermission(pm, component);
 }
 
 //=============================================================================
@@ -1569,7 +1696,8 @@ TvInputManagerService::SessionState::SessionState(
 
 ECode TvInputManagerService::SessionState::ProxyDied()
 {
-    {    AutoLock syncLock(mHost->mLock);
+    {
+        AutoLock syncLock(mHost->mLock);
         mSession = NULL;
         if (mClient != NULL) {
             // try {
@@ -1587,8 +1715,15 @@ ECode TvInputManagerService::SessionState::ProxyDied()
         // If there are any other sessions based on this session, they should be released.
         AutoPtr<UserState> userState;
         mHost->GetUserStateLocked(mUserId, (UserState**)&userState);
-        FOR_EACH(it, Ptr(userState->mSessionStateMap)->Func(IMap::GetValues)) {
-            AutoPtr<SessionState> sessionState = (SessionState*) IObject::Probe(Ptr(it)->Func(it->GetNext));
+        AutoPtr<ICollection> values;
+        userState->mSessionStateMap->GetValues((ICollection**)&values);
+        AutoPtr<IIterator> it;
+        values->GetIterator((IIterator**)&it);
+        Boolean hasNext;
+        while (it->HasNext(&hasNext), hasNext) {
+            AutoPtr<IInterface> obj;
+            it->GetNext((IInterface**)&obj);
+            AutoPtr<SessionState> sessionState = (SessionState*) IObject::Probe(obj);
             if (mSessionToken == sessionState->mHardwareSessionToken) {
                 mHost->ReleaseSessionLocked(sessionState->mSessionToken, IProcess::SYSTEM_UID,
                         mUserId);
@@ -1631,7 +1766,8 @@ ECode TvInputManagerService::InputServiceConnection::OnServiceConnected(
     if (DEBUG) {
         Slogger::D(TAG, "onServiceConnected(component=%s)", TO_CSTR(component));
     }
-    {    AutoLock syncLock(mHost->mLock);
+    {
+        AutoLock syncLock(mHost->mLock);
         AutoPtr<UserState> userState;
         mHost->GetUserStateLocked(mUserId, (UserState**)&userState);
         AutoPtr<IInterface> obj;
@@ -1655,27 +1791,43 @@ ECode TvInputManagerService::InputServiceConnection::OnServiceConnected(
             // }
         }
         // And create sessions, if any.
-        FOR_EACH(it, serviceState->mSessionTokens) {
-            AutoPtr<IBinder> sessionToken = IBinder::Probe(Ptr(it)->Func(IIterator::GetNext));
-            mHost->CreateSessionInternalLocked(serviceState->mService, sessionToken, mUserId);
+        AutoPtr<IIterator> it;
+        serviceState->mSessionTokens->GetIterator((IIterator**)&it);
+        Boolean hasNext;
+        while (it->HasNext(&hasNext), hasNext) {
+            AutoPtr<IInterface> token;
+            it->GetNext((IInterface**)&token);
+            mHost->CreateSessionInternalLocked(serviceState->mService, IBinder::Probe(token), mUserId);
         }
-        FOR_EACH(state_it, Ptr(userState->mInputMap)->Func(IMap::GetValues)) {
-            AutoPtr<TvInputState> inputState = (TvInputState*) IObject::Probe(Ptr(state_it)->Func(IIterator::GetNext));
-            Boolean isEquals;
-            IObject::Probe(Ptr(inputState->mInfo)->Func(ITvInputInfo::GetComponent))->Equals(component, &isEquals);
-            if (isEquals
+        AutoPtr<ICollection> values;
+        userState->mInputMap->GetValues((ICollection**)&values);
+        it = NULL;
+        values->GetIterator((IIterator**)&it);
+        while (it->HasNext(&hasNext), hasNext) {
+            AutoPtr<IInterface> obj;
+            it->GetNext((IInterface**)&obj);
+            TvInputState* inputState = (TvInputState*) IObject::Probe(obj);
+            AutoPtr<IComponentName> inputComponent;
+            inputState->mInfo->GetComponent((IComponentName**)&inputComponent);
+            if (Object::Equals(inputComponent, component)
                     && inputState->mState != ITvInputManager::INPUT_STATE_DISCONNECTED) {
-                mHost->NotifyInputStateChangedLocked(userState, Ptr(inputState->mInfo)->Func(ITvInputInfo::GetId),
+                String inputId;
+                inputState->mInfo->GetId(&inputId);
+                mHost->NotifyInputStateChangedLocked(userState, inputId,
                         inputState->mState, NULL);
             }
         }
         if (serviceState->mIsHardware) {
             AutoPtr<IList> hardwareInfoList;
             mHost->mTvInputHardwareManager->GetHardwareList((IList**)&hardwareInfoList);
-            FOR_EACH(info_it, hardwareInfoList) {
-                AutoPtr<ITvInputHardwareInfo> hardwareInfo = ITvInputHardwareInfo::Probe(Ptr(info_it)->Func(IIterator::GetNext));
+            AutoPtr<IIterator> it;
+            hardwareInfoList->GetIterator((IIterator**)&it);
+            Boolean hasNext;
+            while (it->HasNext(&hasNext), hasNext) {
+                AutoPtr<IInterface> hardwareInfo;
+                it->GetNext((IInterface**)&hardwareInfo);
                 // try {
-                ECode ec = serviceState->mService->NotifyHardwareAdded(hardwareInfo);
+                ECode ec = serviceState->mService->NotifyHardwareAdded(ITvInputHardwareInfo::Probe(hardwareInfo));
                 // } catch (RemoteException e) {
                 if (FAILED(ec)) {
                     if ((ECode)E_REMOTE_EXCEPTION == ec) {
@@ -1688,10 +1840,13 @@ ECode TvInputManagerService::InputServiceConnection::OnServiceConnected(
             }
             AutoPtr<IList> deviceInfoList;
             mHost->mTvInputHardwareManager->GetHdmiDeviceList((IList**)&deviceInfoList);
-            FOR_EACH(deviceInfo_it, deviceInfoList) {
-                AutoPtr<IHdmiDeviceInfo> deviceInfo = IHdmiDeviceInfo::Probe(Ptr(deviceInfo_it)->Func(IIterator::GetNext));
+            it = NULL;
+            deviceInfoList->GetIterator((IIterator**)&it);
+            while (it->HasNext(&hasNext), hasNext) {
+                AutoPtr<IInterface> deviceInfo;
+                it->GetNext((IInterface**)&deviceInfo);
                 // try {
-                ECode ec = serviceState->mService->NotifyHdmiDeviceAdded(deviceInfo);
+                ECode ec = serviceState->mService->NotifyHdmiDeviceAdded(IHdmiDeviceInfo::Probe(deviceInfo));
                 // } catch (RemoteException e) {
                 if (FAILED(ec)) {
                     if ((ECode)E_REMOTE_EXCEPTION == ec) {
@@ -1713,14 +1868,13 @@ ECode TvInputManagerService::InputServiceConnection::OnServiceDisconnected(
     if (DEBUG) {
         Slogger::D(TAG, "onServiceDisconnected(component=%s)", TO_CSTR(component));
     }
-    Boolean isEquals;
-    IObject::Probe(mComponent)->Equals(component, &isEquals);
-    if (!isEquals) {
+    if (!Object::Equals(mComponent, component)) {
         Logger::E(TAG, "Mismatched ComponentName: %s (expected), %s (actual).",
                 TO_CSTR(mComponent), TO_CSTR(component));
         return E_ILLEGAL_ARGUMENT_EXCEPTION;
     }
-    {    AutoLock syncLock(mHost->mLock);
+    {
+        AutoLock syncLock(mHost->mLock);
         AutoPtr<UserState> userState;
         mHost->GetUserStateLocked(mUserId, (UserState**)&userState);
         AutoPtr<IInterface> obj;
@@ -1732,11 +1886,21 @@ ECode TvInputManagerService::InputServiceConnection::OnServiceDisconnected(
             serviceState->mService = NULL;
             serviceState->mCallback = NULL;
             mHost->AbortPendingCreateSessionRequestsLocked(serviceState, String(NULL), mUserId);
-            FOR_EACH(it, Ptr(userState->mInputMap)->Func(IMap::GetValues)) {
-                AutoPtr<TvInputState> inputState = (TvInputState*) IObject::Probe(Ptr(it)->Func(it->GetNext));
-                IObject::Probe(Ptr(inputState->mInfo)->Func(ITvInputInfo::GetComponent))->Equals(component, &isEquals);
-                if (isEquals) {
-                    mHost->NotifyInputStateChangedLocked(userState, Ptr(inputState->mInfo)->Func(ITvInputInfo::GetId),
+            AutoPtr<ICollection> values;
+            userState->mInputMap->GetValues((ICollection**)&values);
+            AutoPtr<IIterator> it;
+            values->GetIterator((IIterator**)&it);
+            Boolean hasNext;
+            while (it->HasNext(&hasNext), hasNext) {
+                AutoPtr<IInterface> obj;
+                it->GetNext((IInterface**)&obj);
+                TvInputState* inputState = (TvInputState*) IObject::Probe(obj);
+                AutoPtr<IComponentName> inputComponent;
+                inputState->mInfo->GetComponent((IComponentName**)&inputComponent);
+                if (Object::Equals(inputComponent, component)) {
+                    String id;
+                    inputState->mInfo->GetId(&id);
+                    mHost->NotifyInputStateChangedLocked(userState, id,
                             ITvInputManager::INPUT_STATE_DISCONNECTED, NULL);
                 }
             }
@@ -1779,9 +1943,11 @@ ECode TvInputManagerService::ServiceCallback::EnsureHardwarePermission()
 ECode TvInputManagerService::ServiceCallback::EnsureValidInput(
     /* [in] */ ITvInputInfo* inputInfo)
 {
-    Boolean isEquals;
-    IObject::Probe(mComponent)->Equals(Ptr(inputInfo)->Func(inputInfo->GetComponent), &isEquals);
-    if (Ptr(inputInfo)->Func(inputInfo->GetId) == NULL || !isEquals) {
+    AutoPtr<IComponentName> inputComponent;
+    inputInfo->GetComponent((IComponentName**)&inputComponent);
+    String id;
+    inputInfo->GetId(&id);
+    if (id.IsNull() || !Object::Equals(mComponent, inputComponent)) {
         Logger::E(TAG, "Invalid TvInputInfo");
         return E_ILLEGAL_ARGUMENT_EXCEPTION;
     }
@@ -1804,7 +1970,8 @@ ECode TvInputManagerService::ServiceCallback::AddHardwareTvInput(
 {
     EnsureHardwarePermission();
     EnsureValidInput(inputInfo);
-    {    AutoLock syncLock(mHost->mLock);
+    {
+        AutoLock syncLock(mHost->mLock);
         mHost->mTvInputHardwareManager->AddHardwareTvInput(deviceId, inputInfo);
         AddTvInputLocked(inputInfo);
     }
@@ -1817,7 +1984,8 @@ ECode TvInputManagerService::ServiceCallback::AddHdmiTvInput(
 {
     EnsureHardwarePermission();
     EnsureValidInput(inputInfo);
-    {    AutoLock syncLock(mHost->mLock);
+    {
+        AutoLock syncLock(mHost->mLock);
         mHost->mTvInputHardwareManager->AddHdmiTvInput(id, inputInfo);
         AddTvInputLocked(inputInfo);
     }
@@ -1828,12 +1996,20 @@ ECode TvInputManagerService::ServiceCallback::RemoveTvInput(
     /* [in] */ const String& inputId)
 {
     EnsureHardwarePermission();
-    {    AutoLock syncLock(mHost->mLock);
+    {
+        AutoLock syncLock(mHost->mLock);
         AutoPtr<ServiceState> serviceState;
         mHost->GetServiceStateLocked(mComponent, mUserId, (ServiceState**)&serviceState);
         Boolean removed = FALSE;
-        FOR_EACH(it, serviceState->mInputList) {
-            if (Ptr(ITvInputInfo::Probe(Ptr(it)->Func(it->GetNext)))->Func(ITvInputInfo::GetId).Equals(inputId)) {
+        AutoPtr<IIterator> it;
+        serviceState->mInputList->GetIterator((IIterator**)&it);
+        Boolean hasNext;
+        while (it->HasNext(&hasNext), hasNext) {
+            AutoPtr<IInterface> obj;
+            it->GetNext((IInterface**)&obj);
+            String id;
+            ITvInputInfo::Probe(obj)->GetId(&id);
+            if (id.Equals(inputId)) {
                 it->Remove();
                 removed = TRUE;
                 break;
@@ -1879,22 +2055,28 @@ ECode TvInputManagerService::SessionCallback::OnSessionCreated(
     /* [in] */ IBinder* harewareSessionToken)
 {
     if (DEBUG) {
-        Slogger::D(TAG, "onSessionCreated(inputId=%s)", Ptr(mSessionState->mInfo)->Func(ITvInputInfo::GetId).string());
+        String id;
+        mSessionState->mInfo->GetId(&id);
+        Slogger::D(TAG, "onSessionCreated(inputId=%s)", id.string());
     }
-    {    AutoLock syncLock(mHost->mLock);
+    {
+        AutoLock syncLock(mHost->mLock);
         mSessionState->mSession = session;
         mSessionState->mHardwareSessionToken = harewareSessionToken;
         Boolean b;
-        AddSessionTokenToClientStateLocked(session, &b);
-        if (session != NULL && b) {
+        if (session != NULL && AddSessionTokenToClientStateLocked(session, &b)) {
+            String id;
+            mSessionState->mInfo->GetId(&id);
             mHost->SendSessionTokenToClientLocked(mSessionState->mClient,
-                    Ptr(mSessionState->mInfo)->Func(ITvInputInfo::GetId),
-                    mSessionState->mSessionToken, (*mChannels)[0],
+                    id, mSessionState->mSessionToken, (*mChannels)[0],
                     mSessionState->mSeq);
-        } else {
+        }
+        else {
+            String id;
+            mSessionState->mInfo->GetId(&id);
             mHost->RemoveSessionStateLocked(mSessionState->mSessionToken, mSessionState->mUserId);
             mHost->SendSessionTokenToClientLocked(mSessionState->mClient,
-                    Ptr(mSessionState->mInfo)->Func(ITvInputInfo::GetId), NULL, NULL, mSessionState->mSeq);
+                    id, NULL, NULL, mSessionState->mSeq);
         }
         (*mChannels)[0]->Dispose();
     }
@@ -1909,7 +2091,7 @@ ECode TvInputManagerService::SessionCallback::AddSessionTokenToClientStateLocked
 
     // try {
     AutoPtr<IProxy> proxy = (IProxy*)session->Probe(EIID_IProxy);
-    ECode ec;
+    ECode ec = NOERROR;
     if (proxy != NULL) ec = proxy->LinkToDeath(mSessionState, 0);
     // } catch (RemoteException e) {
     if (FAILED(ec)) {
@@ -1932,7 +2114,7 @@ ECode TvInputManagerService::SessionCallback::AddSessionTokenToClientStateLocked
         clientState = new ClientState(mHost);
         clientState->constructor(clientToken, mSessionState->mUserId);
         // try {
-        ECode ec;
+        ECode ec = NOERROR;
         AutoPtr<IProxy> proxy = (IProxy*) clientToken->Probe(EIID_IProxy);
         if (proxy != NULL) ec = proxy->LinkToDeath(clientState, 0);
         // } catch (RemoteException e) {
@@ -1956,7 +2138,8 @@ ECode TvInputManagerService::SessionCallback::AddSessionTokenToClientStateLocked
 ECode TvInputManagerService::SessionCallback::OnChannelRetuned(
     /* [in] */ IUri* channelUri)
 {
-    {    AutoLock syncLock(mHost->mLock);
+    {
+        AutoLock syncLock(mHost->mLock);
         if (DEBUG) {
             Slogger::D(TAG, "onChannelRetuned(%s)", TO_CSTR(channelUri));
         }
@@ -1985,7 +2168,8 @@ ECode TvInputManagerService::SessionCallback::OnChannelRetuned(
 ECode TvInputManagerService::SessionCallback::OnTracksChanged(
     /* [in] */ IList* tracks)
 {
-    {    AutoLock syncLock(mHost->mLock);
+    {
+        AutoLock syncLock(mHost->mLock);
         if (DEBUG) {
             Slogger::D(TAG, "onTracksChanged(%s)", TO_CSTR(tracks));
         }
@@ -2011,7 +2195,8 @@ ECode TvInputManagerService::SessionCallback::OnTrackSelected(
     /* [in] */ Int32 type,
     /* [in] */ const String& trackId)
 {
-    {    AutoLock syncLock(mHost->mLock);
+    {
+        AutoLock syncLock(mHost->mLock);
         if (DEBUG) {
             Slogger::D(TAG, "onTrackSelected(type=%d, trackId=%s)", type, trackId.string());
         }
@@ -2035,7 +2220,8 @@ ECode TvInputManagerService::SessionCallback::OnTrackSelected(
 
 ECode TvInputManagerService::SessionCallback::OnVideoAvailable()
 {
-    {    AutoLock syncLock(mHost->mLock);
+    {
+        AutoLock syncLock(mHost->mLock);
         if (DEBUG) {
             Slogger::D(TAG, "onVideoAvailable()");
         }
@@ -2060,7 +2246,8 @@ ECode TvInputManagerService::SessionCallback::OnVideoAvailable()
 ECode TvInputManagerService::SessionCallback::OnVideoUnavailable(
     /* [in] */ Int32 reason)
 {
-    {    AutoLock syncLock(mHost->mLock);
+    {
+        AutoLock syncLock(mHost->mLock);
         if (DEBUG) {
             Slogger::D(TAG, "onVideoUnavailable(%d)", reason);
         }
@@ -2084,7 +2271,8 @@ ECode TvInputManagerService::SessionCallback::OnVideoUnavailable(
 
 ECode TvInputManagerService::SessionCallback::OnContentAllowed()
 {
-    {    AutoLock syncLock(mHost->mLock);
+    {
+        AutoLock syncLock(mHost->mLock);
         if (DEBUG) {
             Slogger::D(TAG, "onContentAllowed()");
         }
@@ -2109,7 +2297,8 @@ ECode TvInputManagerService::SessionCallback::OnContentAllowed()
 ECode TvInputManagerService::SessionCallback::OnContentBlocked(
     /* [in] */ const String& rating)
 {
-    {    AutoLock syncLock(mHost->mLock);
+    {
+        AutoLock syncLock(mHost->mLock);
         if (DEBUG) {
             Slogger::D(TAG, "onContentBlocked()");
         }
@@ -2137,7 +2326,8 @@ ECode TvInputManagerService::SessionCallback::OnLayoutSurface(
     /* [in] */ Int32 right,
     /* [in] */ Int32 bottom)
 {
-    {    AutoLock syncLock(mHost->mLock);
+    {
+        AutoLock syncLock(mHost->mLock);
         if (DEBUG) {
             Slogger::D(TAG, "onLayoutSurface (left=%d, top=%d, right=%d, bottom=%d,)",
                 left, top, right, bottom);
@@ -2165,7 +2355,8 @@ ECode TvInputManagerService::SessionCallback::OnSessionEvent(
     /* [in] */ const String& eventType,
     /* [in] */ IBundle* eventArgs)
 {
-    {    AutoLock syncLock(mHost->mLock);
+    {
+        AutoLock syncLock(mHost->mLock);
         if (DEBUG) {
             Slogger::D(TAG, "onEvent(what=%s, data=%s)", eventType.string(), TO_CSTR(eventArgs));
         }
@@ -2243,12 +2434,14 @@ ECode TvInputManagerService::WatchLogHandler::HandleMessage(
                 values->Put(ITvContractWatchedPrograms::COLUMN_INTERNAL_TUNE_PARAMS,
                         EncodeTuneParams(tuneParams));
             }
-            values->Put(ITvContractWatchedPrograms::COLUMN_INTERNAL_SESSION_TOKEN,
-                    Ptr(sessionToken)->Func(sessionToken->ToString));
+            String token;
+            sessionToken->ToString(&token);
+            values->Put(ITvContractWatchedPrograms::COLUMN_INTERNAL_SESSION_TOKEN, token);
             AutoPtr<ITvContractWatchedPrograms> helper;
             CTvContractWatchedPrograms::AcquireSingleton((ITvContractWatchedPrograms**)&helper);
-            AutoPtr<IUri> uri;
-            mContentResolver->Insert(Ptr(helper)->Func(ITvContractWatchedPrograms::GetCONTENT_URI), values, (IUri**)&uri);
+            AutoPtr<IUri> uri, result;
+            helper->GetCONTENT_URI((IUri**)&uri);
+            mContentResolver->Insert(uri, values, (IUri**)&result);
             args->Recycle();
             return NOERROR;
         }
@@ -2264,12 +2457,14 @@ ECode TvInputManagerService::WatchLogHandler::HandleMessage(
             CContentValues::New((IContentValues**)&values);
             values->Put(ITvContractWatchedPrograms::COLUMN_WATCH_END_TIME_UTC_MILLIS,
                     watchEndTime);
-            values->Put(ITvContractWatchedPrograms::COLUMN_INTERNAL_SESSION_TOKEN,
-                    Ptr(sessionToken)->Func(sessionToken->ToString));
+            String token;
+            sessionToken->ToString(&token);
+            values->Put(ITvContractWatchedPrograms::COLUMN_INTERNAL_SESSION_TOKEN, token);
             AutoPtr<ITvContractWatchedPrograms> helper;
             CTvContractWatchedPrograms::AcquireSingleton((ITvContractWatchedPrograms**)&helper);
-            AutoPtr<IUri> uri;
-            mContentResolver->Insert(Ptr(helper)->Func(ITvContractWatchedPrograms::GetCONTENT_URI), values, (IUri**)&uri);
+            AutoPtr<IUri> uri, result;
+            helper->GetCONTENT_URI((IUri**)&uri);
+            mContentResolver->Insert(uri, values, (IUri**)&result);
             args->Recycle();
             return NOERROR;
         }
@@ -2289,7 +2484,8 @@ String TvInputManagerService::WatchLogHandler::EncodeTuneParams(
     tuneParams->GetKeySet((ISet**)&keySet);
     AutoPtr<IIterator> it;
     keySet->GetIterator((IIterator**)&it);
-    while (Ptr(it)->Func(it->HasNext)) {
+    Boolean hasNext;
+    while (it->HasNext(&hasNext), hasNext) {
         AutoPtr<IInterface> key;
         it->GetNext((IInterface**)&key);
         AutoPtr<IInterface> value;
@@ -2300,7 +2496,7 @@ String TvInputManagerService::WatchLogHandler::EncodeTuneParams(
         builder.Append(ReplaceEscapeCharacters(Object::ToString(key)));
         builder.Append(String("="));
         builder.Append(ReplaceEscapeCharacters(Object::ToString(value)));
-        if (Ptr(it)->Func(it->HasNext)) {
+        if (it->HasNext(&hasNext), hasNext) {
             builder.Append(String(", "));
         }
     }
@@ -2338,7 +2534,8 @@ ECode TvInputManagerService::HardwareListener::OnStateChanged(
     /* [in] */ const String& inputId,
     /* [in] */ Int32 state)
 {
-    {    AutoLock syncLock(mHost->mLock);
+    {
+        AutoLock syncLock(mHost->mLock);
         mHost->SetStateLocked(inputId, state, mHost->mCurrentUserId);
     }
     return NOERROR;
@@ -2347,12 +2544,20 @@ ECode TvInputManagerService::HardwareListener::OnStateChanged(
 ECode TvInputManagerService::HardwareListener::OnHardwareDeviceAdded(
     /* [in] */ ITvInputHardwareInfo* info)
 {
-    {    AutoLock syncLock(mHost->mLock);
+    {
+        AutoLock syncLock(mHost->mLock);
         AutoPtr<UserState> userState;
         mHost->GetUserStateLocked(mHost->mCurrentUserId, (UserState**)&userState);
         // Broadcast the event to all hardware inputs.
-        FOR_EACH(it, Ptr(userState->mServiceStateMap)->Func(IMap::GetValues)) {
-            AutoPtr<ServiceState> serviceState = (ServiceState*) IObject::Probe(Ptr(it)->Func(IIterator::GetNext));
+        AutoPtr<ICollection> values;
+        userState->mServiceStateMap->GetValues((ICollection**)&values);
+        AutoPtr<IIterator> it;
+        values->GetIterator((IIterator**)&it);
+        Boolean hasNext;
+        while (it->HasNext(&hasNext), hasNext) {
+            AutoPtr<IInterface> obj;
+            it->GetNext((IInterface**)&obj);
+            ServiceState* serviceState = (ServiceState*) IObject::Probe(obj);
             if (!serviceState->mIsHardware || serviceState->mService == NULL) continue;
             // try {
             ECode ec = serviceState->mService->NotifyHardwareAdded(info);
@@ -2361,8 +2566,9 @@ ECode TvInputManagerService::HardwareListener::OnHardwareDeviceAdded(
                 if ((ECode)E_REMOTE_EXCEPTION == ec) {
                     Slogger::E(TAG, "error in notifyHardwareAdded %d", ec);
                 }
-                else
+                else {
                     return ec;
+                }
             }
             // }
         }
@@ -2373,12 +2579,20 @@ ECode TvInputManagerService::HardwareListener::OnHardwareDeviceAdded(
 ECode TvInputManagerService::HardwareListener::OnHardwareDeviceRemoved(
     /* [in] */ ITvInputHardwareInfo* info)
 {
-    {    AutoLock syncLock(mHost->mLock);
+    {
+        AutoLock syncLock(mHost->mLock);
         AutoPtr<UserState> userState;
         mHost->GetUserStateLocked(mHost->mCurrentUserId, (UserState**)&userState);
         // Broadcast the event to all hardware inputs.
-        FOR_EACH(it, Ptr(userState->mServiceStateMap)->Func(IMap::GetValues)) {
-            AutoPtr<ServiceState> serviceState = (ServiceState*) IObject::Probe(Ptr(it)->Func(IIterator::GetNext));
+        AutoPtr<ICollection> values;
+        userState->mServiceStateMap->GetValues((ICollection**)&values);
+        AutoPtr<IIterator> it;
+        values->GetIterator((IIterator**)&it);
+        Boolean hasNext;
+        while (it->HasNext(&hasNext), hasNext) {
+            AutoPtr<IInterface> obj;
+            it->GetNext((IInterface**)&obj);
+            ServiceState* serviceState = (ServiceState*) IObject::Probe(obj);
             if (!serviceState->mIsHardware || serviceState->mService == NULL) continue;
             // try {
             ECode ec = serviceState->mService->NotifyHardwareRemoved(info);
@@ -2387,8 +2601,9 @@ ECode TvInputManagerService::HardwareListener::OnHardwareDeviceRemoved(
                 if ((ECode)E_REMOTE_EXCEPTION == ec) {
                     Slogger::E(TAG, "error in notifyHardwareRemoved %d", ec);
                 }
-                else
+                else {
                     return ec;
+                }
             }
             // }
         }
@@ -2399,12 +2614,20 @@ ECode TvInputManagerService::HardwareListener::OnHardwareDeviceRemoved(
 ECode TvInputManagerService::HardwareListener::OnHdmiDeviceAdded(
     /* [in] */ IHdmiDeviceInfo* deviceInfo)
 {
-    {    AutoLock syncLock(mHost->mLock);
+    {
+        AutoLock syncLock(mHost->mLock);
         AutoPtr<UserState> userState;
         mHost->GetUserStateLocked(mHost->mCurrentUserId, (UserState**)&userState);
         // Broadcast the event to all hardware inputs.
-        FOR_EACH(it, Ptr(userState->mServiceStateMap)->Func(IMap::GetValues)) {
-            AutoPtr<ServiceState> serviceState = (ServiceState*) IObject::Probe(Ptr(it)->Func(IIterator::GetNext));
+        AutoPtr<ICollection> values;
+        userState->mServiceStateMap->GetValues((ICollection**)&values);
+        AutoPtr<IIterator> it;
+        values->GetIterator((IIterator**)&it);
+        Boolean hasNext;
+        while (it->HasNext(&hasNext), hasNext) {
+            AutoPtr<IInterface> obj;
+            it->GetNext((IInterface**)&obj);
+            ServiceState* serviceState = (ServiceState*) IObject::Probe(obj);
             if (!serviceState->mIsHardware || serviceState->mService == NULL) continue;
             // try {
             ECode ec = serviceState->mService->NotifyHdmiDeviceAdded(deviceInfo);
@@ -2413,8 +2636,9 @@ ECode TvInputManagerService::HardwareListener::OnHdmiDeviceAdded(
                 if ((ECode)E_REMOTE_EXCEPTION == ec) {
                     Slogger::E(TAG, "error in notifyHdmiDeviceAdded %d", ec);
                 }
-                else
+                else {
                     return ec;
+                }
             }
             // }
         }
@@ -2425,12 +2649,20 @@ ECode TvInputManagerService::HardwareListener::OnHdmiDeviceAdded(
 ECode TvInputManagerService::HardwareListener::OnHdmiDeviceRemoved(
     /* [in] */ IHdmiDeviceInfo* deviceInfo)
 {
-    {    AutoLock syncLock(mHost->mLock);
+    {
+        AutoLock syncLock(mHost->mLock);
         AutoPtr<UserState> userState;
         mHost->GetUserStateLocked(mHost->mCurrentUserId, (UserState**)&userState);
         // Broadcast the event to all hardware inputs.
-        FOR_EACH(it, Ptr(userState->mServiceStateMap)->Func(IMap::GetValues)) {
-            AutoPtr<ServiceState> serviceState = (ServiceState*) IObject::Probe(Ptr(it)->Func(IIterator::GetNext));
+        AutoPtr<ICollection> values;
+        userState->mServiceStateMap->GetValues((ICollection**)&values);
+        AutoPtr<IIterator> it;
+        values->GetIterator((IIterator**)&it);
+        Boolean hasNext;
+        while (it->HasNext(&hasNext), hasNext) {
+            AutoPtr<IInterface> obj;
+            it->GetNext((IInterface**)&obj);
+            ServiceState* serviceState = (ServiceState*) IObject::Probe(obj);
             if (!serviceState->mIsHardware || serviceState->mService == NULL) continue;
             // try {
             ECode ec = serviceState->mService->NotifyHdmiDeviceRemoved(deviceInfo);
@@ -2439,8 +2671,9 @@ ECode TvInputManagerService::HardwareListener::OnHdmiDeviceRemoved(
                 if ((ECode)E_REMOTE_EXCEPTION == ec) {
                     Slogger::E(TAG, "error in notifyHdmiDeviceRemoved %d", ec);
                 }
-                else
+                else {
                     return ec;
+                }
             }
             // }
         }
@@ -2452,9 +2685,12 @@ ECode TvInputManagerService::HardwareListener::OnHdmiDeviceUpdated(
     /* [in] */ const String& inputId,
     /* [in] */ IHdmiDeviceInfo* deviceInfo)
 {
-    {    AutoLock syncLock(mHost->mLock);
+    {
+        AutoLock syncLock(mHost->mLock);
         AutoPtr<IInteger32> state;
-        switch (Ptr(deviceInfo)->Func(deviceInfo->GetDevicePowerStatus)) {
+        Int32 status;
+        deviceInfo->GetDevicePowerStatus(&status);
+        switch (status) {
             case IHdmiControlManager::POWER_STATUS_ON:
                 CInteger32::New(ITvInputManager::INPUT_STATE_CONNECTED, (IInteger32**)&state);
                 break;
@@ -2469,7 +2705,9 @@ ECode TvInputManagerService::HardwareListener::OnHdmiDeviceUpdated(
                 break;
         }
         if (state != NULL) {
-            mHost->SetStateLocked(inputId, Ptr(state)->Func(state->GetValue), mHost->mCurrentUserId);
+            Int32 iv;
+            state->GetValue(&iv);
+            mHost->SetStateLocked(inputId, iv, mHost->mCurrentUserId);
         }
     }
     return NOERROR;
@@ -2491,7 +2729,8 @@ TvInputManagerService::InnerSub_ProxyDeathRecipient::InnerSub_ProxyDeathRecipien
 
 ECode TvInputManagerService::InnerSub_ProxyDeathRecipient::ProxyDied()
 {
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         if (mUserState->mCallbackSet != NULL) {
             mUserState->mCallbackSet->Remove(mCallback);
         }
@@ -2510,7 +2749,8 @@ TvInputManagerService::InnerSub_PackageMonitor::InnerSub_PackageMonitor(
 ECode TvInputManagerService::InnerSub_PackageMonitor::BuildTvInputList(
     /* [in] */ ArrayOf<String>* packages)
 {
-    {    AutoLock syncLock(mHost->mLock);
+    {
+        AutoLock syncLock(mHost->mLock);
         Int32 userId;
         GetChangingUserId(&userId);
         mHost->BuildTvInputListLocked(userId, packages);
@@ -2585,7 +2825,8 @@ ECode TvInputManagerService::InnerSub_PackageMonitor::OnPackageRemoved(
     /* [in] */ const String& packageName,
     /* [in] */ Int32 uid)
 {
-    {    AutoLock syncLock(mHost->mLock);
+    {
+        AutoLock syncLock(mHost->mLock);
         Int32 userId;
         GetChangingUserId(&userId);
         AutoPtr<UserState> userState;
@@ -2607,17 +2848,25 @@ ECode TvInputManagerService::InnerSub_PackageMonitor::OnPackageRemoved(
     AutoPtr<IContentProviderOperationBuilder> builder;
     AutoPtr<ITvContractWatchedPrograms> program_helper;
     CTvContractWatchedPrograms::AcquireSingleton((ITvContractWatchedPrograms**)&program_helper);
-    helper->NewDelete(Ptr(program_helper)->Func(ITvContractWatchedPrograms::GetCONTENT_URI), (IContentProviderOperationBuilder**)&builder);
+    AutoPtr<IUri> uri;
+    program_helper->GetCONTENT_URI((IUri**)&uri);
+    helper->NewDelete(uri, (IContentProviderOperationBuilder**)&builder);
     builder->WithSelection(selection, selectionArgs);
-    operations->Add(Ptr(builder)->Func(IContentProviderOperationBuilder::Build));
+    AutoPtr<IInterface> buildResults;
+    builder->Build((IContentProviderOperation**)&buildResults);
+    operations->Add(buildResults);
     builder = NULL;
-    helper->NewDelete(Ptr(program_helper)->Func(ITvContractWatchedPrograms::GetCONTENT_URI), (IContentProviderOperationBuilder**)&builder);
+    helper->NewDelete(uri, (IContentProviderOperationBuilder**)&builder);
     builder->WithSelection(selection, selectionArgs);
-    operations->Add(Ptr(builder)->Func(IContentProviderOperationBuilder::Build));
+    buildResults = NULL;
+    builder->Build((IContentProviderOperation**)&buildResults);
+    operations->Add(buildResults);
     builder = NULL;
-    helper->NewDelete(Ptr(program_helper)->Func(ITvContractWatchedPrograms::GetCONTENT_URI), (IContentProviderOperationBuilder**)&builder);
+    helper->NewDelete(uri, (IContentProviderOperationBuilder**)&builder);
     builder->WithSelection(selection, selectionArgs);
-    operations->Add(Ptr(builder)->Func(IContentProviderOperationBuilder::Build));
+    buildResults = NULL;
+    builder->Build((IContentProviderOperation**)&buildResults);
+    operations->Add(buildResults);
     AutoPtr<ArrayOf<IContentProviderResult*> > results;
     // try {
     ECode ec = mHost->mContentResolver->ApplyBatch(ITvContract::AUTHORITY, operations, (ArrayOf<IContentProviderResult*>**)&results);
@@ -2687,7 +2936,8 @@ ECode TvInputManagerService::constructor(
     mWatchLogHandler->constructor(mContentResolver, looper);
     mTvInputHardwareManager = new TvInputHardwareManager();
     mTvInputHardwareManager->constructor(context, new HardwareListener(this));
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         mUserStates->Put(mCurrentUserId, TO_IINTERFACE(new UserState(mContext, mCurrentUserId)));
     }
     return NOERROR;
@@ -2705,7 +2955,8 @@ ECode TvInputManagerService::OnBootPhase(
     if (phase == ISystemService::PHASE_SYSTEM_SERVICES_READY) {
         RegisterBroadcastReceivers();
     } else if (phase == ISystemService::PHASE_THIRD_PARTY_APPS_CAN_START) {
-        {    AutoLock syncLock(mLock);
+        {
+            AutoLock syncLock(mLock);
             BuildTvInputListLocked(mCurrentUserId, NULL);
             BuildTvContentRatingSystemListLocked(mCurrentUserId);
         }
@@ -2736,9 +2987,11 @@ Boolean TvInputManagerService::HasHardwarePermission(
     /* [in] */ IPackageManager* pm,
     /* [in] */ IComponentName* component)
 {
+    String packageName;
+    component->GetPackageName(&packageName);
     Int32 permissionCode;
     pm->CheckPermission(Manifest::permission::TV_INPUT_HARDWARE,
-            Ptr(component)->Func(component->GetPackageName), &permissionCode);
+            packageName, &permissionCode);
     return permissionCode == IPackageManager::PERMISSION_GRANTED;
 }
 
@@ -2759,19 +3012,28 @@ ECode TvInputManagerService::BuildTvInputListLocked(
             IPackageManager::GET_SERVICES | IPackageManager::GET_META_DATA, (IList**)&services);
     AutoPtr<IList> inputList;
     CArrayList::New((IList**)&inputList);
-    FOR_EACH(it, services) {
-        AutoPtr<IResolveInfo> ri = IResolveInfo::Probe(Ptr(it)->Func(IIterator::GetNext));
+    AutoPtr<IIterator> it;
+    services->GetIterator((IIterator**)&it);
+    Boolean hasNext;
+    while (it->HasNext(&hasNext), hasNext) {
+        AutoPtr<IInterface> obj;
+        it->GetNext((IInterface**)&obj);
+        AutoPtr<IResolveInfo> ri = IResolveInfo::Probe(obj);
         AutoPtr<IServiceInfo> si;
         ri->GetServiceInfo((IServiceInfo**)&si);
-        if (!Manifest::permission::BIND_TV_INPUT.Equals(Ptr(si)->Func(IServiceInfo::GetPermission))) {
+        String packageName, name;
+        IPackageItemInfo::Probe(si)->GetPackageName(&packageName);
+        IPackageItemInfo::Probe(si)->GetName(&name);
+        String permission;
+        si->GetPermission(&permission);
+        if (!Manifest::permission::BIND_TV_INPUT.Equals(permission)) {
             Slogger::W(TAG, "Skipping TV input %s: it does not require the permission %s",
-                    Ptr(IPackageItemInfo::Probe(si))->Func(IPackageItemInfo::GetName).string(),
+                    name.string(),
                     Manifest::permission::BIND_TV_INPUT.string());
             continue;
         }
         AutoPtr<IComponentName> component;
-        CComponentName::New(Ptr(IPackageItemInfo::Probe(si))->Func(IPackageItemInfo::GetPackageName),
-                Ptr(IPackageItemInfo::Probe(si))->Func(IPackageItemInfo::GetName), (IComponentName**)&component);
+        CComponentName::New(packageName, name, (IComponentName**)&component);
         if (HasHardwarePermission(pm, component)) {
             AutoPtr<IInterface> obj;
             userState->mServiceStateMap->Get(component, (IInterface**)&obj);
@@ -2800,7 +3062,7 @@ ECode TvInputManagerService::BuildTvInputListLocked(
             // } catch (XmlPullParserException | IOException e) {
             if (FAILED(ec)) {
                 if ((ECode)E_XML_PULL_PARSER_EXCEPTION == ec || (ECode)E_IO_EXCEPTION == ec) {
-                    Slogger::E(TAG, "failed to load TV input %s %d", Ptr(IPackageItemInfo::Probe(si))->Func(IPackageItemInfo::GetName).string(), ec);
+                    Slogger::E(TAG, "failed to load TV input %s %d", name.string(), ec);
                     continue;
                 }
                 else
@@ -2808,26 +3070,40 @@ ECode TvInputManagerService::BuildTvInputListLocked(
             }
             // }
         }
-        userState->mPackageSet->Add(StringUtils::ParseCharSequence(Ptr(IPackageItemInfo::Probe(si))->Func(IPackageItemInfo::GetPackageName)));
+        userState->mPackageSet->Add(StringUtils::ParseCharSequence(packageName));
     }
     AutoPtr<IMap> inputMap;
     CHashMap::New((IMap**)&inputMap);
-    FOR_EACH(iter, inputList) {
-        AutoPtr<ITvInputInfo> info = ITvInputInfo::Probe(Ptr(iter)->Func(IIterator::GetNext));
-        if (DEBUG) {
-            Slogger::D(TAG, "add %s", Ptr(info)->Func(info->GetId).string());
-        }
+    it = NULL;
+    inputList->GetIterator((IIterator**)&it);
+    while (it->HasNext(&hasNext), hasNext) {
         AutoPtr<IInterface> obj;
-        userState->mInputMap->Get(StringUtils::ParseCharSequence(Ptr(info)->Func(info->GetId)), (IInterface**)&obj);
+        it->GetNext((IInterface**)&obj);
+        AutoPtr<ITvInputInfo> info = ITvInputInfo::Probe(obj);
+        if (DEBUG) {
+            String id;
+            info->GetId(&id);
+            Slogger::D(TAG, "add %s", id.string());
+        }
+        String id;
+        info->GetId(&id);
+        obj = NULL;
+        userState->mInputMap->Get(StringUtils::ParseCharSequence(id), (IInterface**)&obj);
         AutoPtr<TvInputState> state = (TvInputState*) IObject::Probe(obj);
         if (state == NULL) {
             state = new TvInputState();
         }
         state->mInfo = info;
-        inputMap->Put(StringUtils::ParseCharSequence(Ptr(info)->Func(info->GetId)), TO_IINTERFACE(state));
+        inputMap->Put(StringUtils::ParseCharSequence(id), TO_IINTERFACE(state));
     }
-    FOR_EACH(id_it, Ptr(inputMap)->Func(inputMap->GetKeySet)) {
-        AutoPtr<ICharSequence> inputId = ICharSequence::Probe(Ptr(id_it)->Func(IIterator::GetNext));
+    AutoPtr<ISet> keys;
+    inputMap->GetKeySet((ISet**)&keys);
+    it = NULL;
+    keys->GetIterator((IIterator**)&it);
+    while (it->HasNext(&hasNext), hasNext) {
+        AutoPtr<IInterface> obj;
+        it->GetNext((IInterface**)&obj);
+        AutoPtr<ICharSequence> inputId = ICharSequence::Probe(obj);
         Boolean isContains;
         userState->mInputMap->ContainsKey(inputId, &isContains);
         if (!isContains) {
@@ -2841,7 +3117,9 @@ ECode TvInputManagerService::BuildTvInputListLocked(
             for (Int32 i = 0; i < updatedPackages->GetLength(); ++i) {
                 AutoPtr<ICharSequence> updatedPackage;
                 CString::New((*updatedPackages)[i], (ICharSequence**)&updatedPackage);
-                if (Ptr(component)->Func(component->GetPackageName).Equals(Object::ToString(updatedPackage))) {
+                String packageName;
+                component->GetPackageName(&packageName);
+                if (packageName.Equals(Object::ToString(updatedPackage))) {
                     UpdateServiceConnectionLocked(component, userId);
                     NotifyInputUpdatedLocked(userState, Object::ToString(inputId));
                     break;
@@ -2849,16 +3127,24 @@ ECode TvInputManagerService::BuildTvInputListLocked(
             }
         }
     }
-    FOR_EACH(input_id_it, Ptr(userState->mInputMap)->Func(IMap::GetKeySet)) {
-        AutoPtr<ICharSequence> inputId = ICharSequence::Probe(Ptr(input_id_it)->Func(IIterator::GetNext));
+    keys = NULL;
+    userState->mInputMap->GetKeySet((ISet**)&keys);
+    it = NULL;
+    keys->GetIterator((IIterator**)&it);
+    while (it->HasNext(&hasNext), hasNext) {
+        AutoPtr<IInterface> obj;
+        it->GetNext((IInterface**)&obj);
+        AutoPtr<ICharSequence> inputId = ICharSequence::Probe(obj);
         Boolean isContains;
         inputMap->ContainsKey(inputId, &isContains);
         if (!isContains) {
             AutoPtr<IInterface> obj;
             userState->mInputMap->Get(inputId, (IInterface**)&obj);
             AutoPtr<ITvInputInfo> info = ((TvInputState*) IObject::Probe(obj))->mInfo;
+            AutoPtr<IComponentName> component;
+            info->GetComponent((IComponentName**)&component);
             obj = NULL;
-            userState->mServiceStateMap->Get(Ptr(info)->Func(info->GetComponent), (IInterface**)&obj);
+            userState->mServiceStateMap->Get(component, (IInterface**)&obj);
             AutoPtr<ServiceState> serviceState = (ServiceState*) IObject::Probe(obj);
             if (serviceState != NULL) {
                 AbortPendingCreateSessionRequestsLocked(serviceState, Object::ToString(inputId), userId);
@@ -2883,8 +3169,13 @@ ECode TvInputManagerService::BuildTvContentRatingSystemListLocked(
     CIntent::New(ITvInputManager::ACTION_QUERY_CONTENT_RATING_SYSTEMS, (IIntent**)&intent);
     AutoPtr<IList> receivers;
     pm->QueryBroadcastReceivers(intent, IPackageManager::GET_META_DATA, (IList**)&receivers);
-    FOR_EACH(it, receivers) {
-        AutoPtr<IResolveInfo> resolveInfo = IResolveInfo::Probe(Ptr(it)->Func(IIterator::GetNext));
+    AutoPtr<IIterator> it;
+    receivers->GetIterator((IIterator**)&it);
+    Boolean hasNext;
+    while (it->HasNext(&hasNext), hasNext) {
+        AutoPtr<IInterface> obj;
+        it->GetNext((IInterface**)&obj);
+        AutoPtr<IResolveInfo> resolveInfo = IResolveInfo::Probe(obj);
         AutoPtr<IActivityInfo> receiver;
         resolveInfo->GetActivityInfo((IActivityInfo**)&receiver);
         AutoPtr<IBundle> metaData;
@@ -2895,18 +3186,21 @@ ECode TvInputManagerService::BuildTvContentRatingSystemListLocked(
         Int32 xmlResId;
         metaData->GetInt32(ITvInputManager::META_DATA_CONTENT_RATING_SYSTEMS, &xmlResId);
         if (xmlResId == 0) {
+            String packageName, name;
+            IPackageItemInfo::Probe(receiver)->GetPackageName(&packageName);
+            IPackageItemInfo::Probe(receiver)->GetName(&name);
             Slogger::W(TAG, "Missing meta-data '%s' on receiver %s/%s",
                     ITvInputManager::META_DATA_CONTENT_RATING_SYSTEMS.string(),
-                    Ptr(IPackageItemInfo::Probe(receiver))->Func(IPackageItemInfo::GetPackageName).string(),
-                    Ptr(IPackageItemInfo::Probe(receiver))->Func(IPackageItemInfo::GetName).string());
+                    packageName.string(), name.string());
             continue;
         }
         AutoPtr<ITvContentRatingSystemInfoHelper> helper;
         CTvContentRatingSystemInfoHelper::AcquireSingleton((ITvContentRatingSystemInfoHelper**)&helper);
+        AutoPtr<IApplicationInfo> appInfo;
+        IComponentInfo::Probe(receiver)->GetApplicationInfo((IApplicationInfo**)&appInfo);
         AutoPtr<ITvContentRatingSystemInfo> info;
         helper->CreateTvContentRatingSystemInfo(xmlResId,
-                        Ptr(IComponentInfo::Probe(receiver))->Func(IComponentInfo::GetApplicationInfo),
-                        (ITvContentRatingSystemInfo**)&info);
+                        appInfo, (ITvContentRatingSystemInfo**)&info);
         userState->mContentRatingSystemList->Add(info);
     }
     return NOERROR;
@@ -2915,7 +3209,8 @@ ECode TvInputManagerService::BuildTvContentRatingSystemListLocked(
 ECode TvInputManagerService::SwitchUser(
     /* [in] */ Int32 userId)
 {
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         if (mCurrentUserId == userId) {
             return NOERROR;
         }
@@ -2938,7 +3233,8 @@ ECode TvInputManagerService::SwitchUser(
 ECode TvInputManagerService::RemoveUser(
     /* [in] */ Int32 userId)
 {
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         AutoPtr<IInterface> obj;
         mUserStates->Get(userId, (IInterface**)&obj);
         AutoPtr<UserState> userState = (UserState*) IObject::Probe(obj);
@@ -2946,8 +3242,15 @@ ECode TvInputManagerService::RemoveUser(
             return NOERROR;
         }
         // Release created sessions.
-        FOR_EACH(it, Ptr(userState->mSessionStateMap)->Func(IMap::GetValues)) {
-            AutoPtr<SessionState> state = (SessionState*) IObject::Probe(Ptr(it)->Func(IIterator::GetNext));
+        AutoPtr<ICollection> values;
+        userState->mSessionStateMap->GetValues((ICollection**)&values);
+        AutoPtr<IIterator> it;
+        values->GetIterator((IIterator**)&it);
+        Boolean hasNext;
+        while (it->HasNext(&hasNext), hasNext) {
+            AutoPtr<IInterface> obj;
+            it->GetNext((IInterface**)&obj);
+            AutoPtr<SessionState> state = (SessionState*) IObject::Probe(obj);
             if (state->mSession != NULL) {
                 // try {
                 ECode ec = state->mSession->ReleaseResources();
@@ -2964,8 +3267,14 @@ ECode TvInputManagerService::RemoveUser(
         }
         userState->mSessionStateMap->Clear();
         // Unregister all callbacks and unbind all services.
-        FOR_EACH(iter, Ptr(userState->mServiceStateMap)->Func(IMap::GetValues)) {
-            AutoPtr<ServiceState> serviceState = (ServiceState*) IObject::Probe(Ptr(iter)->Func(IIterator::GetNext));
+        values = NULL;
+        userState->mServiceStateMap->GetValues((ICollection**)&values);
+        it = NULL;
+        values->GetIterator((IIterator**)&it);
+        while (it->HasNext(&hasNext), hasNext) {
+            AutoPtr<IInterface> obj;
+            it->GetNext((IInterface**)&obj);
+            AutoPtr<ServiceState> serviceState = (ServiceState*) IObject::Probe(obj);
             if (serviceState->mCallback != NULL) {
                 // try {
                 ECode ec = serviceState->mService->UnregisterCallback(serviceState->mCallback);
@@ -3008,7 +3317,9 @@ ECode TvInputManagerService::GetUserStateLocked(
         Logger::E(TAG, "User state not found for user ID %d", userId);
         return E_ILLEGAL_STATE_EXCEPTION;
     }
-    FUNC_RETURN(userState)
+    * result = userState;
+    REFCOUNT_ADD(*result);
+    return NOERROR;
 }
 
 ECode TvInputManagerService::GetServiceStateLocked(
@@ -3029,7 +3340,9 @@ ECode TvInputManagerService::GetServiceStateLocked(
                 TO_CSTR(component), userId);
         return E_ILLEGAL_STATE_EXCEPTION;
     }
-    FUNC_RETURN(serviceState)
+    *result = serviceState;
+    REFCOUNT_ADD(*result);
+    return NOERROR;
 }
 
 ECode TvInputManagerService::GetSessionStateLocked(
@@ -3056,7 +3369,9 @@ ECode TvInputManagerService::GetSessionStateLocked(
                 TO_CSTR(sessionToken), callingUid);
         return E_SECURITY_EXCEPTION;
     }
-    FUNC_RETURN(sessionState)
+    *result = sessionState;
+    REFCOUNT_ADD(*result);
+    return NOERROR;
 }
 
 ECode TvInputManagerService::GetSessionLocked(
@@ -3086,7 +3401,9 @@ ECode TvInputManagerService::GetSessionLocked(
                 TO_CSTR(sessionState->mSessionToken));
         return E_ILLEGAL_STATE_EXCEPTION;
     }
-    FUNC_RETURN(session)
+    *result = session;
+    REFCOUNT_ADD(*result);
+    return NOERROR;
 }
 
 ECode TvInputManagerService::ResolveCallingUserId(
@@ -3127,7 +3444,8 @@ ECode TvInputManagerService::UpdateServiceConnectionLocked(
         return NOERROR;
     }
     if (serviceState->mReconnecting) {
-        if (!Ptr(serviceState->mSessionTokens)->Func(IList::IsEmpty)) {
+        Boolean empty;
+        if (serviceState->mSessionTokens->IsEmpty(&empty), !empty) {
             // wait until all the sessions are removed.
             return NOERROR;
         }
@@ -3174,21 +3492,32 @@ ECode TvInputManagerService::AbortPendingCreateSessionRequestsLocked(
     GetUserStateLocked(userId, (UserState**)&userState);
     AutoPtr<IList> sessionsToAbort;
     CArrayList::New((IList**)&sessionsToAbort);
-    FOR_EACH(it, serviceState->mSessionTokens) {
-        AutoPtr<IBinder> sessionToken = IBinder::Probe(Ptr(it)->Func(IIterator::GetNext));
+    AutoPtr<IIterator> it;
+    serviceState->mSessionTokens->GetIterator((IIterator**)&it);
+    Boolean hasNext;
+    while (it->HasNext(&hasNext), hasNext) {
+        AutoPtr<IInterface> token;
+        it->GetNext((IInterface**)&token);
         AutoPtr<IInterface> obj;
-        userState->mSessionStateMap->Get(sessionToken, (IInterface**)&obj);
+        userState->mSessionStateMap->Get(token, (IInterface**)&obj);
         AutoPtr<SessionState> sessionState = (SessionState*) IObject::Probe(obj);
-        if (sessionState->mSession == NULL && (inputId == NULL
-                || Ptr(sessionState->mInfo)->Func(ITvInputInfo::GetId).Equals(inputId))) {
+        String id;
+        if (sessionState->mSession == NULL && (inputId.IsNull()
+                || (sessionState->mInfo->GetId(&id), id.Equals(inputId)))) {
             sessionsToAbort->Add(TO_IINTERFACE(sessionState));
         }
     }
-    FOR_EACH(iter, sessionsToAbort) {
-        AutoPtr<SessionState> sessionState = (SessionState*) IObject::Probe(Ptr(iter)->Func(IIterator::GetNext));
+    it = NULL;
+    sessionsToAbort->GetIterator((IIterator**)&it);
+    while (it->HasNext(&hasNext), hasNext) {
+        AutoPtr<IInterface> obj;
+        it->GetNext((IInterface**)&obj);
+        AutoPtr<SessionState> sessionState = (SessionState*) IObject::Probe(obj);
         RemoveSessionStateLocked(sessionState->mSessionToken, sessionState->mUserId);
+        String id;
+        sessionState->mInfo->GetId(&id);
         SendSessionTokenToClientLocked(sessionState->mClient,
-                Ptr(sessionState->mInfo)->Func(ITvInputInfo::GetId), NULL, NULL, sessionState->mSeq);
+                id, NULL, NULL, sessionState->mSeq);
     }
     UpdateServiceConnectionLocked(serviceState->mComponent, userId);
     return NOERROR;
@@ -3205,24 +3534,30 @@ ECode TvInputManagerService::CreateSessionInternalLocked(
     userState->mSessionStateMap->Get(sessionToken, (IInterface**)&obj);
     AutoPtr<SessionState> sessionState = (SessionState*) IObject::Probe(obj);
     if (DEBUG) {
-        Slogger::D(TAG, "createSessionInternalLocked(inputId=%s)", Ptr(sessionState->mInfo)->Func(ITvInputInfo::GetId).string());
+        String id;
+        sessionState->mInfo->GetId(&id);
+        Slogger::D(TAG, "createSessionInternalLocked(inputId=%s)", id.string());
     }
     AutoPtr<IInputChannelHelper> helper;
     CInputChannelHelper::AcquireSingleton((IInputChannelHelper**)&helper);
+    String tokenStr;
+    sessionToken->ToString(&tokenStr);
     AutoPtr<ArrayOf<IInputChannel*> > channels;
-    helper->OpenInputChannelPair(Ptr(sessionToken)->Func(sessionToken->ToString), (ArrayOf<IInputChannel*>**)&channels);
+    helper->OpenInputChannelPair(tokenStr, (ArrayOf<IInputChannel*>**)&channels);
     // Set up a callback to send the session token.
     AutoPtr<IITvInputSessionCallback> callback = new SessionCallback(this);
     ((SessionCallback*) callback.Get())->constructor(sessionState, channels);
     // Create a session. When failed, send a null token immediately.
     // try {
-    ECode ec = service->CreateSession((*channels)[1], callback, Ptr(sessionState->mInfo)->Func(ITvInputInfo::GetId));
+    String id;
+    sessionState->mInfo->GetId(&id);
+    ECode ec = service->CreateSession((*channels)[1], callback, id);
     // } catch (RemoteException e) {
     if (FAILED(ec)) {
         if ((ECode)E_REMOTE_EXCEPTION == ec) {
             Slogger::E(TAG, "error in createSession %d", ec);
             RemoveSessionStateLocked(sessionToken, userId);
-            SendSessionTokenToClientLocked(sessionState->mClient, Ptr(sessionState->mInfo)->Func(ITvInputInfo::GetId), NULL,
+            SendSessionTokenToClientLocked(sessionState->mClient, id, NULL,
                     NULL, sessionState->mSeq);
         }
     }
@@ -3308,20 +3643,26 @@ ECode TvInputManagerService::RemoveSessionStateLocked(
     AutoPtr<ClientState> clientState = (ClientState*) IObject::Probe(obj);
     if (clientState != NULL) {
         clientState->mSessionTokens->Remove(sessionToken);
-        if (Ptr(clientState)->Func(clientState->IsEmpty)) {
+        Boolean empty;
+        clientState->IsEmpty(&empty);
+        if (empty) {
             userState->mClientStateMap->Remove(IBinder::Probe(sessionState->mClient));
         }
     }
     AutoPtr<ITvInputInfo> info = sessionState->mInfo;
     if (info != NULL) {
+        AutoPtr<IComponentName> component;
+        info->GetComponent((IComponentName**)&component);
         obj = NULL;
-        userState->mServiceStateMap->Get(Ptr(info)->Func(info->GetComponent), (IInterface**)&obj);
+        userState->mServiceStateMap->Get(component, (IInterface**)&obj);
         AutoPtr<ServiceState> serviceState = (ServiceState*) IObject::Probe(obj);
         if (serviceState != NULL) {
             serviceState->mSessionTokens->Remove(sessionToken);
         }
     }
-    UpdateServiceConnectionLocked(Ptr(sessionState->mInfo)->Func(ITvInputInfo::GetComponent), userId);
+    AutoPtr<IComponentName> component;
+    sessionState->mInfo->GetComponent((IComponentName**)&component);
+    UpdateServiceConnectionLocked(component, userId);
     // Log the end of watch.
     AutoPtr<ISomeArgsHelper> helper;
     CSomeArgsHelper::AcquireSingleton((ISomeArgsHelper**)&helper);
@@ -3330,7 +3671,9 @@ ECode TvInputManagerService::RemoveSessionStateLocked(
     args->SetObjectArg(1, sessionToken);
     AutoPtr<ISystem> system_helper;
     CSystem::AcquireSingleton((ISystem**)&system_helper);
-    args->SetInt32Arg(2, Ptr(system_helper)->Func(ISystem::GetCurrentTimeMillis));
+    Int64 currTime;
+    system_helper->GetCurrentTimeMillis(&currTime);
+    args->SetInt32Arg(2, currTime);
     AutoPtr<IMessage> msg;
     mWatchLogHandler->ObtainMessage(WatchLogHandler::MSG_LOG_WATCH_END, args, (IMessage**)&msg);
     msg->SendToTarget();
@@ -3349,8 +3692,10 @@ ECode TvInputManagerService::SetMainLocked(
         GetSessionStateLocked(sessionState->mHardwareSessionToken,
                 IProcess::SYSTEM_UID, userId, (SessionState**)&sessionState);
     }
+    AutoPtr<IComponentName> component;
+    sessionState->mInfo->GetComponent((IComponentName**)&component);
     AutoPtr<ServiceState> serviceState;
-    GetServiceStateLocked(Ptr(sessionState->mInfo)->Func(ITvInputInfo::GetComponent), userId, (ServiceState**)&serviceState);
+    GetServiceStateLocked(component, userId, (ServiceState**)&serviceState);
     if (!serviceState->mIsHardware) {
         return NOERROR;
     }
@@ -3363,8 +3708,9 @@ ECode TvInputManagerService::SetMainLocked(
         if ((ECode)E_REMOTE_EXCEPTION == ec) {
             Slogger::E(TAG, "error in setMain %d", ec);
         }
-        else
+        else {
             return ec;
+        }
     }
     // }
     return NOERROR;
@@ -3377,8 +3723,13 @@ ECode TvInputManagerService::NotifyInputAddedLocked(
     if (DEBUG) {
         Slogger::D(TAG, "notifyInputAddedLocked(inputId=%s)", inputId.string());
     }
-    FOR_EACH(it, userState->mCallbackSet) {
-        AutoPtr<IITvInputManagerCallback> callback = IITvInputManagerCallback::Probe(Ptr(it)->Func(IIterator::GetNext));
+    AutoPtr<IIterator> it;
+    userState->mCallbackSet->GetIterator((IIterator**)&it);
+    Boolean hasNext;
+    while (it->HasNext(&hasNext), hasNext) {
+        AutoPtr<IInterface> obj;
+        it->GetNext((IInterface**)&obj);
+        AutoPtr<IITvInputManagerCallback> callback = IITvInputManagerCallback::Probe(obj);
         // try {
         ECode ec = callback->OnInputAdded(inputId);
         // } catch (RemoteException e) {
@@ -3386,8 +3737,9 @@ ECode TvInputManagerService::NotifyInputAddedLocked(
             if ((ECode)E_REMOTE_EXCEPTION == ec) {
                 Slogger::E(TAG, "failed to report added input to callback %d", ec);
             }
-            else
+            else {
                 return ec;
+            }
         }
         // }
     }
@@ -3401,8 +3753,13 @@ ECode TvInputManagerService::NotifyInputRemovedLocked(
     if (DEBUG) {
         Slogger::D(TAG, "notifyInputRemovedLocked(inputId=%s)", inputId.string());
     }
-    FOR_EACH(it, userState->mCallbackSet) {
-        AutoPtr<IITvInputManagerCallback> callback = IITvInputManagerCallback::Probe(Ptr(it)->Func(IIterator::GetNext));
+    AutoPtr<IIterator> it;
+    userState->mCallbackSet->GetIterator((IIterator**)&it);
+    Boolean hasNext;
+    while (it->HasNext(&hasNext), hasNext) {
+        AutoPtr<IInterface> obj;
+        it->GetNext((IInterface**)&obj);
+        AutoPtr<IITvInputManagerCallback> callback = IITvInputManagerCallback::Probe(obj);
         // try {
         ECode ec = callback->OnInputRemoved(inputId);
         // } catch (RemoteException e) {
@@ -3410,8 +3767,9 @@ ECode TvInputManagerService::NotifyInputRemovedLocked(
             if ((ECode)E_REMOTE_EXCEPTION == ec) {
                 Slogger::E(TAG, "failed to report removed input to callback %d", ec);
             }
-            else
+            else {
                 return ec;
+            }
         }
         // }
     }
@@ -3425,8 +3783,13 @@ ECode TvInputManagerService::NotifyInputUpdatedLocked(
     if (DEBUG) {
         Slogger::D(TAG, "notifyInputUpdatedLocked(inputId=%s)", inputId.string());
     }
-    FOR_EACH(it, userState->mCallbackSet) {
-        AutoPtr<IITvInputManagerCallback> callback = IITvInputManagerCallback::Probe(Ptr(it)->Func(IIterator::GetNext));
+    AutoPtr<IIterator> it;
+    userState->mCallbackSet->GetIterator((IIterator**)&it);
+    Boolean hasNext;
+    while (it->HasNext(&hasNext), hasNext) {
+        AutoPtr<IInterface> obj;
+        it->GetNext((IInterface**)&obj);
+        AutoPtr<IITvInputManagerCallback> callback = IITvInputManagerCallback::Probe(obj);
         // try {
         ECode ec = callback->OnInputUpdated(inputId);
         // } catch (RemoteException e) {
@@ -3434,8 +3797,9 @@ ECode TvInputManagerService::NotifyInputUpdatedLocked(
             if ((ECode)E_REMOTE_EXCEPTION == ec) {
                 Slogger::E(TAG, "failed to report updated input to callback %d", ec);
             }
-            else
+            else {
                 return ec;
+            }
         }
         // }
     }
@@ -3453,8 +3817,13 @@ ECode TvInputManagerService::NotifyInputStateChangedLocked(
                 inputId.string(), state);
     }
     if (targetCallback == NULL) {
-    FOR_EACH(it, userState->mCallbackSet) {
-        AutoPtr<IITvInputManagerCallback> callback = IITvInputManagerCallback::Probe(Ptr(it)->Func(IIterator::GetNext));
+        AutoPtr<IIterator> it;
+        userState->mCallbackSet->GetIterator((IIterator**)&it);
+        Boolean hasNext;
+        while (it->HasNext(&hasNext), hasNext) {
+            AutoPtr<IInterface> obj;
+            it->GetNext((IInterface**)&obj);
+            AutoPtr<IITvInputManagerCallback> callback = IITvInputManagerCallback::Probe(obj);
             // try {
             ECode ec = callback->OnInputStateChanged(inputId, state);
             // } catch (RemoteException e) {
@@ -3462,8 +3831,9 @@ ECode TvInputManagerService::NotifyInputStateChangedLocked(
                 if ((ECode)E_REMOTE_EXCEPTION == ec) {
                     Slogger::E(TAG, "failed to report state change to callback %d", ec);
                 }
-                else
+                else {
                     return ec;
+                }
             }
             // }
         }
@@ -3475,8 +3845,9 @@ ECode TvInputManagerService::NotifyInputStateChangedLocked(
             if ((ECode)E_REMOTE_EXCEPTION == ec) {
                 Slogger::E(TAG, "failed to report state change to callback %d", ec);
             }
-            else
+            else {
                 return ec;
+            }
         }
         // }
     }
@@ -3493,8 +3864,10 @@ ECode TvInputManagerService::SetStateLocked(
     AutoPtr<IInterface> obj;
     userState->mInputMap->Get(StringUtils::ParseCharSequence(inputId), (IInterface**)&obj);
     AutoPtr<TvInputState> inputState = (TvInputState*) IObject::Probe(obj);
+    AutoPtr<IComponentName> component;
+    inputState->mInfo->GetComponent((IComponentName**)&component);
     obj = NULL;
-    userState->mServiceStateMap->Get(Ptr(inputState->mInfo)->Func(ITvInputInfo::GetComponent), (IInterface**)&obj);
+    userState->mServiceStateMap->Get(component, (IInterface**)&obj);
     AutoPtr<ServiceState> serviceState = (ServiceState*) IObject::Probe(obj);
     Int32 oldState = inputState->mState;
     inputState->mState = state;

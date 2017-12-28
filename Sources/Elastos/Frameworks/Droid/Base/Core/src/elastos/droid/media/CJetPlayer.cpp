@@ -23,9 +23,8 @@
 #include <elastos/utility/logging/Logger.h>
 #include <media/JetPlayer.h>
 
-#include <elastos/core/AutoLock.h>
-using Elastos::Core::AutoLock;
 using Elastos::Droid::Os::Looper;
+using Elastos::Core::AutoLock;
 using Elastos::Core::Math;
 using Elastos::Utility::Logging::Logger;
 
@@ -84,7 +83,8 @@ ECode CJetPlayer::NativeEventHandler::HandleMessage(
     CJetPlayer* jetPlayer = (CJetPlayer*)jet.Get();
     Object& lock = jetPlayer->mEventListenerLock;
     AutoPtr<IOnJetEventListener> listener;
-    {    AutoLock syncLock(lock);
+    {
+        AutoLock syncLock(lock);
         listener = jetPlayer->mJetEventListener;
     }
 
@@ -353,7 +353,8 @@ ECode CJetPlayer::SetEventListener(
     /* [in] */ IOnJetEventListener* listener,
     /* [in] */ IHandler* handler)
 {
-    {    AutoLock syncLock(mEventListenerLock);
+    {
+        AutoLock syncLock(mEventListenerLock);
         mJetEventListener = listener;
 
         if (listener == NULL) {

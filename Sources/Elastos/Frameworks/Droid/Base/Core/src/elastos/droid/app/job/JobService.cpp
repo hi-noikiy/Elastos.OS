@@ -19,7 +19,6 @@
 #include <elastos/core/AutoLock.h>
 #include <elastos/utility/logging/Logger.h>
 
-#include <elastos/core/AutoLock.h>
 using Elastos::Core::AutoLock;
 using Elastos::Droid::Os::CMessage;
 using Elastos::Utility::Logging::Logger;
@@ -173,7 +172,8 @@ CAR_INTERFACE_IMPL(JobService, Service, IJobService)
 /** @hide */
 ECode JobService::EnsureHandler()
 {
-    {    AutoLock syncLock(mHandlerLock);
+    {
+        AutoLock syncLock(mHandlerLock);
         if (mHandler == NULL) {
             AutoPtr<ILooper> looper;
             GetMainLooper((ILooper**)&looper);

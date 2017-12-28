@@ -336,7 +336,8 @@ void CProcessStatsService::WriteStateLocked(
     /* [in] */ Boolean sync,
     /* [in] */ Boolean commit)
 {
-    {    AutoLock syncLock(mPendingWriteLock);
+    {
+        AutoLock syncLock(mPendingWriteLock);
         Int64 now = SystemClock::GetUptimeMillis();
         if (mPendingWrite == NULL || !mPendingWriteCommitted) {
             mPendingWrite = NULL;
@@ -401,7 +402,8 @@ void CProcessStatsService::PerformWriteState()
     }
     AutoPtr<IParcel> data;
     AutoPtr<IAtomicFile> file;
-    {    AutoLock syncLock(mPendingWriteLock);
+    {
+        AutoLock syncLock(mPendingWriteLock);
         data = mPendingWrite;
         file = mPendingWriteFile;
         mPendingWriteCommitted = FALSE;
@@ -845,7 +847,8 @@ ECode CProcessStatsService::GetCurrentMemoryState(
     /* [out] */ Int32* state)
 {
     VALIDATE_NOT_NULL(state)
-    {    AutoLock syncLock(mAm);
+    {
+        AutoLock syncLock(mAm);
         *state = mLastMemOnlyState;
     }
     return NOERROR;
@@ -1210,7 +1213,8 @@ void CProcessStatsService::DumpInner(
             }
         }
         pw->Println();
-        {    AutoLock syncLock(mAm);
+        {
+            AutoLock syncLock(mAm);
             DumpFilteredProcessesCsvLocked(pw, String(NULL),
                     csvSepScreenStats, csvScreenStats, csvSepMemStats, csvMemStats,
                     csvSepProcStats, csvProcStats, now, reqPackage);
@@ -1399,7 +1403,8 @@ void CProcessStatsService::DumpInner(
                     dumpDetails, dumpFullDetails, dumpAll, activeOnly);
             sepNeeded = TRUE;
         }
-        {    AutoLock syncLock(mAm);
+        {
+            AutoLock syncLock(mAm);
             if (isCompact) {
                 mProcessStats->DumpCheckinLocked(pw, reqPackage);
             }

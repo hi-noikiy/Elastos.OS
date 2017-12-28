@@ -155,10 +155,11 @@ AutoPtr<ICountryDetector> CountryDetector::GetInstanceForTest(
     return (ICountryDetector*)detector;
 }
 
-CARAPI_(AutoPtr<ICountryDetector>) CountryDetector::GetInstance(
+AutoPtr<ICountryDetector> CountryDetector::GetInstance(
     /* [in] */ IContext* context)
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         if (sInstance == NULL) {
             AutoPtr<IContext> appContext;
             context->GetApplicationContext((IContext**)&appContext);

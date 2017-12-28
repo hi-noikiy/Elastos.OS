@@ -37,8 +37,6 @@
 #include <media/AudioRecord.h>
 #include <system/audio.h>
 
-#include <elastos/core/AutoLock.h>
-using Elastos::Core::AutoLock;
 using Elastos::Droid::App::CActivityThread;
 using Elastos::Droid::App::IAppOpsManager;
 using Elastos::Droid::Media::CAudioAttributesBuilder;
@@ -50,6 +48,7 @@ using Elastos::Droid::Os::EIID_IHandler;
 using Elastos::Droid::Os::Looper;
 using Elastos::Droid::Os::Process;
 using Elastos::Droid::Os::ServiceManager;
+using Elastos::Core::AutoLock;
 using Elastos::Core::ICharSequence;
 using Elastos::Core::StringBuilder;
 using Elastos::Core::StringUtils;
@@ -112,7 +111,8 @@ ECode CAudioRecord::NativeEventHandler::HandleMessage(
     AutoPtr<IAudioRecordOnRecordPositionUpdateListener> listener;
 
     Object& lock = mOwner->mPositionListenerLock;
-    {    AutoLock syncLock(lock);
+    {
+        AutoLock syncLock(lock);
         listener = mOwner->mPositionListener;
     }
 
@@ -318,7 +318,8 @@ ECode CAudioRecord::StartRecording() // throws IllegalStateException
     }
 
     // start recording
-    {    AutoLock syncLock(mRecordingStateLock);
+    {
+        AutoLock syncLock(mRecordingStateLock);
         Int32 result;
         NativeStart(IMediaSyncEvent::SYNC_EVENT_NONE, 0, &result);
         if (result == SUCCESS) {
@@ -350,7 +351,8 @@ ECode CAudioRecord::StartRecording( // throws IllegalStateException
     syncEvent->GetType(&tempValue1);
     syncEvent->GetAudioSessionId(&tempValue2);
 
-    {    AutoLock syncLock(mRecordingStateLock);
+    {
+        AutoLock syncLock(mRecordingStateLock);
         Int32 result;
         NativeStart(tempValue1, tempValue2, &result);
         if (result == SUCCESS) {
@@ -369,7 +371,8 @@ ECode CAudioRecord::Stop() // throws IllegalStateException
     }
 
     // stop recording
-    {    AutoLock syncLock(mRecordingStateLock);
+    {
+        AutoLock syncLock(mRecordingStateLock);
         HandleFullVolumeRec(FALSE);
 
         NativeStop();
@@ -463,7 +466,8 @@ ECode CAudioRecord::SetRecordPositionUpdateListener(
     /* [in] */ IAudioRecordOnRecordPositionUpdateListener* listener,
     /* [in] */ IHandler* handler)
 {
-    {    AutoLock syncLock(mPositionListenerLock);
+    {
+        AutoLock syncLock(mPositionListenerLock);
         mPositionListener = listener;
 
         if (listener != NULL) {
@@ -649,7 +653,8 @@ ECode CAudioRecord::GetRecordingState(
     /* [out] */ Int32* result)
 {
     VALIDATE_NOT_NULL(result);
-    {    AutoLock syncLock(mRecordingStateLock);
+    {
+        AutoLock syncLock(mRecordingStateLock);
         *result = mRecordingState;
     }
     return NOERROR;

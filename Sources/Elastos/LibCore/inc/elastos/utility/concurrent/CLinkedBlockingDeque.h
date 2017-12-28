@@ -398,7 +398,9 @@ public:
         /* [in] */ ArrayOf<IInterface*>* inArray,
         /* [out, callee] */ ArrayOf<IInterface*>** outArray);
 
-    String ToString();
+    using AbstractQueue::ToString;
+
+    CARAPI_(String) ToString();
 
     CARAPI Clear();
 

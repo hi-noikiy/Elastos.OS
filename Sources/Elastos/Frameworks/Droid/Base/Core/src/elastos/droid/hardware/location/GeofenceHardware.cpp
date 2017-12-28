@@ -22,7 +22,6 @@
 #include "elastos/droid/os/Build.h"
 #include <elastos/core/AutoLock.h>
 
-#include <elastos/core/AutoLock.h>
 using Elastos::Core::AutoLock;
 using Elastos::Droid::Os::Build;
 
@@ -351,7 +350,8 @@ ECode GeofenceHardware::UnregisterForMonitorStateChangeCallback(
 void GeofenceHardware::RemoveCallback(
     /* [in] */ IGeofenceHardwareCallback* _callback)
 {
-    {    AutoLock syncLock(mCallbacksLock);
+    {
+        AutoLock syncLock(mCallbacksLock);
         mCallbacks.Erase(_callback);
     }
 }
@@ -362,7 +362,8 @@ ECode GeofenceHardware::GetCallbackWrapper(
 {
     VALIDATE_NOT_NULL(wrapper);
 
-    {    AutoLock syncLock(mCallbacksLock);
+    {
+        AutoLock syncLock(mCallbacksLock);
         AutoPtr<GeofenceHardwareCallbackWrapper> _wrapper = mCallbacks[_callback];
         if (_wrapper == NULL) {
             _wrapper = new GeofenceHardwareCallbackWrapper(_callback, this);
@@ -378,7 +379,8 @@ ECode GeofenceHardware::GetCallbackWrapper(
 void GeofenceHardware::RemoveMonitorCallback(
     /* [in] */ IGeofenceHardwareMonitorCallback* _callback)
 {
-    {    AutoLock syncLock(mMonitorCallbacksLock);
+    {
+        AutoLock syncLock(mMonitorCallbacksLock);
         mMonitorCallbacks.Erase(_callback);
     }
 }
@@ -389,7 +391,8 @@ ECode GeofenceHardware::GetMonitorCallbackWrapper(
 {
     VALIDATE_NOT_NULL(wrapper);
 
-    {    AutoLock syncLock(mMonitorCallbacksLock);
+    {
+        AutoLock syncLock(mMonitorCallbacksLock);
         AutoPtr<GeofenceHardwareMonitorCallbackWrapper> _wrapper = mMonitorCallbacks[_callback];
         if (_wrapper == NULL) {
             _wrapper = new GeofenceHardwareMonitorCallbackWrapper(_callback);

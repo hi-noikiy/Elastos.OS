@@ -753,7 +753,8 @@ void CDownloadThread::CheckConnectivity()
 
 void CDownloadThread::CheckPausedOrCanceled()
 {
-    {    AutoLock syncLock(mInfo);
+    {
+        AutoLock syncLock(mInfo);
         AutoPtr<CDownloadInfo> _mInfo = (CDownloadInfo*)mInfo.Get();
         if (_mInfo->mControl == IDownloadsImpl::CONTROL_PAUSED) {
             // throw new StopRequestException(

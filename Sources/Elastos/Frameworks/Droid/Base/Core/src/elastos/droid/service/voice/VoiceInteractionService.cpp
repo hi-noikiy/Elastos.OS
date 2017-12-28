@@ -23,8 +23,6 @@
 #include <elastos/core/AutoLock.h>
 #include <elastos/utility/logging/Slogger.h>
 
-#include <elastos/core/AutoLock.h>
-using Elastos::Core::AutoLock;
 using Elastos::Droid::App::Service;
 using Elastos::Droid::Content::CComponentName;
 using Elastos::Droid::Content::IContentResolver;
@@ -216,7 +214,8 @@ ECode VoiceInteractionService::OnShutdown()
 
 ECode VoiceInteractionService::OnSoundModelsChangedInternal()
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         if (mHotwordDetector != NULL) {
             // TODO: Stop recognition if a sound model that was being recognized gets deleted.
             mHotwordDetector->OnSoundModelsChanged();
@@ -236,7 +235,8 @@ ECode VoiceInteractionService::CreateAlwaysOnHotwordDetector(
         Slogger::E("VoiceInteractionService", "Not available until onReady() is called");
         return E_ILLEGAL_STATE_EXCEPTION;
     }
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         // Allow only one concurrent recognition via the APIs.
         SafelyShutdownHotwordDetector();
         CAlwaysOnHotwordDetector::New(keyphrase, locale, callback, mKeyphraseEnrollmentInfo,
@@ -258,7 +258,8 @@ ECode VoiceInteractionService::GetKeyphraseEnrollmentInfo(
 
 ECode VoiceInteractionService::SafelyShutdownHotwordDetector()
 {
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         if (mHotwordDetector != NULL) {
             Boolean result;
             mHotwordDetector->StopRecognition(&result);

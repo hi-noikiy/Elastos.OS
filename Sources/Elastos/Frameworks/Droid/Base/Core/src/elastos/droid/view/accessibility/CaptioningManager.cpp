@@ -33,14 +33,13 @@
 #include <elastos/core/AutoLock.h>
 #include <elastos/core/StringUtils.h>
 
-#include <elastos/core/AutoLock.h>
-using Elastos::Core::AutoLock;
 using Elastos::Droid::Graphics::IColor;
 using Elastos::Droid::Graphics::Typeface;
 using Elastos::Droid::Os::CHandler;
 using Elastos::Droid::Provider::ISettingsSecure;
 using Elastos::Droid::Provider::Settings;
 using Elastos::Droid::Text::TextUtils;
+using Elastos::Core::AutoLock;
 using Elastos::Core::StringUtils;
 using Elastos::Utility::CArrayList;
 using Elastos::Utility::CLocale;
@@ -345,25 +344,25 @@ ECode CaptioningManager::CaptionStyle::GetCustomStyle(
 /* CaptioningManager::CaptioningChangeListener */
 CAR_INTERFACE_IMPL(CaptioningManager::CaptioningChangeListener, Object, ICaptioningManagerCaptioningChangeListener)
 
-CaptioningManager::CaptioningChangeListener::OnEnabledChanged(
+ECode CaptioningManager::CaptioningChangeListener::OnEnabledChanged(
     /* [in] */ Boolean enabled)
 {
     return NOERROR;
 }
 
-CaptioningManager::CaptioningChangeListener::OnUserStyleChanged(
+ECode CaptioningManager::CaptioningChangeListener::OnUserStyleChanged(
     /* [in] */ ICaptioningManagerCaptionStyle* userStyle)
 {
     return NOERROR;
 }
 
-CaptioningManager::CaptioningChangeListener::OnLocaleChanged(
+ECode CaptioningManager::CaptioningChangeListener::OnLocaleChanged(
     /* [in] */ ILocale* locale)
 {
     return NOERROR;
 }
 
-CaptioningManager::CaptioningChangeListener::OnFontScaleChanged(
+ECode CaptioningManager::CaptioningChangeListener::OnFontScaleChanged(
     /* [in] */ Float fontScale)
 {
     return NOERROR;
@@ -378,7 +377,7 @@ CaptioningManager::MyContentObserver::MyContentObserver(
 CaptioningManager::MyContentObserver::~MyContentObserver()
 {}
 
-CaptioningManager::MyContentObserver::OnChange(
+ECode CaptioningManager::MyContentObserver::OnChange(
     /* [in] */ Boolean selfChange,
     /* [in] */ IUri* uri)
 {
@@ -522,7 +521,8 @@ ECode CaptioningManager::GetUserStyle(
 ECode CaptioningManager::AddCaptioningChangeListener(
     /* [in] */ ICaptioningManagerCaptioningChangeListener* listener)
 {
-    {    AutoLock syncLock(mListeners);
+    {
+        AutoLock syncLock(mListeners);
         Boolean res;
         if (mListeners->IsEmpty(&res), res) {
             RegisterObserver(ISettingsSecure::ACCESSIBILITY_CAPTIONING_ENABLED);
@@ -553,7 +553,8 @@ void CaptioningManager::RegisterObserver(
 ECode CaptioningManager::RemoveCaptioningChangeListener(
     /* [in] */ ICaptioningManagerCaptioningChangeListener* listener)
 {
-    {    AutoLock syncLock(mListeners);
+    {
+        AutoLock syncLock(mListeners);
         mListeners->Remove(listener);
 
         Boolean res;
@@ -568,7 +569,8 @@ void CaptioningManager::NotifyEnabledChanged()
 {
     Boolean enabled;
     IsEnabled(&enabled);
-    {    AutoLock syncLock(mListeners);
+    {
+        AutoLock syncLock(mListeners);
         Int32 size;
         mListeners->GetSize(&size);
         for(Int32 i = 0; i < size; i++) {
@@ -585,7 +587,8 @@ void CaptioningManager::NotifyUserStyleChanged()
 {
     AutoPtr<ICaptioningManagerCaptionStyle> userStyle;
     GetUserStyle((ICaptioningManagerCaptionStyle**)&userStyle);
-    {    AutoLock syncLock(mListeners);
+    {
+        AutoLock syncLock(mListeners);
         Int32 size;
         mListeners->GetSize(&size);
         for(Int32 i = 0; i < size; i++) {
@@ -602,7 +605,8 @@ void CaptioningManager::NotifyLocaleChanged()
 {
     AutoPtr<ILocale> locale;
     GetLocale((ILocale**)&locale);
-    {    AutoLock syncLock(mListeners);
+    {
+        AutoLock syncLock(mListeners);
         Int32 size;
         mListeners->GetSize(&size);
         for(Int32 i = 0; i < size; i++) {
@@ -619,7 +623,8 @@ void CaptioningManager::NotifyFontScaleChanged()
 {
     Float fontScale;
     GetFontScale(&fontScale);
-    {    AutoLock syncLock(mListeners);
+    {
+        AutoLock syncLock(mListeners);
         Int32 size;
         mListeners->GetSize(&size);
         for(Int32 i = 0; i < size; i++) {

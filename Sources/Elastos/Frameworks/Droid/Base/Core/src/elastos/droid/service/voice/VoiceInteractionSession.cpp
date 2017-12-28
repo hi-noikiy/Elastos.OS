@@ -774,7 +774,8 @@ ECode VoiceInteractionSession::NewRequest(
     /* [out] */ IVoiceInteractionSessionRequest** request)
 {
     VALIDATE_NOT_NULL(request)
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         AutoPtr<IVoiceInteractionSessionRequest> req;
         CVoiceInteractionSessionRequest::New(callback, this, (IVoiceInteractionSessionRequest**)&req);
         AutoPtr<Request> _req = (Request*)req.Get();
@@ -790,7 +791,8 @@ ECode VoiceInteractionSession::RemoveRequest(
     /* [out] */ IVoiceInteractionSessionRequest** request)
 {
     VALIDATE_NOT_NULL(request)
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         AutoPtr<IInterface> obj;
         mActiveRequests->Get(reqInterface, (IInterface**)&obj);
         AutoPtr<IVoiceInteractionSessionRequest> req = IVoiceInteractionSessionRequest::Probe(obj);

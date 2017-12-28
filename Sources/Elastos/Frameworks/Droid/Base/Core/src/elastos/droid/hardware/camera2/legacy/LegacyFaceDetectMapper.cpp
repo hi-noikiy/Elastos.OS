@@ -70,7 +70,8 @@ ECode LegacyFaceDetectMapper::MyListener::OnFaceDetection(
 {
     Int32 lengthFaces = faces == NULL ? 0 : faces->GetLength();
     Object& _lock = mHost->mLock;
-    {    AutoLock syncLock(_lock);
+    {
+        AutoLock syncLock(_lock);
         if (mHost->mFaceDetectEnabled) {
             mHost->mFaces = faces;
         }
@@ -194,7 +195,8 @@ ECode LegacyFaceDetectMapper::ProcessFaceDetectMode(
 
     Boolean enableFaceDetect = (fdMode != ICameraMetadata::STATISTICS_FACE_DETECT_MODE_OFF)
             || (sceneMode == ICameraMetadata::CONTROL_SCENE_MODE_FACE_PRIORITY);
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         // Enable/disable face detection if it's changed since last time
         if (enableFaceDetect != mFaceDetectEnabled) {
             if (enableFaceDetect) {
@@ -233,7 +235,8 @@ ECode LegacyFaceDetectMapper::MapResultFaces(
     AutoPtr<ArrayOf<ICameraFace*> > previousFaces;
     Int32 fdMode = 0;
     Boolean fdScenePriority = FALSE;
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         fdMode = mFaceDetectReporting ?
                 ICameraMetadata::STATISTICS_FACE_DETECT_MODE_SIMPLE :
                 ICameraMetadata::STATISTICS_FACE_DETECT_MODE_OFF;

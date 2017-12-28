@@ -659,7 +659,8 @@ ECode AudioSystem::GetParameters(
 ECode AudioSystem::SetErrorCallback(
     /* [in] */ IAudioSystemErrorCallback* cb)
 {
-    {    AutoLock syncLock(sLock);
+    {
+        AutoLock syncLock(sLock);
         sErrorCallback = cb;
         if (cb != NULL) {
             Int32 val;

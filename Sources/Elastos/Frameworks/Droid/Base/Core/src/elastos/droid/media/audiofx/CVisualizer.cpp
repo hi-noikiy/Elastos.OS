@@ -22,7 +22,6 @@
 
 #include <media/Visualizer.h>
 
-#include <elastos/core/AutoLock.h>
 using Elastos::Core::AutoLock;
 using Elastos::Core::IByte;
 using Elastos::Core::CByte;

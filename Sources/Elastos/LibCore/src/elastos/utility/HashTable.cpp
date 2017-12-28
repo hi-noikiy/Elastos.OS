@@ -20,7 +20,6 @@
 #include "HashTable.h"
 #include "AutoLock.h"
 
-#include <elastos/core/AutoLock.h>
 using Elastos::Core::AutoLock;
 using Elastos::Core::IFloat;
 using Elastos::Core::CFloat;
@@ -949,7 +948,8 @@ ECode HashTable::IsEmpty(
 {
     VALIDATE_NOT_NULL(value)
 
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
        *value = mSize == 0;
     }
     return NOERROR;
@@ -960,7 +960,8 @@ ECode HashTable::GetSize(
 {
     VALIDATE_NOT_NULL(value)
 
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         *value = mSize;
     }
     return NOERROR;
@@ -972,7 +973,8 @@ ECode HashTable::Get(
 {
     VALIDATE_NOT_NULL(outface)
 
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         // Doug Lea's supplemental secondaryHash function (inlined)
         Int32 hash = Object::GetHashCode(key);
         hash ^= ((UInt32)hash >> 20) ^ ((UInt32)hash >> 12);
@@ -1004,7 +1006,8 @@ ECode HashTable::ContainsKey(
         return E_NULL_POINTER_EXCEPTION;
     }
 
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         // Doug Lea's supplemental secondaryHash function (inlined)
         Int32 hash = Object::GetHashCode(key);
         hash ^= ((UInt32)hash >> 20) ^ ((UInt32)hash >> 12);
@@ -1032,7 +1035,8 @@ ECode HashTable::ContainsValue(
     VALIDATE_NOT_NULL(result)
     *result = FALSE;
 
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         if (value == NULL) {
             // throw new NullPointerException("value == null");
             return E_NULL_POINTER_EXCEPTION;
@@ -1065,7 +1069,8 @@ ECode HashTable::Put(
     /* [in] */ IInterface* value,
     /* [out] */ IInterface** outface)
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         if (key == NULL || value == NULL) {
             if (outface) {
                 *outface = NULL;
@@ -1151,7 +1156,8 @@ ECode HashTable::PutAll(
         return E_NULL_POINTER_EXCEPTION;
     }
 
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         Int32 sizelen = 0;
         map->GetSize(&sizelen);
         EnsureCapacity(sizelen);
@@ -1280,7 +1286,8 @@ ECode HashTable::Remove(
         return E_NULL_POINTER_EXCEPTION;
     }
 
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         Int32 keyhash = Object::GetHashCode(key);
         Int32 hash = SecondaryHash(keyhash);
         AutoPtr<ArrayOf<HashtableEntry*> > tab = mTable;
@@ -1315,7 +1322,8 @@ ECode HashTable::Remove(
 
 ECode HashTable::Clear()
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         if (mSize != 0) {
             // Arrays.fill(table, null);
             for (Int32 i = 0; i < mTable->GetLength(); ++i) {
@@ -1333,7 +1341,8 @@ ECode HashTable::GetKeySet(
 {
     VALIDATE_NOT_NULL(keySet)
 
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         AutoPtr<ISet> ks = mKeySet;
         *keySet = ks != NULL ? ks : (mKeySet = (ISet*) new _KeySet(this));
         REFCOUNT_ADD(*keySet);
@@ -1346,7 +1355,8 @@ ECode HashTable::GetValues(
 {
     VALIDATE_NOT_NULL(value)
 
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         AutoPtr<ICollection> vs = mValues;
         *value = vs != NULL ? vs : (mValues = (ICollection*) new _Values(this));
         REFCOUNT_ADD(*value);
@@ -1359,7 +1369,8 @@ ECode HashTable::GetEntrySet(
 {
     VALIDATE_NOT_NULL(entries)
 
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         AutoPtr<ISet> es = mEntrySet;
         *entries = (es != NULL) ? es : (mEntrySet = (ISet*) new _EntrySet(this));
         REFCOUNT_ADD(*entries);
@@ -1372,7 +1383,8 @@ ECode HashTable::GetKeys(
 {
     VALIDATE_NOT_NULL(enm)
 
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         AutoPtr<IEnumeration> res = (IEnumeration*) new KeyEnumeration(this);
         *enm = res;
         REFCOUNT_ADD(*enm);
@@ -1385,7 +1397,8 @@ ECode HashTable::GetElements(
 {
     VALIDATE_NOT_NULL(enm)
 
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         AutoPtr<IEnumeration> res = (IEnumeration*) new ValueEnumeration(this);
         *enm = res;
         REFCOUNT_ADD(*enm);
@@ -1397,7 +1410,8 @@ Boolean HashTable::ContainsMapping(
     /* [in] */ IInterface* key,
     /* [in] */ IInterface* value)
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         Int32 keycode = Object::GetHashCode(key);
         Int32 hash = SecondaryHash(keycode);
         AutoPtr<ArrayOf<HashtableEntry*> > tab = mTable;
@@ -1417,7 +1431,8 @@ Boolean HashTable::RemoveMapping(
     /* [in] */ IInterface* key,
     /* [in] */ IInterface* value)
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         Int32 keycode = Object::GetHashCode(key);
         Int32 hash = SecondaryHash(keycode);
         AutoPtr<ArrayOf<HashtableEntry*> > tab = mTable;
@@ -1449,7 +1464,8 @@ ECode HashTable::Equals(
 {
     VALIDATE_NOT_NULL(result)
 
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         AutoPtr<IMap> res = (IMap*) object->Probe(EIID_IMap);
         AutoPtr<ISet> outarr;
         AutoPtr<ISet> outarr2;
@@ -1465,7 +1481,8 @@ ECode HashTable::GetHashCode(
 {
     VALIDATE_NOT_NULL(hashCode)
 
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         Int32 result = 0;
         AutoPtr<ISet> outset;
         GetEntrySet((ISet**)&outset);
@@ -1501,7 +1518,8 @@ ECode HashTable::ToString(
     StringBuilder result;
     result.AppendChar('{');
 
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         AutoPtr<ISet> outarr;
         GetEntrySet((ISet**)&outarr);
         AutoPtr<IIterator> i;
@@ -1564,7 +1582,8 @@ ECode HashTable::WriteObject(
     /* [in] */ IObjectOutputStream* stream)
 {
     // Emulate loadFactor field for other implementations to read
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         AutoPtr<IObjectOutputStreamPutField> fields;
         stream->PutFields((IObjectOutputStreamPutField**)&fields);
         fields->Put(String("threshold"),  (Int32) (DEFAULT_LOAD_FACTOR * mTable->GetLength()));

@@ -244,7 +244,8 @@ AutoPtr<IBatteryStats> CBatteryStatsHelper::StatsFromFile(
     /* [in] */ IContext* context,
     /* [in] */ const String& fname)
 {
-    {    AutoLock syncLock(sFileXfer);
+    {
+        AutoLock syncLock(sFileXfer);
         AutoPtr<IFile> path = MakeFilePath(context, fname);
         AutoPtr<IInterface> value;
         IMap::Probe(sFileXfer)->Get(path, (IInterface**)&value);

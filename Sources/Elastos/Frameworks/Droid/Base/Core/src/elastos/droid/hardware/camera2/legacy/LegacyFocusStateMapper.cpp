@@ -25,7 +25,6 @@
 #include <elastos/utility/Objects.h>
 #include <elastos/utility/logging/Logger.h>
 
-#include <elastos/core/AutoLock.h>
 using Elastos::Core::AutoLock;
 using Elastos::Droid::Hardware::Camera2::Utils::ParamsUtils;
 using Elastos::Droid::Internal::Utility::Preconditions;
@@ -57,7 +56,7 @@ LegacyFocusStateMapper::MyMoveCallback::MyMoveCallback(
 {
 }
 
-LegacyFocusStateMapper::MyMoveCallback::OnAutoFocusMoving(
+ECode LegacyFocusStateMapper::MyMoveCallback::OnAutoFocusMoving(
     /* [in] */ Boolean start,
     /* [in] */ IHardwareCamera* camera)
 {
@@ -247,7 +246,8 @@ ECode LegacyFocusStateMapper::ProcessRequestTriggers(
             }
 
             Int32 currentAfRun;
-            {    AutoLock syncLock(mLock);
+            {
+                AutoLock syncLock(mLock);
                 currentAfRun = ++mAfRun;
                 mAfState = afStateAfterStart;
             }
@@ -268,10 +268,12 @@ ECode LegacyFocusStateMapper::ProcessRequestTriggers(
         }
         case ICameraMetadata::CONTROL_AF_TRIGGER_CANCEL:
         {
-            {    AutoLock syncLock(mLock);
+            {
+                AutoLock syncLock(mLock);
                 Int32 updatedAfRun;
 
-                {    AutoLock syncLock(mLock);
+                {
+                    AutoLock syncLock(mLock);
                     updatedAfRun = ++mAfRun;
                     mAfState = ICameraMetadata::CONTROL_AF_STATE_INACTIVE;
                 }
@@ -301,7 +303,8 @@ ECode LegacyFocusStateMapper::MapResultTriggers(
     FAIL_RETURN(Preconditions::CheckNotNull(result, String("result must not be null")))
 
     Int32 newAfState = 0;
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         newAfState = mAfState;
     }
 

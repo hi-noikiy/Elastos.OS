@@ -17,7 +17,6 @@
 #include "Authenticator.h"
 #include "AutoLock.h"
 
-#include <elastos/core/AutoLock.h>
 using Elastos::Core::AutoLock;
 
 namespace Elastos {
@@ -96,7 +95,8 @@ ECode Authenticator::RequestPasswordAuthentication(
 {
     VALIDATE_NOT_NULL(passwordAuthentication)
 
-    {    AutoLock syncLock(sLock);
+    {
+        AutoLock syncLock(sLock);
         // SecurityManager sm = System.getSecurityManager();
         // if (sm != null) {
         //     sm.checkPermission(requestPasswordAuthenticationPermission);
@@ -142,7 +142,8 @@ ECode Authenticator::RequestPasswordAuthentication(
 {
     VALIDATE_NOT_NULL(passwordAuthentication)
 
-    {    AutoLock syncLock(sLock);
+    {
+        AutoLock syncLock(sLock);
         // SecurityManager sm = System.getSecurityManager();
         // if (sm != null) {
         //     sm.checkPermission(requestPasswordAuthenticationPermission);

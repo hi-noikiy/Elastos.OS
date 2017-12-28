@@ -146,7 +146,8 @@ Int32 AppOpsPolicy::StringToControl(
 ECode AppOpsPolicy::ReadPolicy()
 {
     AutoPtr<IFileInputStream> stream;
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         ECode ec = CFileInputStream::New(mFile, (IFileInputStream**)&stream);
         if (FAILED(ec)) {
             Slogger::I(TAG, "App ops policy file (%s) not found; Skipping.", TO_CSTR(mFile));

@@ -19,7 +19,6 @@
 #include "elastos/droid/os/CHandler.h"
 #include <elastos/core/AutoLock.h>
 
-#include <elastos/core/AutoLock.h>
 using Elastos::Core::AutoLock;
 using Elastos::Droid::Os::EIID_IIdleHandler;
 using Elastos::Droid::Os::ConditionVariable;
@@ -118,7 +117,8 @@ ECode RequestHandlerThread::HasAnyMessages(
     mHandler->GetLooper((ILooper**)&lopper);
     AutoPtr<IMessageQueue> queue;
     lopper->GetQueue((IMessageQueue**)&queue);
-    {    AutoLock syncLock(queue);
+    {
+        AutoLock syncLock(queue);
         for (Int32 i = 0; i < what->GetLength(); i++) {
             Int32 j = (*what)[i];
             Boolean result;
@@ -141,7 +141,8 @@ ECode RequestHandlerThread::RemoveMessages(
     mHandler->GetLooper((ILooper**)&lopper);
     AutoPtr<IMessageQueue> queue;
     lopper->GetQueue((IMessageQueue**)&queue);
-    {    AutoLock syncLock(queue);
+    {
+        AutoLock syncLock(queue);
         for (Int32 i = 0; i < what->GetLength(); i++) {
             Int32 j = (*what)[i];
             mHandler->RemoveMessages(j);

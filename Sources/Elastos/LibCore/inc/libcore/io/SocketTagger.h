@@ -71,6 +71,10 @@ class SocketTaggerInner
     : public SocketTagger
 {
 public:
+    using SocketTagger::Tag;
+
+    using SocketTagger::Untag;
+
     CARAPI Tag(
         /* [in] */ IFileDescriptor* socketDescriptor);
 

@@ -4104,7 +4104,8 @@ void Settings::RemoveUserLPw(
 void Settings::RemoveCrossProfileIntentFiltersLPw(
     /* [in] */ Int32 userId)
 {
-    {    AutoLock syncLock(mCrossProfileIntentResolversLock);
+    {
+        AutoLock syncLock(mCrossProfileIntentResolversLock);
         // userId is the source user
         if (mCrossProfileIntentResolvers.Find(userId) != mCrossProfileIntentResolvers.End()) {
             mCrossProfileIntentResolvers.Erase(userId);

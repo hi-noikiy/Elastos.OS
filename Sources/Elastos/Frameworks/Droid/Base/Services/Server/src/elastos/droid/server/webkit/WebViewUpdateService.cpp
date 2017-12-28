@@ -22,8 +22,6 @@
 #include <elastos/core/AutoLock.h>
 #include <Elastos.Droid.Content.h>
 
-#include <elastos/core/AutoLock.h>
-using Elastos::Core::AutoLock;
 using Elastos::Droid::Os::Binder;
 using Elastos::Droid::Os::Process;
 using Elastos::Droid::Os::EIID_IBinder;
@@ -33,6 +31,7 @@ using Elastos::Droid::Content::CIntentFilter;
 using Elastos::Droid::Webkit::EIID_IIWebViewUpdateService;
 using Elastos::Droid::Webkit::IWebViewFactory;
 using Elastos::Droid::Webkit::CWebViewFactory;
+using Elastos::Core::AutoLock;
 using Elastos::Core::ISynchronize;
 using Elastos::Core::ISystem;
 using Elastos::Core::CSystem;
@@ -71,7 +70,8 @@ ECode WebViewUpdateService::BinderService::NotifyRelroCreationCompleted(
         return NOERROR;
     }
 
-    {    AutoLock syncLock(mHost);
+    {
+        AutoLock syncLock(mHost);
         if (is64Bit) {
             mHost->mRelroReady64Bit = TRUE;
         } else {
@@ -181,7 +181,8 @@ void WebViewUpdateService::OnWebViewUpdateInstalled()
 {
     Slogger::D(TAG, "WebView Package updated!");
 
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         mRelroReady32Bit = FALSE;
         mRelroReady64Bit = FALSE;
     }

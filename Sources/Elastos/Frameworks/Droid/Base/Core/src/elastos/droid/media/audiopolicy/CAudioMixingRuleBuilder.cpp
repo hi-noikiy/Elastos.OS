@@ -19,8 +19,6 @@
 #include "elastos/droid/media/audiopolicy/CAudioMixingRule.h"
 #include <elastos/core/AutoLock.h>
 
-#include <elastos/core/AutoLock.h>
-using Elastos::Core::AutoLock;
 using Elastos::Core::AutoLock;
 using Elastos::Utility::CArrayList;
 using Elastos::Utility::IIterator;
@@ -64,7 +62,8 @@ ECode CAudioMixingRuleBuilder::AddRule(
         // throw new IllegalArgumentException("Illegal rule value " + rule);
         return E_ILLEGAL_ARGUMENT_EXCEPTION;
     }
-    {    AutoLock syncLock(mCriteria);
+    {
+        AutoLock syncLock(mCriteria);
         AutoPtr<IIterator> crIterator;
         mCriteria->GetIterator((IIterator**)&crIterator);
         Boolean b;

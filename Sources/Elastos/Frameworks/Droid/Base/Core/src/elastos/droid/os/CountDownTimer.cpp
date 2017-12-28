@@ -20,7 +20,6 @@
 #include "elastos/droid/os/SystemClock.h"
 #include <elastos/core/AutoLock.h>
 
-#include <elastos/core/AutoLock.h>
 using Elastos::Core::AutoLock;
 using Elastos::Core::ISynchronize;
 using Elastos::Core::EIID_ISynchronize;
@@ -98,7 +97,8 @@ ECode CountDownTimer::MyHandler::HandleMessage(
     ISynchronize* sync = ISynchronize::Probe(obj);
     CountDownTimer* ctd = (CountDownTimer*)sync;
 
-    {    AutoLock syncLock(obj);
+    {
+        AutoLock syncLock(obj);
         if (ctd->mCancelled) {
             return NOERROR;
         }

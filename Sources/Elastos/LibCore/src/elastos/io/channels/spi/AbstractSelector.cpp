@@ -139,7 +139,8 @@ ECode AbstractSelector::End()
 ECode AbstractSelector::Cancel(
     /* [in] */ ISelectionKey* key)
 {
-    {    AutoLock syncLock(mCancelledKeySet);
+    {
+        AutoLock syncLock(mCancelledKeySet);
         Boolean isflag = FALSE;
         mCancelledKeySet->Add(key, &isflag);
     }

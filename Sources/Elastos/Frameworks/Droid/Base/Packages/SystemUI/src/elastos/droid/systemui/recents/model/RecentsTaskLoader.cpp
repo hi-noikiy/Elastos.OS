@@ -100,7 +100,8 @@ void RecentsTaskLoader::TaskResourceLoadQueue::AddTasks(
             IQueue::Probe(mQueue)->Add(t);
         }
     }
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         NotifyAll();
     }
 }
@@ -112,7 +113,8 @@ void RecentsTaskLoader::TaskResourceLoadQueue::AddTask(
     if (IQueue::Probe(mQueue)->Contains(t, &b), !b) {
         IQueue::Probe(mQueue)->Add(t);
     }
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         NotifyAll();
     }
 }
@@ -180,7 +182,8 @@ void RecentsTaskLoader::TaskResourceLoader::Start(
     mCancelled = FALSE;
     mSystemServicesProxy = new SystemServicesProxy(context);
     // Notify the load thread to start loading
-    {    AutoLock syncLock(mLoadThread);
+    {
+        AutoLock syncLock(mLoadThread);
         ISynchronize::Probe(mLoadThread)->NotifyAll();
     }
 }
@@ -205,7 +208,8 @@ ECode RecentsTaskLoader::TaskResourceLoader::Run()
             // when we call stop()
             mContext = NULL;
             // If we are cancelled, then wait until we are started again
-            {    AutoLock syncLock(mLoadThread);
+            {
+                AutoLock syncLock(mLoadThread);
                 ECode ec = ISynchronize::Probe(mLoadThread)->Wait();
                 if (FAILED(ec)) {
                     return E_INTERRUPTED_EXCEPTION;

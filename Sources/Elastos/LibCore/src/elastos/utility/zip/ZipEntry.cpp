@@ -39,16 +39,16 @@ namespace Zip {
 CAR_INTERFACE_IMPL(ZipEntry, Object, IZipEntry, ICloneable)
 
 ZipEntry::ZipEntry()
-    : mCrc(-1)
-    , mCompressedSize(-1)
-    , mSize(-1)
+    : mCrc(-1LL)
+    , mCompressedSize(-1LL)
+    , mSize(-1LL)
     , mCompressionMethod(-1)
     , mTime(-1)
     , mModDate(-1)
     , mExtra(NULL)
     , mNameLength(-1)
-    , mLocalHeaderRelOffset(-1)
-    , mDataOffset(-1)
+    , mLocalHeaderRelOffset(-1LL)
+    , mDataOffset(-1LL)
 {}
 
 ZipEntry::~ZipEntry()
@@ -133,7 +133,7 @@ ECode ZipEntry::constructor(
     Int32 sig;
     it->ReadInt32(&sig);
     if (sig != IZipConstants::CENSIG) {
-        ALOGE("ZipException: ZipEntry::constructor Central Directory Entry not found., sig:%d,CENSIG:%d", sig, IZipConstants::CENSIG);
+        ALOGE("ZipException: ZipEntry::constructor Central Directory Entry not found., sig:%d,CENSIG:%lld", sig, IZipConstants::CENSIG);
         return E_ZIP_EXCEPTION;
 //         throw new ZipException("Central Directory Entry not found");
     }

@@ -23,7 +23,6 @@
 #include <elastos/utility/logging/Logger.h>
 #include <elastos/core/AutoLock.h>
 
-#include <elastos/core/AutoLock.h>
 using Elastos::Core::AutoLock;
 using Elastos::Droid::Os::EIID_IBinder;
 using Elastos::Droid::Internal::Os::CHandlerCaller;
@@ -419,7 +418,8 @@ AutoPtr<IVoiceInteractorRequest> VoiceInteractor::PullRequest(
     /* [in] */ Boolean complete)
 {
     AutoPtr<IVoiceInteractorRequest> req;
-    {    AutoLock syncLock(mActiveRequestsLock);
+    {
+        AutoLock syncLock(mActiveRequestsLock);
         HashMap<AutoPtr<IBinder>, AutoPtr<IVoiceInteractorRequest> >::Iterator it;
         AutoPtr<IBinder> binder = IBinder::Probe(request);
         it = mActiveRequests.Find(binder);
@@ -515,7 +515,8 @@ ECode VoiceInteractor::SubmitRequest(
     request->mContext = mContext;
     request->mActivity = mActivity;
 
-    {    AutoLock syncLock(mActiveRequestsLock);
+    {
+        AutoLock syncLock(mActiveRequestsLock);
         AutoPtr<IBinder> binder = IBinder::Probe(ireq);
         mActiveRequests[binder] = vir;
     }

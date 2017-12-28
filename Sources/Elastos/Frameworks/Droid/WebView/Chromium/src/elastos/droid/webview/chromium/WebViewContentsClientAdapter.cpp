@@ -41,8 +41,6 @@
 #include "elastos/core/CoreUtils.h"
 #include <elastos/utility/logging/Logger.h>
 
-#include <elastos/core/AutoLock.h>
-using Elastos::Core::AutoLock;
 using Elastos::Droid::Content::CIntentHelper;
 using Elastos::Droid::Content::IIntent;
 using Elastos::Droid::Content::IIntentHelper;

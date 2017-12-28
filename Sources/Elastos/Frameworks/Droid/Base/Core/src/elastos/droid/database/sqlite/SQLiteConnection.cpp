@@ -257,7 +257,8 @@ Int32 SQLiteConnection::OperationLog::BeginOperation(
     /* [in] */ ArrayOf<IInterface*>* bindArgs)
 {
     AutoPtr<Operation> operation;
-    {    AutoLock syncLock(mOperationsLock);
+    {
+        AutoLock syncLock(mOperationsLock);
         Int32 index = (mIndex + 1) % MAX_RECENT_OPERATIONS;
         operation = (*mOperations)[index];
         if (operation == NULL) {
@@ -306,7 +307,8 @@ void SQLiteConnection::OperationLog::FailOperation(
     /* [in] */ Int32 cookie,
     /* [in] */ ECode ec)
 {
-    {    AutoLock syncLock(mOperationsLock);
+    {
+        AutoLock syncLock(mOperationsLock);
         AutoPtr<Operation> operation = GetOperationLocked(cookie);
         if (operation != NULL) {
             operation->mException = ec;
@@ -317,7 +319,8 @@ void SQLiteConnection::OperationLog::FailOperation(
 void SQLiteConnection::OperationLog::EndOperation(
     /* [in] */ Int32 cookie)
 {
-    {    AutoLock syncLock(mOperationsLock);
+    {
+        AutoLock syncLock(mOperationsLock);
         if (EndOperationDeferLogLocked(cookie)) {
             LogOperationLocked(cookie, String(NULL));
         }
@@ -328,7 +331,8 @@ Boolean SQLiteConnection::OperationLog::EndOperationDeferLog(
     /* [in] */ Int32 cookie)
 {
     Boolean ret = FALSE;
-    {    AutoLock syncLock(mOperationsLock);
+    {
+        AutoLock syncLock(mOperationsLock);
         ret = EndOperationDeferLogLocked(cookie);
     }
     return ret;
@@ -338,7 +342,8 @@ void SQLiteConnection::OperationLog::LogOperation(
     /* [in] */ Int32 cookie,
     /* [in] */ const String& detail)
 {
-    {    AutoLock syncLock(mOperationsLock);
+    {
+        AutoLock syncLock(mOperationsLock);
         LogOperationLocked(cookie, detail);
     }
 }
@@ -388,7 +393,8 @@ AutoPtr<SQLiteConnection::Operation> SQLiteConnection::OperationLog::GetOperatio
 
 String SQLiteConnection::OperationLog::DescribeCurrentOperation()
 {
-    {    AutoLock syncLock(mOperationsLock);
+    {
+        AutoLock syncLock(mOperationsLock);
         AutoPtr<Operation> operation = (*mOperations)[mIndex];
         if (operation != NULL && !operation->mFinished) {
             StringBuilder msg;
@@ -403,7 +409,8 @@ void SQLiteConnection::OperationLog::Dump(
     /* [in] */ IPrinter* printer,
     /* [in] */ Boolean verbose)
 {
-    {    AutoLock syncLock(mOperationsLock);
+    {
+        AutoLock syncLock(mOperationsLock);
         printer->Println(String("  Most recently executed operations:"));
         Int32 index = mIndex;
         AutoPtr<Operation> operation = (*mOperations)[mIndex];
@@ -713,7 +720,7 @@ void SQLiteConnection::NativeFinalizeStatement(
     // We ignore the result of sqlite3_finalize because it is really telling us about
     // whether any errors occurred while executing the statement.  The statement itself
     // is always finalized regardless.
-    // Slogger::V(TAG, "Finalized statement %p on connection %p", statement, connection->db);
+    Slogger::V(TAG, "Finalized statement %p on connection %p", statement, connection->db);
     sqlite3_finalize(statement);
 }
 

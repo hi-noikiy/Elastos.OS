@@ -129,7 +129,8 @@ ECode BaseObj::GetName(
 void BaseObj::HelpDestroy()
 {
     Boolean shouldDestroy = FALSE;
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         if (!mDestroyed) {
             shouldDestroy = TRUE;
             mDestroyed = TRUE;

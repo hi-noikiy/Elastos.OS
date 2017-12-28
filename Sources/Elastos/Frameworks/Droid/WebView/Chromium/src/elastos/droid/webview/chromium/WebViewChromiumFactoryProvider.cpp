@@ -43,8 +43,6 @@
 #include "elastos/core/Thread.h"
 #include <elastos/utility/logging/Logger.h>
 
-#include <elastos/core/AutoLock.h>
-using Elastos::Core::AutoLock;
 using Elastos::Droid::App::CActivityManagerHelper;
 using Elastos::Droid::App::CActivityThreadHelper;
 using Elastos::Droid::App::IActivityManagerHelper;

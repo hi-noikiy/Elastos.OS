@@ -20,7 +20,6 @@
 #include <elastos/core/Math.h>
 #include <elastos/utility/logging/Slogger.h>
 
-#include <elastos/core/AutoLock.h>
 using Elastos::Core::AutoLock;
 using Elastos::Utility::Concurrent::ITimeUnitHelper;
 using Elastos::Utility::Concurrent::CTimeUnitHelper;
@@ -79,7 +78,8 @@ ECode RankingReconsideration::Run()
         Work();
 
         mState = DONE;
-        {    AutoLock syncLock(this);
+        {
+            AutoLock syncLock(this);
             NotifyAll();
         }
     }

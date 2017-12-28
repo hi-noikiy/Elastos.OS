@@ -29,8 +29,6 @@
 #include "elastos/droid/provider/Settings.h"
 #include <elastos/core/AutoLock.h>
 
-#include <elastos/core/AutoLock.h>
-using Elastos::Core::AutoLock;
 using Elastos::Droid::Content::EIID_IContentResolver;
 using Elastos::Droid::Database::IContentObserver;
 using Elastos::Droid::Database::IIContentObserver;
@@ -40,6 +38,7 @@ using Elastos::Droid::Provider::Settings;
 using Elastos::Droid::Provider::ISettingsSystem;
 using Elastos::Droid::Text::CNoCopySpanConcrete;
 using Elastos::Droid::View::IKeyCharacterMap;
+using Elastos::Core::AutoLock;
 
 
 namespace Elastos {
@@ -476,7 +475,8 @@ ECode TextKeyListener::GetPrefs(
     /* [out] */ Int32* ret)
 {
     VALIDATE_NOT_NULL(ret)
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         if (!mPrefsInited || mResolver == NULL) {
             InitPrefs(context);
         }
@@ -484,14 +484,6 @@ ECode TextKeyListener::GetPrefs(
 
     *ret = mPrefs;
     return NOERROR;
-}
-
-ECode TextKeyListener::ClearMetaKeyState(
-    /* [in] */ IView* view,
-    /* [in] */ IEditable* content,
-    /* [in] */ Int32 states)
-{
-    return E_NOT_IMPLEMENTED;
 }
 
 } // namespace Method

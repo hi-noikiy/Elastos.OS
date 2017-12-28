@@ -3887,7 +3887,8 @@ Boolean Editor::IsPositionVisible(
     /* [in] */ Float positionX,
     /* [in] */ Float positionY)
 {
-    {    AutoLock syncLock(TEMP_POSITION_OBJECT);
+    {
+        AutoLock syncLock(TEMP_POSITION_OBJECT);
         AutoLock lock(mTempPositionLock);
         AutoPtr<ArrayOf<Float> > position = TEMP_POSITION;
         (*position)[0] = positionX;

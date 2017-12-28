@@ -20,11 +20,10 @@
 #include "elastos/droid/server/wm/DisplayContent.h"
 #include <Elastos.Droid.Internal.h>
 #include "elastos/droid/R.h"
+#include <elastos/core/AutoLock.h>
 #include <elastos/core/Math.h>
 #include <elastos/utility/logging/Slogger.h>
 
-#include <elastos/core/AutoLock.h>
-using Elastos::Core::AutoLock;
 using Elastos::Droid::Animation::IObjectAnimator;
 using Elastos::Droid::Animation::IObjectAnimatorHelper;
 using Elastos::Droid::Animation::CObjectAnimatorHelper;
@@ -72,6 +71,7 @@ using Elastos::Droid::View::CViewConfigurationHelper;
 using Elastos::Droid::View::IWindowInfoHelper;
 using Elastos::Droid::View::CWindowInfoHelper;
 using Elastos::Droid::View::Animation::CDecelerateInterpolator;
+using Elastos::Core::AutoLock;
 using Elastos::Utility::CArrayList;
 using Elastos::Utility::IIterator;
 using Elastos::Utility::Logging::Slogger;
@@ -241,7 +241,8 @@ void AccessibilityController::DisplayMagnifier::MagnifiedViewport::ViewportWindo
     /* [in] */ Boolean shown,
     /* [in] */ Boolean animate)
 {
-    {    AutoLock syncLock(mHost->mHost->mWindowManagerService->mWindowMapLock);
+    {
+        AutoLock syncLock(mHost->mHost->mWindowManagerService->mWindowMapLock);
         if (mShown == shown) {
             return;
         }
@@ -262,7 +263,8 @@ Int32 AccessibilityController::DisplayMagnifier::MagnifiedViewport::ViewportWind
 void AccessibilityController::DisplayMagnifier::MagnifiedViewport::ViewportWindow::SetAlpha(
     /* [in] */ Int32 alpha)
 {
-    {    AutoLock syncLock(mHost->mHost->mWindowManagerService->mWindowMapLock);
+    {
+        AutoLock syncLock(mHost->mHost->mWindowManagerService->mWindowMapLock);
         if (mAlpha == alpha) {
             return;
         }
@@ -277,7 +279,8 @@ void AccessibilityController::DisplayMagnifier::MagnifiedViewport::ViewportWindo
 void AccessibilityController::DisplayMagnifier::MagnifiedViewport::ViewportWindow::SetBounds(
     /* [in] */ IRegion* bounds)
 {
-    {    AutoLock syncLock(mHost->mHost->mWindowManagerService->mWindowMapLock);
+    {
+        AutoLock syncLock(mHost->mHost->mWindowManagerService->mWindowMapLock);
         Boolean equals;
         if (IObject::Probe(mBounds)->Equals(bounds, &equals), equals) {
             return;
@@ -293,7 +296,8 @@ void AccessibilityController::DisplayMagnifier::MagnifiedViewport::ViewportWindo
 
 void AccessibilityController::DisplayMagnifier::MagnifiedViewport::ViewportWindow::UpdateSize()
 {
-    {    AutoLock syncLock(mHost->mHost->mWindowManagerService->mWindowMapLock);
+    {
+        AutoLock syncLock(mHost->mHost->mWindowManagerService->mWindowMapLock);
         AutoPtr<IDisplay> display;
         mHost->mWindowManager->GetDefaultDisplay((IDisplay**)&display);
         display->GetRealSize(mHost->mTempPoint);
@@ -320,7 +324,8 @@ void AccessibilityController::DisplayMagnifier::MagnifiedViewport::ViewportWindo
 
 void AccessibilityController::DisplayMagnifier::MagnifiedViewport::ViewportWindow::DrawIfNeeded()
 {
-    {    AutoLock syncLock(mHost->mHost->mWindowManagerService->mWindowMapLock);
+    {
+        AutoLock syncLock(mHost->mHost->mWindowManagerService->mWindowMapLock);
         if (!mInvalidated) {
             return;
         }
@@ -715,7 +720,8 @@ ECode AccessibilityController::DisplayMagnifier::MyHandler::HandleMessage(
         } break;
 
         case MESSAGE_SHOW_MAGNIFIED_REGION_BOUNDS_IF_NEEDED : {
-            {    AutoLock syncLock(mHost->mWindowManagerService->mWindowMapLock);
+            {
+                AutoLock syncLock(mHost->mWindowManagerService->mWindowMapLock);
                 if (mHost->mMagnifedViewport->IsMagnifyingLocked()) {
                     mHost->mMagnifedViewport->SetMagnifiedRegionBorderShownLocked(TRUE, TRUE);
                     mHost->mWindowManagerService->ScheduleAnimationLocked();
@@ -1031,7 +1037,8 @@ void AccessibilityController::WindowsForAccessibilityObserver::ComputeChangedWin
         Slogger::I(TAG, "computeChangedWindows()");
     }
 
-    {    AutoLock syncLock(mWindowManagerService->mWindowMapLock);
+    {
+        AutoLock syncLock(mWindowManagerService->mWindowMapLock);
         // Do not send the windows if there is no current focus as
         // the window manager is still looking for where to put it.
         // We will do the work when we get a focus change callback.

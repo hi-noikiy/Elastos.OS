@@ -23,8 +23,6 @@
 #include <elastos/core/StringUtils.h>
 #include <elastos/utility/logging/Slogger.h>
 
-#include <elastos/core/AutoLock.h>
-using Elastos::Core::AutoLock;
 using Elastos::Droid::Hardware::EIID_ISensorEventListener;
 using Elastos::Droid::Os::IMessage;
 using Elastos::Droid::Os::CMessageHelper;
@@ -32,6 +30,7 @@ using Elastos::Droid::Os::IMessageHelper;
 using Elastos::Droid::Os::IBatteryManager;
 using Elastos::Droid::Os::SystemClock;
 using Elastos::Droid::Utility::TimeUtils;
+using Elastos::Core::AutoLock;
 using Elastos::Core::StringBuilder;
 using Elastos::Core::StringUtils;
 using Elastos::Utility::Logging::Slogger;
@@ -66,7 +65,8 @@ ECode WirelessChargerDetector::MySensorEventListener::OnSensorChanged(
     /* [in] */ ISensorEvent* event)
 {
     Object& lock = mHost->mLock;
-    {    AutoLock syncLock(lock);
+    {
+        AutoLock syncLock(lock);
         AutoPtr< ArrayOf<Float> > values;
         event->GetValues((ArrayOf<Float>**)&values);
         mHost->ProcessSampleLocked((*values)[0], (*values)[1], (*values)[2]);
@@ -93,7 +93,8 @@ WirelessChargerDetector::MyRunnable::MyRunnable(
 ECode WirelessChargerDetector::MyRunnable::Run()
 {
     Object& lock = mHost->mLock;
-    {    AutoLock syncLock(lock);
+    {
+        AutoLock syncLock(lock);
         mHost->FinishDetectionLocked();
     }
     return NOERROR;
@@ -135,7 +136,8 @@ WirelessChargerDetector::WirelessChargerDetector(
 void WirelessChargerDetector::Dump(
     /* [in] */ IPrintWriter* pw)
 {
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         pw->Println();
         pw->Println(String("Wireless Charger Detector State:"));
         StringBuilder buider;
@@ -182,7 +184,8 @@ Boolean WirelessChargerDetector::Update(
     /* [in] */ Int32 plugType,
     /* [in] */ Int32 batteryLevel)
 {
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
 
         Boolean wasPoweredWirelessly = mPoweredWirelessly;
 

@@ -31,14 +31,13 @@
 #include <utils/String8.h>
 #include <utils/threads.h>
 
-#include <elastos/core/AutoLock.h>
-using Elastos::Core::AutoLock;
 using Elastos::Droid::Content::IContentResolver;
 using Elastos::Droid::Content::Res::IAssetFileDescriptor;
 using Elastos::Droid::Graphics::BitmapConfig;
 using Elastos::Droid::Graphics::CBitmap;
 using Elastos::Droid::Net::Uri;
 using Elastos::Droid::Os::IBinderForDroidObject;
+using Elastos::Core::AutoLock;
 using Elastos::IO::ICloseable;
 using Elastos::IO::CFileInputStream;
 using Elastos::IO::IFileInputStream;

@@ -507,7 +507,8 @@ ECode AlarmManagerService::BinderService::UpdateBlockedUids(
         return NOERROR;
     }
 
-    {    AutoLock syncLock(mHost->mLock);
+    {
+        AutoLock syncLock(mHost->mLock);
         if(isBlocked) {
             mHost->mBlockedUids->Add(CoreUtils::Convert(uid));
             if (mHost->CheckReleaseWakeLock()) {
@@ -973,7 +974,8 @@ ECode AlarmManagerService::AlarmThread::Run()
             mHost->RemoveImpl(mHost->mTimeTickSender);
             mHost->RebatchAllAlarms();
             mHost->mClockReceiver->ScheduleTimeTickEvent();
-            {    AutoLock syncLock(mHost->mLock);
+            {
+                AutoLock syncLock(mHost->mLock);
                 mHost->mNumTimeChanged++;
             }
 
@@ -985,7 +987,8 @@ ECode AlarmManagerService::AlarmThread::Run()
             context->SendBroadcastAsUser(intent, UserHandle::ALL);
         }
 
-        {    AutoLock syncLock(mHost->mLock);
+        {
+            AutoLock syncLock(mHost->mLock);
             Int64 nowRTC;
             system->GetCurrentTimeMillis(&nowRTC);
             Int64 nowELAPSED = SystemClock::GetElapsedRealtime();
@@ -1095,7 +1098,8 @@ ECode AlarmManagerService::AlarmHandler::HandleMessage(
     if (what == ALARM_EVENT) {
         AutoPtr<IArrayList> triggerList;
         CArrayList::New((IArrayList**)&triggerList);
-        {    AutoLock syncLock(mHost->mLock);
+        {
+            AutoLock syncLock(mHost->mLock);
             Int64 nowRTC;
             system->GetCurrentTimeMillis(&nowRTC);
             Int64 nowELAPSED = SystemClock::GetElapsedRealtime();
@@ -1324,7 +1328,8 @@ ECode AlarmManagerService::InteractiveStateReceiver::OnReceive(
     /* [in] */ IContext* context,
     /* [in] */ IIntent* intent)
 {
-    {    AutoLock syncLock(mHost->mLock);
+    {
+        AutoLock syncLock(mHost->mLock);
         String action;
         intent->GetAction(&action);
         mHost->InteractiveStateChangedLocked(action.Equals(IIntent::ACTION_SCREEN_ON));
@@ -1370,7 +1375,8 @@ ECode AlarmManagerService::UninstallReceiver::OnReceive(
     /* [in] */ IContext* context,
     /* [in] */ IIntent* intent)
 {
-    {    AutoLock syncLock(mHost->mLock);
+    {
+        AutoLock syncLock(mHost->mLock);
         String action;
         intent->GetAction(&action);
         AutoPtr<ArrayOf<String> > pkgList;
@@ -1465,7 +1471,8 @@ ECode AlarmManagerService::ResultReceiver::OnSendFinished(
     /* [in] */ const String& resultData,
     /* [in] */ IBundle* resultExtras)
 {
-    {    AutoLock syncLock(mHost->mLock);
+    {
+        AutoLock syncLock(mHost->mLock);
         Int32 uid = 0;
         Int32 size = 0;
         mHost->mInFlight->GetSize(&size);
@@ -2074,7 +2081,8 @@ void AlarmManagerService::SetTimeZoneImpl(
     // Prevent reentrant calls from stepping on each other when writing
     // the time zone property
     Boolean timeZoneWasChanged = FALSE;
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         AutoPtr<ISystemProperties> sysProp;
         CSystemProperties::AcquireSingleton((ISystemProperties**)&sysProp);
         String current;
@@ -2193,7 +2201,8 @@ ECode AlarmManagerService::SetImpl(
         }
     }
 
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         // if (DEBUG_BATCH) {
         //     Slogger::V(TAG, "Set(" + operation + ") : type=" + type
         //             + " triggerAtTime=" + triggerAtTime + " win=" + windowLength
@@ -2551,7 +2560,8 @@ AutoPtr<AlarmManagerService::Batch> AlarmManagerService::FindFirstRtcWakeupBatch
 AutoPtr<IAlarmClockInfo> AlarmManagerService::GetNextAlarmClockImpl(
     /* [in] */ Int32 userId)
 {
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         AutoPtr<IInterface> obj;
         mNextAlarmClockForUser->Get(userId, (IInterface**)&obj);
         IAlarmClockInfo* info = IAlarmClockInfo::Probe(obj);
@@ -2667,7 +2677,8 @@ void AlarmManagerService::SendNextAlarmClockChanged()
     AutoPtr<ISparseArray> pendingUsers = mHandlerSparseAlarmClockArray;
     pendingUsers->Clear();
 
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         Int32 N;
         mPendingSendNextAlarmClockChangedForUser->GetSize(&N);
         for (Int32 i = 0; i < N; i++) {

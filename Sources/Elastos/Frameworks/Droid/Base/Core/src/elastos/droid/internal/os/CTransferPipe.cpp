@@ -22,8 +22,6 @@
 #include <elastos/core/StringBuilder.h>
 #include <elastos/utility/logging/Slogger.h>
 
-#include <elastos/core/AutoLock.h>
-using Elastos::Core::AutoLock;
 using Elastos::Droid::Os::SystemClock;
 using Elastos::Droid::Os::EIID_IBinder;
 using Elastos::Droid::Os::IParcelFileDescriptorHelper;

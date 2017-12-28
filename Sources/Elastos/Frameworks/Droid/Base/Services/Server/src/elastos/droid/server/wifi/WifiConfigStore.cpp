@@ -1267,7 +1267,8 @@ ECode WifiConfigStore::EnableNetwork(
     } else {
         if (VDBG) LocalLog(String("enableNetwork(disableOthers=false) "), netId);
         AutoPtr<IWifiConfiguration> enabledNetwork;
-        {    AutoLock syncLock(mConfiguredNetworks);
+        {
+            AutoLock syncLock(mConfiguredNetworks);
             AutoPtr<IInterface> obj;
             mConfiguredNetworks->Get(CoreUtils::Convert(netId), (IInterface**)&obj);
             enabledNetwork = IWifiConfiguration::Probe(obj);
@@ -5596,7 +5597,8 @@ void WifiConfigStore::LocalLog(
     }
 
     AutoPtr<IWifiConfiguration> config;
-    {    AutoLock syncLock(mConfiguredNetworks);
+    {
+        AutoLock syncLock(mConfiguredNetworks);
         AutoPtr<IInterface> p;
         mConfiguredNetworks->Get(CoreUtils::Convert(netId), (IInterface**)&p);
         config = IWifiConfiguration::Probe(p);

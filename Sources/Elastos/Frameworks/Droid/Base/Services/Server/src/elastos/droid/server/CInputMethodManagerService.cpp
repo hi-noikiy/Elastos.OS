@@ -50,8 +50,6 @@
 #include <Elastos.CoreLibrary.IO.h>
 #include <Elastos.CoreLibrary.Utility.h>
 
-#include <elastos/core/AutoLock.h>
-using Elastos::Core::AutoLock;
 using Elastos::Droid::R;
 using Elastos::Droid::App::IDialog;
 using Elastos::Droid::App::AppGlobals;
@@ -132,6 +130,7 @@ using Elastos::Droid::Utility::CParcelableList;
 using Elastos::Droid::Utility::Xml;
 using Elastos::Droid::Server::Wm::EIID_IOnHardKeyboardStatusChangeListener;
 
+using Elastos::Core::AutoLock;
 using Elastos::Core::CoreUtils;
 using Elastos::Core::StringUtils;
 using Elastos::Core::StringBuilder;
@@ -274,7 +273,7 @@ CInputMethodManagerService::ClientState::ClientState(
             mUid, mPid, (IInputBinding**)&mBinding));
 }
 
-CInputMethodManagerService::ClientState::ToString(
+ECode CInputMethodManagerService::ClientState::ToString(
     /* [out] */ String* str)
 {
     VALIDATE_NOT_NULL(str)
@@ -344,7 +343,8 @@ ECode CInputMethodManagerService::SettingsObserver::OnChange(
 {
     AutoPtr<IUri> showImeUri;
     Settings::Secure::GetUriFor(ISettingsSecure::SHOW_IME_WITH_HARD_KEYBOARD, (IUri**)&showImeUri);
-    {    AutoLock syncLock(mHost->mMethodMap.Get());
+    {
+        AutoLock syncLock(mHost->mMethodMap.Get());
         if (Object::Equals(showImeUri, uri)) {
             mHost->UpdateKeyboardFromSettingsLocked();
         }
@@ -1230,7 +1230,8 @@ ECode CInputMethodManagerService::constructor(
     UpdateCurrentProfileIds();
     mFileManager = new InputMethodFileManager(mMethodMap, userId, this);
 
-    {    AutoLock syncLock(mMethodMap.Get());
+    {
+        AutoLock syncLock(mMethodMap.Get());
         AutoPtr<IInputMethodSubtypeSwitchingControllerHelper> helper;
         CInputMethodSubtypeSwitchingControllerHelper::AcquireSingleton(
             (IInputMethodSubtypeSwitchingControllerHelper**)&helper);
@@ -1246,7 +1247,8 @@ ECode CInputMethodManagerService::constructor(
     }
     mImeSelectedOnBoot = !TextUtils::IsEmpty(defaultImiId);
 
-    {    AutoLock syncLock(mMethodMap.Get());
+    {
+        AutoLock syncLock(mMethodMap.Get());
         BuildInputMethodListLocked(mMethodList, mMethodMap,
             !mImeSelectedOnBoot /* resetDefaultEnabledIme */);
     }
@@ -1254,13 +1256,15 @@ ECode CInputMethodManagerService::constructor(
 
    if (!mImeSelectedOnBoot) {
         Slogger::W(TAG, "No IME selected. Choose the most applicable IME.");
-        {    AutoLock syncLock(mMethodMap.Get());
+        {
+            AutoLock syncLock(mMethodMap.Get());
             ResetDefaultImeLocked(context);
         }
    }
     mSettingsObserver = new SettingsObserver();
     mSettingsObserver->constructor(mHandler, this);
-    {    AutoLock syncLock(mMethodMap.Get());
+    {
+        AutoLock syncLock(mMethodMap.Get());
         UpdateFromSettingsLocked(TRUE);
     }
 
@@ -3417,7 +3421,8 @@ ECode CInputMethodManagerService::ShouldOfferSwitchingToNextInputMethod(
     if (!CalledFromValidUser()) {
         return NOERROR;
     }
-    {    AutoLock syncLock(mMethodMap.Get());
+    {
+        AutoLock syncLock(mMethodMap.Get());
         if (!CalledWithValidToken(token)) {
             Int32 uid = Binder::GetCallingUid();
             Slogger::E(TAG, "Ignoring shouldOfferSwitchingToNextInputMethod due to an invalid "
@@ -3551,7 +3556,8 @@ ECode CInputMethodManagerService::NotifyUserAction(
     if (DEBUG) {
         Slogger::D(TAG, "Got the notification of a user action. sequenceNumber:%d", sequenceNumber);
     }
-    {    AutoLock syncLock(mMethodMap.Get());
+    {
+        AutoLock syncLock(mMethodMap.Get());
         if (mCurUserActionNotificationSequenceNumber != sequenceNumber) {
             if (DEBUG) {
                 Slogger::D(TAG, "Ignoring the user action notification due to the sequence number "
@@ -3574,7 +3580,8 @@ ECode CInputMethodManagerService::SetInputMethodWithSubtypeId(
     /* [in] */ const String& id,
     /* [in] */ Int32 subtypeId)
 {
-    {    AutoLock syncLock(mMethodMap.Get());
+    {
+        AutoLock syncLock(mMethodMap.Get());
         return SetInputMethodWithSubtypeIdLocked(token, id, subtypeId);
     }
     return NOERROR;

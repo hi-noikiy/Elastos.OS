@@ -24,7 +24,6 @@
 #include "elastos/droid/view/WindowIdFocusObserver.h"
 #include <elastos/core/AutoLock.h>
 
-#include <elastos/core/AutoLock.h>
 using Elastos::Core::AutoLock;
 
 namespace Elastos {
@@ -48,7 +47,8 @@ ECode CWindowIdFocusObserver::FocusGained(
     WindowIdFocusObserver* observer = (WindowIdFocusObserver*)mObserver.Get();
     AutoPtr<IWindowId> token;
     AutoPtr<IHashMap> map = observer->mRegistrations;
-    {    AutoLock syncLock(map);
+    {
+        AutoLock syncLock(map);
         AutoPtr<IInterface> obj;
         map->Get(inputToken, (IInterface**)&obj);
         token = IWindowId::Probe(obj);
@@ -70,7 +70,8 @@ ECode CWindowIdFocusObserver::FocusLost(
     WindowIdFocusObserver* observer = (WindowIdFocusObserver*)mObserver.Get();
     AutoPtr<IWindowId> token;
     AutoPtr<IHashMap> map = observer->mRegistrations;
-    {    AutoLock syncLock(map);
+    {
+        AutoLock syncLock(map);
         AutoPtr<IInterface> obj;
         map->Get(inputToken, (IInterface**)&obj);
         token = IWindowId::Probe(obj);

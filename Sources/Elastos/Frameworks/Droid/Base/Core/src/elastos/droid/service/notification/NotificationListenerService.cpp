@@ -24,8 +24,6 @@
 #include <elastos/core/AutoLock.h>
 #include <elastos/utility/logging/Logger.h>
 
-#include <elastos/core/AutoLock.h>
-using Elastos::Core::AutoLock;
 using Elastos::Droid::App::CNotificationBuilder;
 using Elastos::Droid::App::INotification;
 using Elastos::Droid::App::INotificationBuilder;
@@ -697,7 +695,8 @@ ECode NotificationListenerService::RankingMap::ReadFromParcel(
 Int32 NotificationListenerService::RankingMap::GetRank(
     /* [in] */ const String& key)
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         if (mRanks == NULL) {
             BuildRanksLocked();
         }
@@ -727,7 +726,8 @@ Boolean NotificationListenerService::RankingMap::IsAmbient(
 Boolean NotificationListenerService::RankingMap::IsIntercepted(
     /* [in] */ const String& key)
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         if (mIntercepted == NULL) {
             BuildInterceptedSetLocked();
         }
@@ -742,7 +742,8 @@ Boolean NotificationListenerService::RankingMap::IsIntercepted(
 Int32 NotificationListenerService::RankingMap::GetVisibilityOverride(
     /* [in] */ const String& key)
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         if (mVisibilityOverrides == NULL) {
             BuildVisibilityOverridesLocked();
         }

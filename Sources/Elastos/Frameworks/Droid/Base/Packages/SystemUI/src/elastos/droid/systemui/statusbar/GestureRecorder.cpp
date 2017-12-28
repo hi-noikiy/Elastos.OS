@@ -21,12 +21,11 @@
 #include <elastos/core/StringUtils.h>
 #include <elastos/utility/logging/Logger.h>
 
-#include <elastos/core/AutoLock.h>
-using Elastos::Core::AutoLock;
 using Elastos::Droid::Os::SystemClock;
 using Elastos::Droid::View::CMotionEventHelper;
 using Elastos::Droid::View::IInputEvent;
 using Elastos::Droid::View::IMotionEventHelper;
+using Elastos::Core::AutoLock;
 using Elastos::Core::CString;
 using Elastos::Core::IAppendable;
 using Elastos::Core::ICharSequence;
@@ -232,7 +231,8 @@ GestureRecorder::GestureRecorder(
 void GestureRecorder::Add(
     /* [in] */ IMotionEvent* ev)
 {
-    {    AutoLock syncLock(mGestures);
+    {
+        AutoLock syncLock(mGestures);
         if (mCurrentGesture == NULL || mCurrentGesture->IsComplete()) {
             mCurrentGesture = new Gesture();
             mGestures->Add((IObject*)mCurrentGesture->Probe(EIID_IObject));
@@ -247,7 +247,8 @@ void GestureRecorder::Tag(
     /* [in] */ const String& tag,
     /* [in] */ const String& info)
 {
-    {    AutoLock syncLock(mGestures);
+    {
+        AutoLock syncLock(mGestures);
         if (mCurrentGesture == NULL) {
             mCurrentGesture = new Gesture();
             mGestures->Add((IObject*)mCurrentGesture->Probe(EIID_IObject));
@@ -311,7 +312,8 @@ String GestureRecorder::ToJsonLocked()
 String GestureRecorder::ToJson()
 {
     String s;
-    {    AutoLock syncLock(mGestures);
+    {
+        AutoLock syncLock(mGestures);
         s = ToJsonLocked();
     }
     return s;
@@ -327,7 +329,8 @@ void GestureRecorder::SaveLater()
 void GestureRecorder::Save()
 {
     String log;
-    {    AutoLock syncLock(mGestures);
+    {
+        AutoLock syncLock(mGestures);
         AutoPtr<IFileWriter> writer;
         CFileWriter::New(mLogfile, /*append=*/ TRUE, (IFileWriter**)&writer);
         AutoPtr<IBufferedWriter> w;

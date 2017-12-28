@@ -18,7 +18,6 @@
 #include "AutoLock.h"
 #include "Arrays.h"
 
-#include <elastos/core/AutoLock.h>
 using Elastos::Core::AutoLock;
 using Elastos::Utility::Arrays;
 
@@ -119,7 +118,8 @@ CARAPI ByteArrayInputStream::Read(
     VALIDATE_NOT_NULL(buffer)
     VALIDATE_NOT_NULL(number)
 
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         FAIL_RETURN(Arrays::CheckOffsetAndCount(buffer->GetLength(), byteOffset, byteCount));
 
         // Are there any bytes available?

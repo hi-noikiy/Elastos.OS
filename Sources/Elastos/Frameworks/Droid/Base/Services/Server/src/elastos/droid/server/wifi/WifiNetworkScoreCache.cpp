@@ -22,13 +22,12 @@
 #include "elastos/core/AutoLock.h"
 #include <elastos/utility/logging/Logger.h>
 
-#include <elastos/core/AutoLock.h>
-using Elastos::Core::AutoLock;
 using Elastos::Droid::Net::EIID_IINetworkScoreCache;
 using Elastos::Droid::Net::IRssiCurve;
 using Elastos::Droid::Net::IWifiKey;
 using Elastos::Droid::Net::INetworkKey;
 using Elastos::Droid::Os::EIID_IBinder;
+using Elastos::Core::AutoLock;
 using Elastos::Core::CoreUtils;
 using Elastos::Core::StringBuilder;
 using Elastos::Utility::CHashMap;
@@ -70,7 +69,8 @@ ECode WifiNetworkScoreCache::UpdateScores(
     networks->GetSize(&size);
     Logger::E(TAG, "updateScores list size=%d", size);
 
-    {    AutoLock syncLock(mNetworkCache);
+    {
+        AutoLock syncLock(mNetworkCache);
         for (Int32 i = 0; i < size; ++i) {
             AutoPtr<IInterface> obj;
             networks->Get(i, (IInterface**)&obj);
@@ -85,8 +85,9 @@ ECode WifiNetworkScoreCache::UpdateScores(
 
 ECode WifiNetworkScoreCache::ClearScores()
 {
-    {    AutoLock syncLock(mNetworkCache);
-         mNetworkCache->Clear();
+    {
+        AutoLock syncLock(mNetworkCache);
+        mNetworkCache->Clear();
     }
     return NOERROR;
 }
@@ -100,7 +101,8 @@ ECode WifiNetworkScoreCache::IsScoredNetwork(
     if (key.IsNull()) return FALSE;
 
     //find it
-    {    AutoLock syncLock(mNetworkCache);
+    {
+        AutoLock syncLock(mNetworkCache);
         AutoPtr<IInterface> obj;
         mNetworkCache->Get(CoreUtils::Convert(key), (IInterface**)&obj);
         IScoredNetwork* network = IScoredNetwork::Probe(obj);
@@ -127,7 +129,8 @@ ECode WifiNetworkScoreCache::GetNetworkScore(
     }
 
     //find it
-    {    AutoLock syncLock(mNetworkCache);
+    {
+        AutoLock syncLock(mNetworkCache);
         AutoPtr<IInterface> obj;
         mNetworkCache->Get(CoreUtils::Convert(key), (IInterface**)&obj);
         IScoredNetwork* network = IScoredNetwork::Probe(obj);
@@ -166,7 +169,8 @@ ECode WifiNetworkScoreCache::GetNetworkScore(
     }
 
     //find it
-    {    AutoLock syncLock(mNetworkCache);
+    {
+        AutoLock syncLock(mNetworkCache);
         AutoPtr<IInterface> obj;
         mNetworkCache->Get(CoreUtils::Convert(key), (IInterface**)&obj);
         IScoredNetwork* network = IScoredNetwork::Probe(obj);

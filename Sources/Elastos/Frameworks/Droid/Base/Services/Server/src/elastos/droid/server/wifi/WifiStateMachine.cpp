@@ -5388,7 +5388,8 @@ ECode WifiStateMachine::SyncGetBatchedScanResultsList(
     /* [out] */ IList** result)
 {
     VALIDATE_NOT_NULL(result)
-    {    AutoLock syncLock(mBatchedScanResults);
+    {
+        AutoLock syncLock(mBatchedScanResults);
         Int32 size;
         mBatchedScanResults->GetSize(&size);
         AutoPtr<IArrayList> batchedScanList;
@@ -5646,7 +5647,8 @@ ECode WifiStateMachine::SyncGetDhcpResults(
     /* [out] */ IDhcpResults** result)
 {
     VALIDATE_NOT_NULL(result)
-    {    AutoLock syncLock(mDhcpResultsLock);
+    {
+        AutoLock syncLock(mDhcpResultsLock);
         CDhcpResults::New(mDhcpResults, result);
     }
     return NOERROR;
@@ -6018,7 +6020,8 @@ ECode WifiStateMachine::SyncSaveConfig(
 ECode WifiStateMachine::UpdateBatteryWorkSource(
     /* [in] */ IWorkSource* newSource)
 {
-    {    AutoLock syncLock(mRunningWifiUids);
+    {
+        AutoLock syncLock(mRunningWifiUids);
         // try {
         if (newSource != NULL) {
             mRunningWifiUids->Set(newSource);
@@ -8015,7 +8018,8 @@ void WifiStateMachine::RetrieveBatchedScanData()
     CIntent::New(IWifiManager::BATCHED_SCAN_RESULTS_AVAILABLE_ACTION, (IIntent**)&intent);
     intent->AddFlags(IIntent::FLAG_RECEIVER_REGISTERED_ONLY_BEFORE_BOOT);
 
-    {    AutoLock syncLock(mBatchedScanResults);
+    {
+        AutoLock syncLock(mBatchedScanResults);
         mBatchedScanResults->Clear();
         AutoPtr<IBatchedScanResult> batchedScanResult;
         CBatchedScanResult::New((IBatchedScanResult**)&batchedScanResult);
@@ -9595,7 +9599,8 @@ void WifiStateMachine::UpdateLinkProperties(
     }
 
     // IPv4 routes, DNS servers and domains come from mDhcpResults.
-    {    AutoLock syncLock(mDhcpResultsLock);
+    {
+        AutoLock syncLock(mDhcpResultsLock);
         // Even when we're using static configuration, we don't need to look at the config
         // store, because static IP configuration also populates mDhcpResults.
         if ((mDhcpResults != NULL) && (lp->HasIPv4Address(&b), b)) {
@@ -9762,17 +9767,18 @@ void WifiStateMachine::UpdateLinkProperties(
 
 void WifiStateMachine::ClearLinkProperties()
 {
-     // Clear the link properties obtained from DHCP and netlink.
-     {    AutoLock syncLock(mDhcpResultsLock);
-         if (mDhcpResults != NULL) {
-             mDhcpResults->Clear();
-         }
-     }
-     mNetlinkTracker->ClearLinkProperties();
+    // Clear the link properties obtained from DHCP and netlink.
+    {
+        AutoLock syncLock(mDhcpResultsLock);
+        if (mDhcpResults != NULL) {
+            mDhcpResults->Clear();
+        }
+    }
+    mNetlinkTracker->ClearLinkProperties();
 
-     // Now clear the merged link properties.
-     mLinkProperties->Clear();
-     if (mNetworkAgent != NULL) mNetworkAgent->SendLinkProperties(mLinkProperties);
+    // Now clear the merged link properties.
+    mLinkProperties->Clear();
+    if (mNetworkAgent != NULL) mNetworkAgent->SendLinkProperties(mLinkProperties);
 }
 
 String WifiStateMachine::UpdateDefaultRouteMacAddress(
@@ -10087,7 +10093,8 @@ void WifiStateMachine::HandleIPv4Success(
         //Logger::E("link address " + dhcpResults.ipAddress);
     }
 
-    {    AutoLock syncLock(mDhcpResultsLock);
+    {
+        AutoLock syncLock(mDhcpResultsLock);
         mDhcpResults = dhcpResults;
     }
 
@@ -10164,10 +10171,11 @@ void WifiStateMachine::HandleSuccessfulIpConfiguration()
 void WifiStateMachine::HandleIPv4Failure(
     /* [in] */ Int32 reason)
 {
-    {    AutoLock syncLock(mDhcpResultsLock);
-         if (mDhcpResults != NULL) {
-             mDhcpResults->Clear();
-         }
+    {
+        AutoLock syncLock(mDhcpResultsLock);
+        if (mDhcpResults != NULL) {
+            mDhcpResults->Clear();
+        }
     }
     if (PDBG) {
         Loge(String("wifistatemachine handleIPv4Failure"));

@@ -1147,7 +1147,8 @@ ECode CResources::GetDrawableForDensity(
     AutoPtr<IDrawable> res;
     LoadDrawable(value, id, theme, (IDrawable**)&res);
 
-    {    AutoLock syncLock(mAccessLock);
+    {
+        AutoLock syncLock(mAccessLock);
         if (mTmpValue == NULL) {
             mTmpValue = (CTypedValue*)value.Get();
         }
@@ -2190,7 +2191,8 @@ Boolean CResources::VerifyPreloadConfig(
 
 ECode CResources::UpdateStringCache()
 {
-    {    AutoLock syncLock(mAccessLock);
+    {
+        AutoLock syncLock(mAccessLock);
         mAssets->RecreateStringBlocks();
     }
     return NOERROR;
@@ -2476,7 +2478,7 @@ AutoPtr<IDrawable> CResources::GetCachedDrawableLocked(
     if (entry != NULL) {
         AutoPtr<IDrawable> dr;
         entry->NewDrawable(this, (IDrawable**)&dr);
-        return NOERROR;
+        return dr;
     }
     return NULL;
 }
@@ -2766,7 +2768,8 @@ ECode CResources::LoadXmlResourceParser(
 ECode CResources::RecycleCachedStyledAttributes(
     /* [in] */ CTypedArray* attrs)
 {
-    {    AutoLock syncLock(mAccessLock);
+    {
+        AutoLock syncLock(mAccessLock);
         AutoPtr<CTypedArray> cached = mCachedStyledAttributes;
         if (cached == NULL || cached->mData->GetLength() < attrs->mData->GetLength()) {
             mCachedStyledAttributes = attrs;

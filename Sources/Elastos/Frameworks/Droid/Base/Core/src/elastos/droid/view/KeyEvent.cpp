@@ -25,15 +25,15 @@
 #include "elastos/droid/view/CKeyEvent.h"
 #include "elastos/droid/view/KeyCharacterMap.h"
 #include "elastos/droid/utility/CSparseInt32Array.h"
-#include <input/Input.h>
+#include <elastos/core/AutoLock.h>
 #include <elastos/core/StringBuilder.h>
 #include <elastos/utility/logging/Logger.h>
 #include <elastos/core/StringUtils.h>
+#include <input/Input.h>
 
-#include <elastos/core/AutoLock.h>
-using Elastos::Core::AutoLock;
 using Elastos::Droid::Text::Method::IMetaKeyKeyListener;
 using Elastos::Droid::Utility::CSparseInt32Array;
+using Elastos::Core::AutoLock;
 using Elastos::Core::StringUtils;
 using Elastos::Core::StringBuilder;
 using Elastos::Utility::Logging::Logger;
@@ -472,7 +472,8 @@ ECode KeyEvent::constructor(
 AutoPtr<IKeyEvent> KeyEvent::Obtain()
 {
     AutoPtr<IKeyEvent> ev;
-    {    AutoLock syncLock(gRecyclerLock);
+    {
+        AutoLock syncLock(gRecyclerLock);
         ev = gRecyclerTop;
         if (ev == NULL) {
             CKeyEvent::New((IKeyEvent**)&ev);
@@ -565,7 +566,8 @@ ECode KeyEvent::Recycle()
     InputEvent::Recycle();
     mCharacters = NULL;
 
-    {    AutoLock syncLock(gRecyclerLock);
+    {
+        AutoLock syncLock(gRecyclerLock);
         if (gRecyclerUsed < MAX_RECYCLED) {
             gRecyclerUsed++;
             mNext = gRecyclerTop;

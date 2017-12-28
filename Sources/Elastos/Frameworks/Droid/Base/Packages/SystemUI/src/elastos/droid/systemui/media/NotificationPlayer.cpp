@@ -22,8 +22,6 @@
 #include <elastos/core/StringBuilder.h>
 #include <elastos/utility/logging/Logger.h>
 
-#include <elastos/core/AutoLock.h>
-using Elastos::Core::AutoLock;
 using Elastos::Droid::Media::CAudioAttributesBuilder;
 using Elastos::Droid::Media::CAudioAttributesHelper;
 using Elastos::Droid::Media::CMediaPlayer;
@@ -33,6 +31,7 @@ using Elastos::Droid::Media::IAudioAttributesHelper;
 using Elastos::Droid::Os::IPowerManager;
 using Elastos::Droid::Os::Looper;
 using Elastos::Droid::Os::SystemClock;
+using Elastos::Core::AutoLock;
 using Elastos::Core::StringBuilder;
 using Elastos::Core::ThreadState;
 using Elastos::Core::ThreadState_TERMINATED;
@@ -89,7 +88,8 @@ ECode NotificationPlayer::CreationAndCompletionThread::Run()
 {
     Looper::Prepare();
     mHost->mLooper = Looper::GetMyLooper();
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         AutoPtr<IInterface> amObj;
         mCmd->mContext->GetSystemService(IContext::AUDIO_SERVICE, (IInterface**)&amObj);
         AutoPtr<IAudioManager> audioManager = IAudioManager::Probe(amObj);
@@ -106,7 +106,8 @@ ECode NotificationPlayer::CreationAndCompletionThread::Run()
             Boolean isMusicActiveRemotely;
             audioManager->IsMusicActiveRemotely(&isMusicActiveRemotely);
             if (!isMusicActiveRemotely) {
-                {    AutoLock syncLock(mHost->mQueueAudioFocusLock);
+                {
+                    AutoLock syncLock(mHost->mQueueAudioFocusLock);
                     if (mHost->mAudioManagerWithAudioFocus == NULL) {
                         if (mDebug) Logger::D(mHost->mTag, "requesting AudioFocus");
                         AutoPtr<IAudioAttributesHelper> aah;
@@ -167,7 +168,8 @@ ECode NotificationPlayer::CmdThread::Run()
 {
     while (TRUE) {
         AutoPtr<Command> cmd;
-        {    AutoLock syncLock(mHost->mCmdQueue);
+        {
+            AutoLock syncLock(mHost->mCmdQueue);
             if (mHost->mDebug) Logger::D(mHost->mTag, "RemoveFirst");
             AutoPtr<IInterface> obj;
             mHost->mCmdQueue->RemoveFirst((IInterface**)&obj);
@@ -189,7 +191,8 @@ ECode NotificationPlayer::CmdThread::Run()
                 mHost->mPlayer->Stop();
                 mHost->mPlayer->Release();
                 mHost->mPlayer = NULL;
-                {    AutoLock syncLock(mHost->mQueueAudioFocusLock);
+                {
+                    AutoLock syncLock(mHost->mQueueAudioFocusLock);
                     if (mHost->mAudioManagerWithAudioFocus != NULL) {
                         Int32 result;
                         mHost->mAudioManagerWithAudioFocus->AbandonAudioFocus(NULL, &result);
@@ -210,7 +213,8 @@ ECode NotificationPlayer::CmdThread::Run()
             }
             break;
         }
-        {    AutoLock syncLock(mHost->mCmdQueue);
+        {
+            AutoLock syncLock(mHost->mCmdQueue);
             Int32 size;
             mHost->mCmdQueue->GetSize(&size);
             if (size == 0) {
@@ -309,7 +313,8 @@ ECode NotificationPlayer::OnCompletion(
         Int32 size;
         mCmdQueue->GetSize(&size);
         if (size == 0) {
-            {    AutoLock syncLock(mCompletionHandlingLock);
+            {
+                AutoLock syncLock(mCompletionHandlingLock);
                 if(mLooper != NULL) {
                     mLooper->Quit();
                 }

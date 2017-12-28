@@ -27,13 +27,11 @@
 #include <elastos/utility/logging/Slogger.h>
 #include <elastos/utility/logging/Logger.h>
 
-#include <elastos/core/AutoLock.h>
-using Elastos::Core::AutoLock;
-using Elastos::Core::AutoLock;
-using Elastos::Core::StringUtils;
 using Elastos::Droid::Graphics::EIID_ISurfaceTexture;
 using Elastos::Droid::Os::Process;
 using Elastos::Droid::View::EIID_ISurface;
+using Elastos::Core::AutoLock;
+using Elastos::Core::StringUtils;
 using Elastos::Droid::Webkit::Webview::Chromium::Content::Browser::ChildProcessConnection;
 using Elastos::Utility::Logging::Slogger;
 using Elastos::Utility::Logging::Logger;

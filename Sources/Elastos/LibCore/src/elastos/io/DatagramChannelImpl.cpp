@@ -31,8 +31,6 @@
 #include "Math.h"
 #include "IoUtils.h"
 
-#include <elastos/core/AutoLock.h>
-using Elastos::Core::AutoLock;
 using Elastos::Core::AutoLock;
 using Elastos::Net::CInetSocketAddress;
 using Elastos::Net::EIID_IDatagramSocket;
@@ -196,7 +194,8 @@ ECode DatagramChannelImpl::DatagramSocketAdapter::Send(
 
 ECode DatagramChannelImpl::DatagramSocketAdapter::Close()
 {
-    {    AutoLock syncLock(mChannelImpl);
+    {
+        AutoLock syncLock(mChannelImpl);
         FAIL_RETURN(DatagramSocket::Close())
 
         Boolean isflag = FALSE;
@@ -405,7 +404,8 @@ ECode DatagramChannelImpl::Receive(
     Begin();
 
     // receive real data packet, (not peek)
-    {    AutoLock syncLock(mReadLock);
+    {
+        AutoLock syncLock(mReadLock);
         IsBlocking(&loop);
         if (IBuffer::Probe(target)->IsDirect(&bval), !bval) {
             ReceiveImpl(target, loop, (ISocketAddress**)&retAddr);
@@ -553,7 +553,8 @@ ECode DatagramChannelImpl::Send(
         return E_ILLEGAL_ARGUMENT_EXCEPTION;
     }
 
-    {    AutoLock syncLock(mWriteLock);
+    {
+        AutoLock syncLock(mWriteLock);
         Int32 sendCount = 0;
         // try {
             Begin();
@@ -671,7 +672,8 @@ ECode DatagramChannelImpl::ReadImpl(
     VALIDATE_NOT_NULL(count)
     *count = 0;
 
-    {    AutoLock syncLock(mReadLock);
+    {
+        AutoLock syncLock(mReadLock);
         Int32 readCount = 0;
         // try {
             Begin();
@@ -771,7 +773,8 @@ ECode DatagramChannelImpl::WriteImpl(
     VALIDATE_NOT_NULL(count)
     *count = 0;
 
-    {    AutoLock syncLock(mWriteLock);
+    {
+        AutoLock syncLock(mWriteLock);
         Int32 result = 0;
         // try {
             Begin();

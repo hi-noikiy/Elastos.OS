@@ -46,7 +46,6 @@ public:
      * {@link RecognitionService#onStartListening(Intent, Callback)} method. Recognizers may call
      * these methods on any thread.
      */
-    //public
     class RecognitionServiceCallback
         : public Object
         , public IRecognitionServiceCallback
@@ -237,9 +236,9 @@ public:
 
 public:
     //@Override
-    //public final
-    CARAPI_(AutoPtr<IBinder>) OnBind(
-        /* [in]  */ IIntent* intent);
+    CARAPI OnBind(
+        /* [in]  */ IIntent* intent,
+        /* [out] */ IBinder** service);
 
     //@Override
     //public void

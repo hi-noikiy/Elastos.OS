@@ -23,8 +23,6 @@
 #include <elastos/core/AutoLock.h>
 #include <elastos/utility/logging/Logger.h>
 
-#include <elastos/core/AutoLock.h>
-using Elastos::Core::AutoLock;
 using Elastos::Droid::Os::CHandler;
 using Elastos::Droid::Os::CUserHandleHelper;
 using Elastos::Droid::Os::IBinder;
@@ -32,6 +30,7 @@ using Elastos::Droid::Os::IHandler;
 using Elastos::Droid::Os::IUserHandleHelper;
 using Elastos::Droid::Os::ServiceManager;
 using Elastos::Droid::Utility::CArrayMap;
+using Elastos::Core::AutoLock;
 using Elastos::Utility::CArrayList;
 using Elastos::Utility::IArrayList;
 using Elastos::Utility::IMap;
