@@ -22,27 +22,26 @@
 #include "elastos/droid/R.h"
 #include <elastos/core/AutoLock.h>
 
-#include <elastos/core/AutoLock.h>
-using Elastos::Core::AutoLock;
 using Elastos::Droid::Content::Res::IResources;
 using Elastos::Droid::Content::Res::IResourcesHelper;
 using Elastos::Droid::Content::Res::CResourcesHelper;
-using Libcore::ICU::ILocaleDataHelper;
-using Libcore::ICU::CLocaleDataHelper;
+using Elastos::Core::AutoLock;
+using Elastos::Core::IAppendable;
+using Elastos::Core::IInteger32;
+using Elastos::Core::CInteger32;
+using Elastos::Core::EIID_IAppendable;
+using Elastos::Core::CString;
+using Elastos::IO::IBuffer;
+using Elastos::IO::ICharBufferHelper;
+using Elastos::IO::CCharBufferHelper;
 using Elastos::Utility::CLocale;
 using Elastos::Utility::IFormatter;
 using Elastos::Utility::CFormatter;
 using Elastos::Utility::ILocaleHelper;
 using Elastos::Utility::CLocaleHelper;
 using Elastos::Utility::ITimeZone;
-using Elastos::IO::IBuffer;
-using Elastos::IO::ICharBufferHelper;
-using Elastos::IO::CCharBufferHelper;
-using Elastos::Core::IAppendable;
-using Elastos::Core::IInteger32;
-using Elastos::Core::CInteger32;
-using Elastos::Core::EIID_IAppendable;
-using Elastos::Core::CString;
+using Libcore::ICU::ILocaleDataHelper;
+using Libcore::ICU::CLocaleDataHelper;
 
 
 namespace Elastos {
@@ -77,7 +76,8 @@ CTimeFormatter::~CTimeFormatter()
 
 ECode CTimeFormatter::constructor()
 {
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
 
         AutoPtr<ILocaleHelper> localeHelper;
         CLocaleHelper::AcquireSingleton((ILocaleHelper**)&localeHelper);
@@ -566,6 +566,7 @@ ECode CTimeFormatter::ModifyAndAppend(
         break;
     case '^':
         for (Int32 i = 0; i < length; i++) {
+            str->GetCharAt(i,&c);
             mOutputBuilder.AppendChar(BrokenToUpper(c));
         }
         break;

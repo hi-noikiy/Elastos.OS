@@ -30,8 +30,6 @@
 #include <Elastos.CoreLibrary.IO.h>
 #include <Elastos.CoreLibrary.Net.h>
 
-#include <elastos/core/AutoLock.h>
-using Elastos::Core::AutoLock;
 using Elastos::Droid::Os::IMessage;
 using Elastos::Droid::Os::IServiceManager;
 using Elastos::Droid::Os::CServiceManager;
@@ -51,15 +49,16 @@ using Elastos::Droid::Content::EIID_IServiceConnection;
 using Elastos::Droid::Provider::ISettingsGlobal;
 using Elastos::Droid::Provider::CSettingsGlobal;
 using Elastos::Droid::Server::IoThread;
+using Elastos::Core::AutoLock;
 using Elastos::Core::StringBuilder;
 using Elastos::Core::StringUtils;
-using Elastos::Utility::Logging::Logger;
-using Elastos::Net::CURL;
-using Elastos::Net::IProxyHelper;
-using Elastos::Net::CProxyHelper;
 using Elastos::IO::IInputStream;
 using Libcore::IO::IStreams;
 using Libcore::IO::CStreams;
+using Elastos::Net::CURL;
+using Elastos::Net::IProxyHelper;
+using Elastos::Net::CProxyHelper;
+using Elastos::Utility::Logging::Logger;
 
 namespace Elastos {
 namespace Droid {
@@ -97,7 +96,8 @@ ECode PacManager::PacDownloaderRunnable::Run()
 {
     String file;
     Object& lockObj = mHost->mProxyLock;
-    {    AutoLock syncLock(lockObj);
+    {
+        AutoLock syncLock(lockObj);
         AutoPtr<IUriHelper> helper;
         CUriHelper::AcquireSingleton((IUriHelper**)&helper);
         AutoPtr<IUri> emptyUri;
@@ -113,7 +113,8 @@ ECode PacManager::PacDownloaderRunnable::Run()
 
     if (file != NULL) {
             Object& lockObj = mHost->mProxyLock;
-            {    AutoLock syncLock(lockObj);
+            {
+                AutoLock syncLock(lockObj);
             if (!file.Equals(mHost->mCurrentPac)) {
                 mHost->SetCurrentProxyScript(file);
             }
@@ -160,7 +161,8 @@ ECode PacManager::ServiceConnection::OnServiceDisconnected(
     /* [in] */ IComponentName* component)
 {
     Object& lockObj = mHost->mProxyLock;
-    {    AutoLock syncLock(lockObj);
+    {
+        AutoLock syncLock(lockObj);
         assert(0 && "TODO");
         // mHost->mProxyService = NULL;
     }
@@ -172,7 +174,8 @@ ECode PacManager::ServiceConnection::OnServiceConnected(
     /* [in] */ IBinder* binder)
 {
     Object& lockObj = mHost->mProxyLock;
-    {    AutoLock syncLock(lockObj);
+    {
+        AutoLock syncLock(lockObj);
         Logger::D("PacManager::ServiceConnection", "Adding service %s %s",
             PacManager::PAC_SERVICE_NAME.string(), TO_CSTR(binder));
 
@@ -307,7 +310,8 @@ Boolean PacManager::SetCurrentProxyScriptUrl(
             // Allow to send broadcast, nothing to do.
             return FALSE;
         }
-        {    AutoLock syncLock(mProxyLock);
+        {
+            AutoLock syncLock(mProxyLock);
             mPacUrl = NULL;
             proxy->GetPacFileUrl((IUri**)&mPacUrl);
         }
@@ -320,7 +324,8 @@ Boolean PacManager::SetCurrentProxyScriptUrl(
     }
     else {
         GetAlarmManager()->Cancel(mPacRefreshIntent);
-        {    AutoLock syncLock(mProxyLock);
+        {
+            AutoLock syncLock(mProxyLock);
             mPacUrl = emptyUri;
             mCurrentPac = NULL;
             assert(0 && "TODO");
@@ -517,8 +522,6 @@ void PacManager::SendProxyIfNeeded()
         mHasSentBroadcast = TRUE;
     }
 }
-
-
 
 } // Connectivity
 } // Server

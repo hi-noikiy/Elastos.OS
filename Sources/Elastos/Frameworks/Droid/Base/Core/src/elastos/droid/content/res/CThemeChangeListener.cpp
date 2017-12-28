@@ -21,7 +21,6 @@
 #include <elastos/utility/etl/List.h>
 #include <elastos/core/AutoLock.h>
 
-#include <elastos/core/AutoLock.h>
 using Elastos::Core::AutoLock;
 using Elastos::Utility::Etl::List;
 using Elastos::Utility::Logging::Logger;
@@ -37,7 +36,8 @@ namespace Res {
 
 ECode CThemeChangeListener::OnProgressRunnable::Run()
 {
-    {    AutoLock syncLock(mHost->mChangeListenersLock);
+    {
+        AutoLock syncLock(mHost->mChangeListenersLock);
         List<AutoPtr<IThemeChangeListener> > listenersToRemove;
         HashSet<AutoPtr<IThemeChangeListener> >::Iterator it = mHost->mChangeListeners.Begin();
         for (; it != mHost->mChangeListeners.End(); ++it) {
@@ -69,7 +69,8 @@ ECode CThemeChangeListener::OnProgressRunnable::Run()
 
 ECode CThemeChangeListener::OnFinishRunnable::Run()
 {
-    {    AutoLock syncLock(mHost->mChangeListenersLock);
+    {
+        AutoLock syncLock(mHost->mChangeListenersLock);
         List<AutoPtr<IThemeChangeListener> > listenersToRemove;
         HashSet<AutoPtr<IThemeChangeListener> >::Iterator it = mHost->mChangeListeners.Begin();
         for (; it != mHost->mChangeListeners.End(); ++it) {

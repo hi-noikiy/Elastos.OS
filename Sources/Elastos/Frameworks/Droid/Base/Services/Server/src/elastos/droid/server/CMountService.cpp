@@ -2846,7 +2846,8 @@ AutoPtr<IArrayList> CMountService::GetShareableVolumes()
     // Sharable volumes have android:allowMassStorage="true" in storage_list.xml
     AutoPtr<IArrayList> volumesToMount;
     CArrayList::New((IArrayList**)&volumesToMount);
-    {    AutoLock syncLock(mVolumesLock);
+    {
+        AutoLock syncLock(mVolumesLock);
         List< AutoPtr<IStorageVolume> >::Iterator it = mVolumes.Begin();
         for (; it != mVolumes.End(); ++it) {
             AutoPtr<IStorageVolume> volume = *it;

@@ -24,7 +24,6 @@
 #include "unicode/regex.h"
 #include "AutoLock.h"
 
-#include <elastos/core/AutoLock.h>
 using Elastos::Core::AutoLock;
 using Elastos::Core::CString;
 using Elastos::Core::StringBuilder;
@@ -321,7 +320,8 @@ ECode CMatcher::UsePattern(
 
 void CMatcher::ResetForInput()
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         SetInputImpl(mNativeMatcher, mInput, mRegionStart, mRegionEnd);
         UseAnchoringBoundsImpl(mNativeMatcher, mAnchoringBounds);
         UseTransparentBoundsImpl(mNativeMatcher, mTransparentBounds);
@@ -426,7 +426,8 @@ ECode CMatcher::Find(
 {
     VALIDATE_NOT_NULL(found);
 
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         mMatchFound = FindNextImpl(mNativeMatcher, mInput, mMatchOffsets);
     }
     *found = mMatchFound;
@@ -444,7 +445,8 @@ ECode CMatcher::Find(
         return E_INDEX_OUT_OF_BOUNDS_EXCEPTION;
 //        throw new IndexOutOfBoundsException("start=" + start + "; length=" + input.length());
     }
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         mMatchFound = FindImpl(mNativeMatcher, mInput, start, mMatchOffsets);
     }
     *found = mMatchFound;
@@ -456,7 +458,8 @@ ECode CMatcher::LookingAt(
 {
     VALIDATE_NOT_NULL(matched);
 
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         mMatchFound = LookingAtImpl(mNativeMatcher, mInput, mMatchOffsets);
     }
     *matched = mMatchFound;
@@ -469,7 +472,8 @@ ECode CMatcher::Matches(
 {
     VALIDATE_NOT_NULL(matched);
 
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         mMatchFound = MatchesImpl(mNativeMatcher, mInput, mMatchOffsets);
     }
     *matched = mMatchFound;
@@ -549,7 +553,8 @@ ECode CMatcher::ToMatchResult(
 ECode CMatcher::UseAnchoringBounds(
     /* [in] */ Boolean value)
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         mAnchoringBounds = value;
         UseAnchoringBoundsImpl(mNativeMatcher, value);
     }
@@ -567,7 +572,8 @@ ECode CMatcher::HasAnchoringBounds(
 ECode CMatcher::UseTransparentBounds(
     /* [in] */ Boolean value)
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         mTransparentBounds = value;
         UseTransparentBoundsImpl(mNativeMatcher, value);
     }
@@ -611,7 +617,8 @@ ECode CMatcher::RequireEnd(
     /* [out] */ Boolean* result)
 {
     VALIDATE_NOT_NULL(result);
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         *result = RequireEndImpl(mNativeMatcher);
     }
     return NOERROR;
@@ -621,7 +628,8 @@ ECode CMatcher::HitEnd(
     /* [out] */ Boolean* hit)
 {
     VALIDATE_NOT_NULL(hit);
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         *hit = HitEndImpl(mNativeMatcher);
     }
     return NOERROR;

@@ -171,7 +171,8 @@ ECode CLocationManagerService::AppOpsManagerOnOpChangedInternalListener::OnOpCha
     /* [in] */ Int32 op,
     /* [in] */ const String& packageName)
 {
-    {    AutoLock syncLock(mHost->mLock);
+    {
+        AutoLock syncLock(mHost->mLock);
         AutoPtr<ICollection> cl;
         mHost->mReceivers->GetValues((ICollection**)&cl);
         AutoPtr<IIterator> it;
@@ -215,7 +216,8 @@ ECode CLocationManagerService::MyContentObserver::OnChange(
     /* [in] */ Boolean selfChange)
 {
     Slogger::I(TAG, " >> MyContentObserver: OnChange LOCATION_PROVIDERS_ALLOWED");
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         mHost->UpdateProvidersLocked();
     }
     return NOERROR;
@@ -290,7 +292,8 @@ ECode CLocationManagerService::LocationPackageMonitor::OnPackageDisappeared(
     /* [in] */ Int32 reason)
 {
     // remove all receivers associated with this package name
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         AutoPtr<IArrayList> deadReceivers;
 
         AutoPtr<ICollection> cl;
@@ -961,7 +964,8 @@ void CLocationManagerService::UpdateUserProfiles(
 {
     AutoPtr<IList> profiles;
     mUserManager->GetProfiles(currentUserId, (IList**)&profiles);
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         Int32 size = 0;
         profiles->GetSize(&size);
         mCurrentUserProfiles = ArrayOf<Int32>::Alloc(size);
@@ -977,7 +981,8 @@ void CLocationManagerService::UpdateUserProfiles(
 Boolean CLocationManagerService::IsCurrentProfile(
     /* [in] */ Int32 userId)
 {
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         for (Int32 i = 0; i < mCurrentUserProfiles->GetLength(); i++) {
             if ((*mCurrentUserProfiles)[i] == userId) {
                 return TRUE;

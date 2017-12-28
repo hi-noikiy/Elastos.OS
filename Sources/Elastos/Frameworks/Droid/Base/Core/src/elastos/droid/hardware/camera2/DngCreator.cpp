@@ -35,8 +35,6 @@
 #include <img_utils/TagDefinitions.h>
 #include <utils/String8.h>
 
-#include <elastos/core/AutoLock.h>
-using Elastos::Core::AutoLock;
 using Elastos::Droid::Hardware::Camera2::CaptureResult;
 using Elastos::Droid::Media::IExifInterface;
 using Elastos::Droid::Media::IImagePlane;
@@ -1385,7 +1383,8 @@ ECode DngCreator::NativeInit(
     /* [in] */ ICameraMetadataNative* nativeResult,
     /* [in] */ const String& formattedCaptureTime)
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         ALOGV("%s:", __FUNCTION__);
         android::CameraMetadata characteristics;
         android::CameraMetadata results;
@@ -2051,7 +2050,8 @@ ECode DngCreator::NativeInit(
 
 void DngCreator::NativeDestroy()
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         ALOGV("%s:", __FUNCTION__);
         DngCreator_setNativeContext(NULL);
     }
@@ -2060,7 +2060,8 @@ void DngCreator::NativeDestroy()
 ECode DngCreator::NativeSetOrientation(
     /* [in] */ Int32 orient)
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         ALOGV("%s:", __FUNCTION__);
 
         TiffWriter* writer = DngCreator_getCreator();
@@ -2088,7 +2089,8 @@ ECode DngCreator::NativeSetOrientation(
 ECode DngCreator::NativeSetDescription(
     /* [in] */ const String& description)
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         ALOGV("%s:", __FUNCTION__);
 
         TiffWriter* writer = DngCreator_getCreator();
@@ -2122,7 +2124,8 @@ ECode DngCreator::NativeSetGpsTags(
     /* [in] */ const String& dateTag,
     /* [in] */ ArrayOf<Int32>* timeTag)
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         ALOGV("%s:", __FUNCTION__);
 
         TiffWriter* writer = DngCreator_getCreator();
@@ -2243,7 +2246,8 @@ ECode DngCreator::NativeSetThumbnail(
     /* [in] */ Int32 width,
     /* [in] */ Int32 height)
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         ALOGV("%s:", __FUNCTION__);
 
         NativeContext* context = DngCreator_getNativeContext();
@@ -2435,7 +2439,8 @@ ECode DngCreator::NativeWriteImage(
     /* [in] */ Int64 offset,
     /* [in] */ Boolean isDirect)
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         ALOGV("%s:", __FUNCTION__);
         ALOGV("%s: nativeWriteImage called with: width=%d, height=%d, rowStride=%d, pixStride=%d,"
                   " offset=%lld", __FUNCTION__, width, height, rowStride, pixStride, offset);
@@ -2553,7 +2558,8 @@ ECode DngCreator::NativeWriteInputStream(
     /* [in] */ Int32 height,
     /* [in] */ Int64 offset)
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         ALOGV("%s:", __FUNCTION__);
 
         uint32_t rowStride = width * BYTES_PER_SAMPLE;

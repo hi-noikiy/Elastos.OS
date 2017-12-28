@@ -20,7 +20,6 @@
 #include "elastos/droid/hardware/display/DisplayManagerGlobal.h"
 #include <elastos/core/AutoLock.h>
 
-#include <elastos/core/AutoLock.h>
 using Elastos::Core::AutoLock;
 
 namespace Elastos {
@@ -58,7 +57,8 @@ ECode CDisplayManager::GetDisplay(
 {
     VALIDATE_NOT_NULL(display);
 
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         AutoPtr<IDisplay> temp = GetOrCreateDisplayLocked(displayId, FALSE /*assumeValid*/);
         *display = temp;
         REFCOUNT_ADD(*display);
@@ -84,7 +84,8 @@ ECode CDisplayManager::GetDisplays(
     mGlobal->GetDisplayIds((ArrayOf<Int32>**)&displayIds);
 
     AutoPtr<ArrayOf<IDisplay*> > array;
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         //try {
             if (category.IsNull()) {
                 AddAllDisplaysLocked(mTempDisplays, displayIds);

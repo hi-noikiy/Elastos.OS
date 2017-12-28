@@ -557,7 +557,7 @@ WifiServiceImpl::BatchedScanRequest::BatchedScanRequest(
     /* [in] */ IWorkSource* ws)
     : DeathRecipient(owner, 0, String(NULL), binder, NULL)
 {
-    settings = settings;
+    this->settings = settings;
     uid = Binder::GetCallingUid();
     pid = Binder::GetCallingPid();
     workSource = ws;
@@ -964,7 +964,8 @@ ECode WifiServiceImpl::RequestBatchedScan(
         return NOERROR;
     }
     AutoPtr<BatchedScanRequest> r = new BatchedScanRequest(this, batchedScanSettings, binder, workSource);
-    {    AutoLock syncLock(mBatchedScanners);
+    {
+        AutoLock syncLock(mBatchedScanners);
         mBatchedScanners->Add(TO_IINTERFACE(r));
         ResolveBatchedScannersLocked();
     }
@@ -1661,7 +1662,8 @@ ECode WifiServiceImpl::AcquireWifiLock(
         CWorkSource::New(uid, (IWorkSource**)&ws);
     }
     AutoPtr<WifiLock> wifiLock = new WifiLock(this, lockMode, tag, binder, ws);
-    {    AutoLock syncLock(mLocks);
+    {
+        AutoLock syncLock(mLocks);
         return AcquireWifiLockLocked(wifiLock);
     }
     return NOERROR;
@@ -1687,7 +1689,8 @@ ECode WifiServiceImpl::UpdateWifiLockWorkSource(
 
     Int64 ident = Binder::ClearCallingIdentity();
     //try {
-    {    AutoLock syncLock(mLocks);
+    {
+        AutoLock syncLock(mLocks);
         Int32 index = mLocks->FindLockByBinder(lock);
         if (index < 0) {
             //throw new IllegalArgumentException("Wifi lock not active");
@@ -1716,8 +1719,9 @@ ECode WifiServiceImpl::ReleaseWifiLock(
 {
     VALIDATE_NOT_NULL(result);
     mContext->EnforceCallingOrSelfPermission(Manifest::permission::WAKE_LOCK, String(NULL));
-    {    AutoLock syncLock(mLocks);
-         *result = ReleaseWifiLockLocked(lock);
+    {
+        AutoLock syncLock(mLocks);
+        *result = ReleaseWifiLockLocked(lock);
     }
     return NOERROR;
 }
@@ -1726,7 +1730,8 @@ ECode WifiServiceImpl::InitializeMulticastFiltering()
 {
     EnforceMulticastChangePermission();
 
-    {    AutoLock syncLock(mMulticasters);
+    {
+        AutoLock syncLock(mMulticasters);
         // if anybody had requested filters be off, leave off
         Int32 size;
         mMulticasters->GetSize(&size);
@@ -1746,7 +1751,8 @@ ECode WifiServiceImpl::AcquireMulticastLock(
     VALIDATE_NOT_NULL(binder);
     EnforceMulticastChangePermission();
 
-    {    AutoLock syncLock(mMulticasters);
+    {
+        AutoLock syncLock(mMulticasters);
         mMulticastEnabled++;
         AutoPtr<Multicaster> multicaster = new Multicaster(this, tag, binder);
         mMulticasters->Add(TO_IINTERFACE(multicaster));
@@ -1800,7 +1806,8 @@ ECode WifiServiceImpl::IsMulticastEnabled(
     VALIDATE_NOT_NULL(result);
     EnforceAccessPermission();
 
-    {    AutoLock syncLock(mMulticasters);
+    {
+        AutoLock syncLock(mMulticasters);
         Int32 size;
         mMulticasters->GetSize(&size);
         *result = (size > 0);
@@ -1947,7 +1954,8 @@ void WifiServiceImpl::StopBatchedScan(
 {
     AutoPtr<IArrayList> found;
     CArrayList::New((IArrayList**)&found);
-    {    AutoLock syncLock(mBatchedScanners);
+    {
+        AutoLock syncLock(mBatchedScanners);
         Int32 size;
         mBatchedScanners->GetSize(&size);
         for (Int32 i = 0; i < size; ++i) {

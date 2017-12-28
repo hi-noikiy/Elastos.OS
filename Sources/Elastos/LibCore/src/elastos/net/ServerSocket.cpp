@@ -26,7 +26,6 @@
 #include "IoBridge.h"
 #include "StringBuilder.h"
 
-#include <elastos/core/AutoLock.h>
 using Elastos::Core::AutoLock;
 using Elastos::Core::StringBuilder;
 using Elastos::Core::IInteger32;
@@ -97,7 +96,8 @@ ECode ServerSocket::constructor(
 
     AutoPtr<IInetAddress> addr = localAddr == NULL ? CInet4Address::ANY.Get() : localAddr;
 
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         mImpl->Create(TRUE);
 
         ec = mImpl->Bind(addr, aPort);

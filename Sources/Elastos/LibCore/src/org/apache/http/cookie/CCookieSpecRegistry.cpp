@@ -23,7 +23,6 @@
 #include "elastos/utility/CLinkedHashMap.h"
 #include "elastos/utility/logging/Logger.h"
 
-#include <elastos/core/AutoLock.h>
 using Elastos::Core::AutoLock;
 using Elastos::Core::StringBuilder;
 using Elastos::Core::StringUtils;
@@ -50,7 +49,8 @@ ECode CCookieSpecRegistry::Register(
     /* [in] */ const String& name,
     /* [in] */ ICookieSpecFactory* factory)
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         if (name.IsNull()) {
             Logger::E("CCookieSpecRegistry", "Name may not be null");
             return E_ILLEGAL_ARGUMENT_EXCEPTION;
@@ -69,7 +69,8 @@ ECode CCookieSpecRegistry::Register(
 ECode CCookieSpecRegistry::Unregister(
     /* [in] */ const String& id)
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         if (id.IsNull()) {
             Logger::E("CCookieSpecRegistry", "Id may not be null");
             return E_ILLEGAL_ARGUMENT_EXCEPTION;
@@ -86,7 +87,8 @@ ECode CCookieSpecRegistry::GetCookieSpec(
     /* [in] */ IHttpParams* params,
     /* [out] */ ICookieSpec** spec)
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         VALIDATE_NOT_NULL(spec)
         *spec = NULL;
 
@@ -114,7 +116,8 @@ ECode CCookieSpecRegistry::GetCookieSpec(
     /* [in] */ const String& name,
     /* [out] */ ICookieSpec** spec)
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         VALIDATE_NOT_NULL(spec)
         GetCookieSpec(name, NULL, spec);
     }
@@ -125,7 +128,8 @@ ECode CCookieSpecRegistry::GetSpecNames(
     /* [out] */ IList** names)
 {
     VALIDATE_NOT_NULL(names)
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         AutoPtr<ISet> keySet;
         mRegisteredSpecs->GetKeySet((ISet**)&keySet);
         AutoPtr<ICollection> col = ICollection::Probe(keySet);
@@ -140,7 +144,8 @@ ECode CCookieSpecRegistry::GetSpecNames(
 ECode CCookieSpecRegistry::SetItems(
     /* [in] */ IMap* map)
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         if (map == NULL) {
             return NOERROR;
         }

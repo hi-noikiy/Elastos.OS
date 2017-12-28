@@ -187,7 +187,8 @@ android::sp<android::Camera> HardwareCamera::get_native_camera(
     /* [in] */ JNICameraContext** pContext)
 {
     android::sp<android::Camera> camera;
-    {    AutoLock syncLock(sLock);
+    {
+        AutoLock syncLock(sLock);
         JNICameraContext* context = reinterpret_cast<JNICameraContext*>(thiz->mNativeContext)/*(env->GetIntField(thiz, fields.context))*/;
         if (context != NULL) {
             camera = context->getCamera();
@@ -1031,7 +1032,7 @@ HardwareCamera::Parameters::Parameters(
     mOuter = camera;
 }
 
-HardwareCamera::Parameters::CopyFrom(
+ECode HardwareCamera::Parameters::CopyFrom(
     /* [in] */ IParameters* other)
 {
     if (other == NULL) {
@@ -1048,7 +1049,7 @@ AutoPtr<IHardwareCamera> HardwareCamera::Parameters::GetOuter()
     return mOuter;
 }
 
-HardwareCamera::Parameters::Same(
+ECode HardwareCamera::Parameters::Same(
     /* [in] */ IParameters* other,
     /* [out] */ Boolean* result)
 {
@@ -2710,7 +2711,8 @@ ECode HardwareCamera::StopPreview()
     mPostviewCallback = NULL;
     mJpegCallback = NULL;
 
-    {    AutoLock syncLock(mAutoFocusCallbackLock);
+    {
+        AutoLock syncLock(mAutoFocusCallbackLock);
         mAutoFocusCallback = NULL;
     }
 
@@ -2811,7 +2813,8 @@ void HardwareCamera::PostEventFromNative(
 ECode HardwareCamera::AutoFocus(
     /* [in] */ IAutoFocusCallback* cb)
 {
-    {    AutoLock syncLock(mAutoFocusCallbackLock);
+    {
+        AutoLock syncLock(mAutoFocusCallbackLock);
         mAutoFocusCallback = cb;
     }
     native_autoFocus();
@@ -2820,7 +2823,8 @@ ECode HardwareCamera::AutoFocus(
 
 ECode HardwareCamera::CancelAutoFocus()
 {
-    {    AutoLock syncLock(mAutoFocusCallbackLock);
+    {
+        AutoLock syncLock(mAutoFocusCallbackLock);
         mAutoFocusCallback = NULL;
     }
     native_cancelAutoFocus();

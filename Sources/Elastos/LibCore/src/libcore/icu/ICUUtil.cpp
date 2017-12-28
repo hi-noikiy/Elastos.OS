@@ -58,9 +58,7 @@
 #include <unicode/ulocdata.h>
 #include <unicode/ucurr.h>
 
-#include <elastos/core/AutoLock.h>
 using Elastos::Core::AutoLock;
-using Libcore::Utility::CBasicLruCache;
 using Elastos::Core::StringUtils;
 using Elastos::Core::IString;
 using Elastos::Core::ICharSequence;
@@ -72,6 +70,7 @@ using Elastos::Utility::CHashSet;
 using Elastos::Utility::CLocale;
 using Elastos::Utility::Logging::Logger;
 using Elastos::Utility::EIID_ICollection;
+using Libcore::Utility::CBasicLruCache;
 
 namespace Libcore {
 namespace ICU {
@@ -414,7 +413,8 @@ ECode ICUUtil::GetBestDateTimePattern(
     String key = skeleton + "\t" + languageTag;
     AutoPtr<ICharSequence> key_cs;
     CString::New(key, (ICharSequence**)&key_cs);
-    {    AutoLock syncLock(CACHED_PATTERNS);
+    {
+        AutoLock syncLock(CACHED_PATTERNS);
         AutoPtr<IInterface> tmp;
         CACHED_PATTERNS->Get(key_cs, (IInterface**)&tmp);
         AutoPtr<ICharSequence> pattern_cs = ICharSequence::Probe(tmp);

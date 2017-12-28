@@ -259,7 +259,8 @@ ECode RatingBar::OnMeasure(
     /* [in] */ Int32 widthMeasureSpec,
     /* [in] */ Int32 heightMeasureSpec)
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         AbsSeekBar::OnMeasure(widthMeasureSpec, heightMeasureSpec);
 
         if(mSampleTile != NULL) {
@@ -319,7 +320,8 @@ ECode RatingBar::DispatchRatingChange(
 ECode RatingBar::SetMax(
     /* [in] */ Int32 max)
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         if (max <= 0) {
             return NOERROR;
         }

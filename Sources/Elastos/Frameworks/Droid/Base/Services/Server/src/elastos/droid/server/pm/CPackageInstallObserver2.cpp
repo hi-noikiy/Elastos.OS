@@ -68,7 +68,8 @@ ECode CPackageInstallObserver2::OnPackageInstalled(
     // we failed we need to clear the pending flag on the original
     // package object.
     Object& lock = mHost->mPackagesLock;
-    {    AutoLock syncLock(lock);
+    {
+        AutoLock syncLock(lock);
         AutoPtr<PackageParser::Package> pkg;
         HashMap<String, AutoPtr<PackageParser::Package> >::Iterator it = mHost->mPackages.Find(mPackageName);
         if (it != mHost->mPackages.End()) {

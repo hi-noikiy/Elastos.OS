@@ -33,7 +33,6 @@
 #include "elastos/droid/app/ActivityManagerNative.h"
 #include "elastos/droid/app/AppGlobals.h"
 #include "elastos/droid/internal/utility/XmlUtils.h"
-#include "elastos/droid/net/ReturnOutValue.h"
 #include "elastos/droid/os/Binder.h"
 #include "elastos/droid/os/Handler.h"
 #include "elastos/droid/os/UserHandle.h"
@@ -199,6 +198,7 @@ using Elastos::Utility::ICollections;
 using Elastos::Utility::IDate;
 using Elastos::Utility::IHashSet;
 using Elastos::Utility::IMapEntry;
+using Elastos::Utility::IIterator;
 using Elastos::Utility::Logging::Logger;
 using Elastos::Utility::Logging::Slogger;
 
@@ -2741,9 +2741,12 @@ AutoPtr<CDevicePolicyManagerService::ActiveAdmin> CDevicePolicyManagerService::G
         Int32 identifier;
         userHandle->GetIdentifier(&identifier);
         AutoPtr<DevicePolicyData> policy = GetUserData(identifier);
-        FOR_EACH(it, policy->mAdminList) {
+        AutoPtr<IIterator> it2;
+        policy->mAdminList->GetIterator((IIterator**)&it2);
+        Boolean hasNext2;
+        while (it2->HasNext(&hasNext2), hasNext2) {
             AutoPtr<IInterface> obj;
-            it->GetNext((IInterface**)&obj);
+            it2->GetNext((IInterface**)&obj);
             AutoPtr<ActiveAdmin> admin = (ActiveAdmin*) IObject::Probe(obj);
             if (admin->mMaximumFailedPasswordsForWipe ==
                     ActiveAdmin::DEF_MAXIMUM_FAILED_PASSWORDS_FOR_WIPE) {
@@ -3829,7 +3832,7 @@ ECode CDevicePolicyManagerService::ClearProfileOwner(
     // Check if this is the profile owner who is calling
     AutoPtr<ActiveAdmin> objNoUse;
     GetActiveAdminForCallerLocked(who, IDeviceAdminInfo::USES_POLICY_PROFILE_OWNER, (ActiveAdmin**)&objNoUse);
-    ECode ec;
+    ECode ec = NOERROR;
     {
         AutoLock syncLock(this);
         Int64 ident = Binder::ClearCallingIdentity();
@@ -3931,7 +3934,11 @@ ECode CDevicePolicyManagerService::SetProfileEnabled(
                     IIntent::FLAG_RECEIVER_FOREGROUND);
             if (FAILED(ec)) break;
             // TODO This should send to parent of profile (which is always owner at the moment).
-            ec = mContext->SendBroadcastAsUser(intent, IUserHandle::USER_OWNER);
+            AutoPtr<IUserHandleHelper> helper;
+            CUserHandleHelper::AcquireSingleton((IUserHandleHelper**)&helper);
+            AutoPtr<IUserHandle> owner;
+            helper->GetOWNER((IUserHandle**)&owner);
+            ec = mContext->SendBroadcastAsUser(intent, owner);
         } while(FALSE);
         // } finally {
         Binder::RestoreCallingIdentity(id);
@@ -4337,7 +4344,7 @@ ECode CDevicePolicyManagerService::SetActivePasswordState(
     AutoPtr<DevicePolicyData> p = GetUserData(userHandle);
     ValidateQualityConstant(quality);
 
-    ECode ec;
+    ECode ec = NOERROR;
     {
         AutoLock syncLock(this);
         if (p->mActivePasswordQuality != quality || p->mActivePasswordLength != length
@@ -4602,7 +4609,7 @@ ECode CDevicePolicyManagerService::EnforceCrossUserPermission(
     /* [in] */ Int32 userHandle)
 {
     if (userHandle < 0) {
-        Logger::E(TAG, "Invalid userId " + userHandle);
+        Logger::E(TAG, "Invalid userId %d", userHandle);
         return E_ILLEGAL_ARGUMENT_EXCEPTION;
     }
     const Int32 callingUid = Binder::GetCallingUid();
@@ -4741,8 +4748,12 @@ ECode CDevicePolicyManagerService::GetActiveAdminForCallerLocked(
             return E_SECURITY_EXCEPTION;
         }
         candidates->Add(TO_IINTERFACE(admin));
-    } else {
-        FOR_EACH(it, policy->mAdminList) {
+    }
+    else {
+        AutoPtr<IIterator> it;
+        policy->mAdminList->GetIterator((IIterator**)&it);
+        Boolean hasNext;
+        while (it->HasNext(&hasNext), &hasNext) {
             AutoPtr<IInterface> obj;
             it->GetNext((IInterface**)&obj);
             AutoPtr<ActiveAdmin> admin = (ActiveAdmin*) IObject::Probe(obj);
@@ -7336,7 +7347,7 @@ ECode CDevicePolicyManagerService::GetPermittedInputMethodsForCurrentUser(
             inputMethodManager->GetInputMethodList((IList**)&imes);
             Int64 id = Binder::ClearCallingIdentity();
             // try {
-            ECode ec;
+            ECode ec = NOERROR;
             do {
                 AutoPtr<IIPackageManager> pm = AppGlobals::GetPackageManager();
                 if (imes != NULL) {
@@ -7621,7 +7632,7 @@ ECode CDevicePolicyManagerService::SetUserRestriction(
         }
         if (enabled && !alreadyRestricted) {
             // try {
-            ECode ec;
+            ECode ec = NOERROR;
             do {
                 if (IUserManager::DISALLOW_UNMUTE_MICROPHONE.Equals(key)) {
                     String packageName;
@@ -7645,7 +7656,7 @@ ECode CDevicePolicyManagerService::SetUserRestriction(
         }
         Int64 id = Binder::ClearCallingIdentity();
         // try {
-        ECode ec;
+        ECode ec = NOERROR;
         do {
             if (enabled && !alreadyRestricted) {
                 if (IUserManager::DISALLOW_CONFIG_WIFI.Equals(key)) {
@@ -8330,7 +8341,10 @@ ECode CDevicePolicyManagerService::NotifyLockTaskModeChanged(
         AutoPtr<IBundle> adminExtras;
         CBundle::New((IBundle**)&adminExtras);
         adminExtras->PutString(IDeviceAdminReceiver::EXTRA_LOCK_TASK_PACKAGE, pkg);
-        FOR_EACH(it, policy->mAdminList) {
+        AutoPtr<IIterator> it;
+        policy->mAdminList->GetIterator((IIterator**)&it);
+        Boolean hasNext;
+        while (it->HasNext(&hasNext), hasNext) {
             AutoPtr<IInterface> obj;
             it->GetNext((IInterface**)&obj);
             AutoPtr<ActiveAdmin> admin = (ActiveAdmin*) IObject::Probe(obj);

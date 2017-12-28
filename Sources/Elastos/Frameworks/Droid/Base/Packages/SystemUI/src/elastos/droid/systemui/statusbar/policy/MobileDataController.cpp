@@ -21,8 +21,6 @@
 #include <elastos/core/StringBuilder.h>
 #include <elastos/utility/logging/Logger.h>
 
-#include <elastos/core/AutoLock.h>
-using Elastos::Core::AutoLock;
 using Elastos::Droid::Net::CConnectivityManagerHelper;
 using Elastos::Droid::Net::CNetworkTemplateHelper;
 using Elastos::Droid::Net::CNetworkPolicyManagerHelper;
@@ -36,6 +34,7 @@ using Elastos::Droid::Telephony::ITelephonyManagerHelper;
 using Elastos::Droid::Text::Format::CDateUtils;
 using Elastos::Droid::Text::Format::CTime;
 using Elastos::Droid::Text::Format::IDateUtils;
+using Elastos::Core::AutoLock;
 using Elastos::Core::CSystem;
 using Elastos::Core::IAppendable;
 using Elastos::Core::ISystem;
@@ -374,7 +373,8 @@ String MobileDataController::FormatDateRange(
     /* [in] */ Int64 end)
 {
     const Int32 flags = IDateUtils::FORMAT_SHOW_DATE | IDateUtils::FORMAT_ABBREV_MONTH;
-    {    AutoLock syncLock(PERIOD_BUILDER);
+    {
+        AutoLock syncLock(PERIOD_BUILDER);
         PERIOD_BUILDER->SetLength(0);
         AutoPtr<IDateUtils> du;
         CDateUtils::AcquireSingleton((IDateUtils**)&du);

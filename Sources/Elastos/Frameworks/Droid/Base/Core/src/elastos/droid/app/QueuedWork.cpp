@@ -19,7 +19,6 @@
 #include "elastos/droid/app/QueuedWork.h"
 #include <elastos/core/AutoLock.h>
 
-#include <elastos/core/AutoLock.h>
 using Elastos::Core::AutoLock;
 using Elastos::Utility::Concurrent::CConcurrentLinkedQueue;
 using Elastos::Utility::Concurrent::IExecutors;
@@ -45,7 +44,8 @@ ECode QueuedWork::SingleThreadExecutor(
 {
     VALIDATE_NOT_NULL(singleThreadExecutor)
     *singleThreadExecutor = NULL;
-    {    AutoLock syncLock(sClassLock);
+    {
+        AutoLock syncLock(sClassLock);
         if (sSingleThreadExecutor == NULL) {
             AutoPtr<IExecutors> executors;
             CExecutors::AcquireSingleton((IExecutors**)&executors);

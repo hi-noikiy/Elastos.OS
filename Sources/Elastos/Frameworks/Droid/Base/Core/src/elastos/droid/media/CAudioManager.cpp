@@ -113,7 +113,8 @@ ECode CAudioManager::FocusEventHandlerDelegate::MyHandler::HandleMessage(
 
     AutoPtr<IAudioManagerOnAudioFocusChangeListener> listener;
     Object& lock = mHost->mOwner->mFocusListenerLock;
-    {    AutoLock syncLock(lock);
+    {
+        AutoLock syncLock(lock);
         listener = mHost->mOwner->FindFocusListener(info);
     }
     if (listener != NULL) {
@@ -1302,7 +1303,8 @@ ECode CAudioManager::RegisterAudioFocusListener(
     /* [in] */ IAudioManagerOnAudioFocusChangeListener* l)
 {
     String key = GetIdForAudioFocusListener(l);
-    {    AutoLock syncLock(mFocusListenerLock);
+    {
+        AutoLock syncLock(mFocusListenerLock);
         HashMap<String, AutoPtr<IAudioManagerOnAudioFocusChangeListener> >::Iterator it =
             mAudioFocusIdListenerMap.Find(key);
         if (it != mAudioFocusIdListenerMap.End()) {
@@ -1317,7 +1319,8 @@ ECode CAudioManager::UnregisterAudioFocusListener(
     /* [in] */ IAudioManagerOnAudioFocusChangeListener* l)
 {
     String key = GetIdForAudioFocusListener(l);
-    {    AutoLock syncLock(mFocusListenerLock);
+    {
+        AutoLock syncLock(mFocusListenerLock);
         HashMap<String, AutoPtr<IAudioManagerOnAudioFocusChangeListener> >::Iterator it =
         mAudioFocusIdListenerMap.Find(key);
         if (it != mAudioFocusIdListenerMap.End())
@@ -2140,7 +2143,8 @@ ECode CAudioManager::ResetAudioPortGeneration(
     VALIDATE_NOT_NULL(result)
 
     Int32 generation;
-    {    AutoLock syncLock(mAudioPortGeneration);
+    {
+        AutoLock syncLock(mAudioPortGeneration);
         mAudioPortGeneration->GetValue(&generation);
         mAudioPortGeneration = NULL;
         CInteger32::New(AUDIOPORT_GENERATION_INIT, (IInteger32**)&mAudioPortGeneration);
@@ -2156,7 +2160,8 @@ ECode CAudioManager::UpdateAudioPortCache(
 {
     VALIDATE_NOT_NULL(result)
 
-    {    AutoLock syncLock(mAudioPortGeneration);
+    {
+        AutoLock syncLock(mAudioPortGeneration);
         Int32 val;
         mAudioPortGeneration->GetValue(&val);
         if (val == AUDIOPORT_GENERATION_INIT) {

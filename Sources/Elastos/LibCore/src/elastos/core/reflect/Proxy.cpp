@@ -446,9 +446,8 @@ ECode CInterfaceProxy::ProxyEntry(
     /* [in] */ UInt32* args)
 {
     CInterfaceProxy* thisPtr;
-    UInt32 methodIndex, inSize, outSize;
-    Int32 size = 0;
-    ECode ec, orgec;
+    UInt32 methodIndex;
+    ECode ec;
 #ifndef _mips
     UInt32 argNum __attribute__((__unused__));
 #endif

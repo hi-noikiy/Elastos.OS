@@ -26,9 +26,8 @@
 #include <binder/ProcessState.h>
 #include <binder/IServiceManager.h>
 
-#include <elastos/core/AutoLock.h>
-using Elastos::Core::AutoLock;
 using Elastos::Droid::Os::SystemClock;
+using Elastos::Core::AutoLock;
 using Elastos::Core::Thread;
 using Elastos::Core::IRunnable;
 using Elastos::Utility::CArrayList;
@@ -188,7 +187,8 @@ ECode BinderInternal::ForceGc(
 ECode BinderInternal::ModifyDelayedGcParams()
 {
     Int64 nowTime = SystemClock::GetUptimeMillis();
-    {    AutoLock syncLock(mDelayGcMonitorObject);
+    {
+        AutoLock syncLock(mDelayGcMonitorObject);
         if ((mFutureTaskInstance != NULL) && (mPostponedGcCount != 0)) {
             if (mPostponedGcCount <= POSTPONED_GC_MAX) {
                 Boolean res = FALSE;
@@ -215,7 +215,8 @@ ECode BinderInternal::ModifyDelayedGcParams()
 
 ECode BinderInternal::ForceBinderGc()
 {
-    {    AutoLock syncLock(mDelayGcMonitorObject);
+    {
+        AutoLock syncLock(mDelayGcMonitorObject);
         if (mFutureTaskInstance != NULL) {
             Int64 lastGcDelayRequestDuration = (SystemClock::GetUptimeMillis() - mLastGcDelayRequestTime);
             if (lastGcDelayRequestDuration < GC_DELAY_MAX_DURATION) {

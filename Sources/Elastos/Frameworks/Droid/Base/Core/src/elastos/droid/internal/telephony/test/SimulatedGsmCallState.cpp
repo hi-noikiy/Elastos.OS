@@ -176,7 +176,8 @@ class SimulatedGsmCallState extends Handler {
     //@Override
     CARAPI
     HandleMessage(Message msg) {
-        {    AutoLock syncLock(this) { Switch (msg.what);
+        {
+            AutoLock syncLock(this) { Switch (msg.what);
             // PLEASE REMEMBER
             // calls may have hung up by the time delayed events happen
 
@@ -194,7 +195,8 @@ class SimulatedGsmCallState extends Handler {
      */
     public Boolean
     TriggerRing(String number) {
-        {    AutoLock syncLock(this);
+        {
+            AutoLock syncLock(this);
             Int32 empty = -1;
             Boolean isCallWaiting = FALSE;
 
@@ -235,7 +237,8 @@ class SimulatedGsmCallState extends Handler {
     /** If a call is DIALING or ALERTING, progress it to the next state */
     CARAPI
     ProgressConnectingCallState() {
-        {    AutoLock syncLock(this);
+        {
+            AutoLock syncLock(this);
             For (Int32 i = 0 ; i < mCalls.length ; i++) {
                 CallInfo call = mCalls[i];
 
@@ -261,7 +264,8 @@ class SimulatedGsmCallState extends Handler {
     /** If a call is DIALING or ALERTING, progress it all the way to ACTIVE */
     CARAPI
     ProgressConnectingToActive() {
-        {    AutoLock syncLock(this);
+        {
+            AutoLock syncLock(this);
             For (Int32 i = 0 ; i < mCalls.length ; i++) {
                 CallInfo call = mCalls[i];
 
@@ -294,7 +298,8 @@ class SimulatedGsmCallState extends Handler {
      */
     public Boolean
     TriggerHangupForeground() {
-        {    AutoLock syncLock(this);
+        {
+            AutoLock syncLock(this);
             Boolean found;
 
             found = FALSE;
@@ -333,7 +338,8 @@ class SimulatedGsmCallState extends Handler {
      */
     public Boolean
     TriggerHangupBackground() {
-        {    AutoLock syncLock(this);
+        {
+            AutoLock syncLock(this);
             Boolean found = FALSE;
 
             For (Int32 i = 0 ; i < mCalls.length ; i++) {
@@ -355,7 +361,8 @@ class SimulatedGsmCallState extends Handler {
      */
     public Boolean
     TriggerHangupAll() {
-        {    AutoLock syncLock(this);
+        {
+            AutoLock syncLock(this);
             Boolean found = FALSE;
 
             For (Int32 i = 0 ; i < mCalls.length ; i++) {
@@ -374,7 +381,8 @@ class SimulatedGsmCallState extends Handler {
 
     public Boolean
     OnAnswer() {
-        {    AutoLock syncLock(this);
+        {
+            AutoLock syncLock(this);
             For (Int32 i = 0 ; i < mCalls.length ; i++) {
                 CallInfo call = mCalls[i];
 

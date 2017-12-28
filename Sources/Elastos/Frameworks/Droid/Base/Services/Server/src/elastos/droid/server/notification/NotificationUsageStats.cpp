@@ -23,8 +23,6 @@
 #include <elastos/core/StringUtils.h>
 #include <elastos/utility/logging/Logger.h>
 
-#include <elastos/core/AutoLock.h>
-using Elastos::Core::AutoLock;
 using Elastos::Droid::App::INotification;
 using Elastos::Droid::App::INotificationAction;
 using Elastos::Droid::Content::CContentValues;
@@ -34,6 +32,7 @@ using Elastos::Droid::Os::IUserHandle;
 using Elastos::Droid::Os::CHandlerThread;
 using Elastos::Droid::Os::IHandlerThread;
 using Elastos::Droid::Os::IProcess;
+using Elastos::Core::AutoLock;
 using Elastos::Core::ISystem;
 using Elastos::Core::CSystem;
 using Elastos::Core::CoreUtils;
@@ -569,8 +568,8 @@ void NotificationUsageStats::SQLiteLog::PrintPostFrequencies(
     AutoPtr<ICursor> cursor;
     db->RawQuery(q, NULL, (ICursor**)&cursor);
     // try {
-    Boolean res1, res2, res3;
-    for ((cursor->MoveToFirst(&res1), res1); (cursor->IsAfterLast(&res2), !res2); (cursor->MoveToNext(&res3), res3)) {
+    Boolean res;
+    for (cursor->MoveToFirst(&res); (cursor->IsAfterLast(&res), !res); cursor->MoveToNext(&res)) {
         Int32 userId;
         cursor->GetInt32(0, &userId);
         String pkg;
@@ -865,7 +864,8 @@ NotificationUsageStats::~NotificationUsageStats()
 void NotificationUsageStats::RegisterPostedByApp(
     /* [in] */ NotificationRecord* notification)
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         notification->mStats = new SingleNotificationStats();
         notification->mStats->mPosttimeElapsedMs = SystemClock::GetElapsedRealtime();
         AutoPtr< ArrayOf<AggregatedStats*> > args = GetAggregatedStatsLocked(notification);
@@ -894,7 +894,8 @@ void NotificationUsageStats::RegisterUpdatedByApp(
 void NotificationUsageStats::RegisterRemovedByApp(
     /* [in] */ NotificationRecord* notification)
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         notification->mStats->OnRemoved();
         AutoPtr< ArrayOf<AggregatedStats*> > args = GetAggregatedStatsLocked(notification);
         for (Int32 i = 0; i < args->GetLength(); i++) {
@@ -911,7 +912,8 @@ void NotificationUsageStats::RegisterRemovedByApp(
 void NotificationUsageStats::RegisterDismissedByUser(
     /* [in] */ NotificationRecord* notification)
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         notification->mStats->OnDismiss();
         AutoPtr< ArrayOf<AggregatedStats*> > args = GetAggregatedStatsLocked(notification);
         for (Int32 i = 0; i < args->GetLength(); i++) {
@@ -928,7 +930,8 @@ void NotificationUsageStats::RegisterDismissedByUser(
 void NotificationUsageStats::RegisterClickedByUser(
     /* [in] */ NotificationRecord* notification)
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         notification->mStats->OnClick();
         AutoPtr< ArrayOf<AggregatedStats*> > args = GetAggregatedStatsLocked(notification);
         for (Int32 i = 0; i < args->GetLength(); i++) {
@@ -944,7 +947,8 @@ void NotificationUsageStats::RegisterClickedByUser(
 void NotificationUsageStats::RegisterCancelDueToClick(
     /* [in] */ NotificationRecord* notification)
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         notification->mStats->OnCancel();
         AutoPtr< ArrayOf<AggregatedStats*> > args = GetAggregatedStatsLocked(notification);
         for (Int32 i = 0; i < args->GetLength(); i++) {
@@ -957,7 +961,8 @@ void NotificationUsageStats::RegisterCancelDueToClick(
 void NotificationUsageStats::RegisterCancelUnknown(
     /* [in] */ NotificationRecord* notification)
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         notification->mStats->OnCancel();
         AutoPtr< ArrayOf<AggregatedStats*> > args = GetAggregatedStatsLocked(notification);
         for (Int32 i = 0; i < args->GetLength(); i++) {
@@ -1018,7 +1023,8 @@ void NotificationUsageStats::Dump(
     /* [in] */ const String& indent,
     /* [in] */ DumpFilter* filter)
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         if (ENABLE_AGGREGATED_IN_MEMORY_STATS) {
             AutoPtr<ICollection> value;
             mStats->GetValues((ICollection**)&value);

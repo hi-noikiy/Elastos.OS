@@ -450,7 +450,7 @@ ECode ShutdownThread::ShutdownMusicHandler::OnCompletionListener::OnCompletion(
 //          ShutdownThread::ShutdownMusicHandler
 //==============================================================================
 
-ShutdownThread::ShutdownMusicHandler::HandleMessage(
+ECode ShutdownThread::ShutdownMusicHandler::HandleMessage(
     /* [in] */ IMessage* msg)
 {
     AutoPtr<IInterface> obj;
@@ -533,7 +533,8 @@ void ShutdownThread::ShutdownInner(
 {
     // ensure that only one thread is trying to power down.
     // any additional calls are just returned
-    {    AutoLock syncLock(sIsStartedGuard);
+    {
+        AutoLock syncLock(sIsStartedGuard);
         if (sIsStarted) {
             Logger::D(TAG, "Request to shutdown already running, returning.");
             return;

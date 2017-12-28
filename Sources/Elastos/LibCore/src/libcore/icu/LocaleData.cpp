@@ -22,7 +22,6 @@
 #include "AutoLock.h"
 #include "Logger.h"
 
-#include <elastos/core/AutoLock.h>
 using Elastos::Core::AutoLock;
 using Elastos::Core::StringUtils;
 using Elastos::Utility::CLocale;

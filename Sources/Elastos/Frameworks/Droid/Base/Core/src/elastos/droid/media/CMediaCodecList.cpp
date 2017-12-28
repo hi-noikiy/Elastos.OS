@@ -25,7 +25,6 @@
 #include <media/stagefright/foundation/AMessage.h>
 #include <media/stagefright/MediaCodecList.h>
 
-#include <elastos/core/AutoLock.h>
 using Elastos::Core::AutoLock;
 using Elastos::Utility::Arrays;
 using Elastos::Utility::CArrayList;
@@ -168,7 +167,8 @@ String CMediaCodecList::FindCodecForFormat(
 
 void CMediaCodecList::InitCodecList()
 {
-    {    AutoLock syncLock(sInitLock);
+    {
+        AutoLock syncLock(sInitLock);
         if (sRegularCodecInfos == NULL) {
             Int32 count;
             NativeGetCodecCount(&count);

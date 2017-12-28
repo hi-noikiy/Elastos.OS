@@ -42,8 +42,6 @@
 #include <Elastos.Droid.Provider.h>
 #include <Elastos.Droid.Accounts.h>
 
-#include <elastos/core/AutoLock.h>
-using Elastos::Core::AutoLock;
 using Elastos::Droid::R;
 using Elastos::Droid::Os::IBatteryStats;
 using Elastos::Droid::Os::IServiceManager;
@@ -116,6 +114,7 @@ using Elastos::Droid::Internal::Os::IBackgroundThread;
 using Elastos::Droid::Internal::Os::IBackgroundThreadHelper;
 using Elastos::Droid::Internal::Os::CBackgroundThreadHelper;
 // using Elastos::Droid::Server::Accounts::CAccountManagerService;
+using Elastos::Core::AutoLock;
 using Elastos::Core::CoreUtils;
 using Elastos::Core::ISystem;
 using Elastos::Core::CSystem;
@@ -550,7 +549,8 @@ ECode SyncManager::SyncHandler::OnBootCompleted()
     // }
     mHost->DoDatabaseCleanup();
 
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         // Dispatch any stashed messages.
         Boolean bval;
         List<AutoPtr<IMessage> >::Iterator it;
@@ -588,7 +588,8 @@ AutoPtr<IPowerManagerWakeLock> SyncManager::SyncHandler::GetSyncWakeLock(
 Boolean SyncManager::SyncHandler::TryEnqueueMessageUntilReadyToRun(
     /* [in] */ IMessage* msg)
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         if (!mHost->mBootCompleted) {
             // Need to copy the message bc looper will recycle it.
             AutoPtr<IMessageHelper> helper;
@@ -994,7 +995,8 @@ Int64 SyncManager::SyncHandler::MaybeStartNextSyncLocked()
     AutoPtr<IList> operations;
     CArrayList::New((IList**)&operations);
     Object* lockObj = mHost->mSyncQueue.Get();
-    {    AutoLock syncLock(lockObj);
+    {
+        AutoLock syncLock(lockObj);
         // if (isLoggable) {
         //     Logger::V(TAG, "build the operation array, syncQueue size is "
         //         + mSyncQueue.getOperations().size());
@@ -1188,7 +1190,8 @@ Int64 SyncManager::SyncHandler::MaybeStartNextSyncLocked()
             mHost->ScheduleSyncOperation(toReschedule->mSyncOperation);
         }
 
-        {    AutoLock syncLock(lockObj);
+        {
+            AutoLock syncLock(lockObj);
             mHost->mSyncQueue->Remove(candidate);
         }
         DispatchSyncOperation(candidate);
@@ -2081,7 +2084,8 @@ ECode SyncManager::ConnectivityIntentReceiver::OnReceive(
             //     Logger::V(TAG, "Reconnection detected: clearing all backoffs");
             // }
             Object* obj = mHost->mSyncQueue.Get();
-            {    AutoLock syncLock(obj);
+            {
+                AutoLock syncLock(obj);
                 mHost->mSyncStorageEngine->ClearAllBackoffsLocked(mHost->mSyncQueue);
             }
         }
@@ -2185,7 +2189,8 @@ SyncManager::SyncTimeTracker::SyncTimeTracker(
 /** Call to let the tracker know that the sync state may have changed */
 void SyncManager::SyncTimeTracker::Update()
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         Boolean isSyncInProgress = !mHost->mActiveSyncContexts.IsEmpty();
         if (isSyncInProgress == mLastWasSyncing) return;
         Int64 now = SystemClock::GetElapsedRealtime();
@@ -2202,7 +2207,8 @@ void SyncManager::SyncTimeTracker::Update()
  Int64 SyncManager::SyncTimeTracker::TimeSpentSyncing()
  {
     Int64 result = 0;
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         if (!mLastWasSyncing) return mTimeSpentSyncing;
 
         Int64 now = SystemClock::GetElapsedRealtime();
@@ -2310,11 +2316,11 @@ Boolean SyncManager::ContainsAccountAndUser(
 {
     Boolean found = FALSE;
     for (Int32 i = 0; i < accounts->GetLength(); i++) {
-        Int32 userId;
-        (*accounts)[i]->GetUserId(&userId);
+        Int32 othUserId;
+        (*accounts)[i]->GetUserId(&othUserId);
         AutoPtr<IAccount> acnt;
         (*accounts)[i]->GetAccount((IAccount**)&acnt);
-        if (userId == userId && Object::Equals(acnt, account)) {
+        if (userId == othUserId && Object::Equals(acnt, account)) {
             found = TRUE;
             break;
         }
@@ -2385,7 +2391,8 @@ Boolean SyncManager::ReadDataConnectionState()
 
 AutoPtr<IConnectivityManager> SyncManager::GetConnectivityManager()
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         if (mConnManagerDoNotUseDirectly == NULL) {
             AutoPtr<IInterface> obj;
             mContext->GetSystemService(IContext::CONNECTIVITY_SERVICE, (IInterface**)&obj);
@@ -3005,7 +3012,8 @@ void SyncManager::ClearBackoffSetting(
         SyncStorageEngine::NOT_IN_BACKOFF_MODE,
         SyncStorageEngine::NOT_IN_BACKOFF_MODE);
     Object* obj = mSyncQueue.Get();
-    {    AutoLock syncLock(obj);
+    {
+        AutoLock syncLock(obj);
         mSyncQueue->OnBackoffChanged(op->mTarget, 0);
     }
 }
@@ -3058,7 +3066,8 @@ void SyncManager::IncreaseBackoffSetting(
     op->UpdateEffectiveRunTime();
 
     Object* obj = mSyncQueue.Get();
-    {    AutoLock syncLock(obj);
+    {
+        AutoLock syncLock(obj);
         mSyncQueue->OnBackoffChanged(op->mTarget, backoff);
     }
 }
@@ -3080,7 +3089,8 @@ void SyncManager::SetDelayUntilTime(
     }
     mSyncStorageEngine->SetDelayUntilTime(op->mTarget, newDelayUntilTime);
     Object* obj = mSyncQueue.Get();
-    {    AutoLock syncLock(obj);
+    {
+        AutoLock syncLock(obj);
         mSyncQueue->OnDelayUntilTimeChanged(op->mTarget, newDelayUntilTime);
     }
 }
@@ -3097,7 +3107,8 @@ void SyncManager::ScheduleSyncOperation(
 {
     Boolean queueChanged;
     Object* obj = mSyncQueue.Get();
-    {    AutoLock syncLock(obj);
+    {
+        AutoLock syncLock(obj);
         queueChanged = mSyncQueue->Add(syncOperation);
     }
 
@@ -3119,7 +3130,8 @@ void SyncManager::ClearScheduledSyncOperations(
     /* [in] */ EndPoint* info)
 {
     Object* obj = mSyncQueue.Get();
-    {    AutoLock syncLock(obj);
+    {
+        AutoLock syncLock(obj);
         mSyncQueue->Remove(info, NULL /* all operations */);
     }
     mSyncStorageEngine->SetBackoff(info,
@@ -3131,7 +3143,8 @@ void SyncManager::CancelScheduledSyncOperation(
     /* [in] */ IBundle* extras)
 {
     Object* obj = mSyncQueue.Get();
-    {    AutoLock syncLock(obj);
+    {
+        AutoLock syncLock(obj);
         mSyncQueue->Remove(info, extras);
     }
     // Reset the back-off if there are no more syncs pending.
@@ -3234,7 +3247,8 @@ void SyncManager::OnUserStarting(
     UpdateRunningAccounts();
 
     Object* obj = mSyncQueue.Get();
-    {    AutoLock syncLock(obj);
+    {
+        AutoLock syncLock(obj);
         mSyncQueue->AddPendingOperations(userId);
     }
 
@@ -3271,7 +3285,8 @@ void SyncManager::OnUserRemoved(
     AutoPtr<ArrayOf<IAccount*> > accounts = ArrayOf<IAccount*>::Alloc(0);
     mSyncStorageEngine->DoDatabaseCleanup(accounts, userId);
     Object* obj = mSyncQueue.Get();
-    {    AutoLock syncLock(obj);
+    {
+        AutoLock syncLock(obj);
         mSyncQueue->RemoveUserLocked(userId);
     }
 }
@@ -3880,7 +3895,7 @@ Boolean SyncManager::IsSyncStillActive(
     /* [in] */ ActiveSyncContext* activeSyncContext)
 {
     List<AutoPtr<ActiveSyncContext> >::Iterator it;
-    for (it != mActiveSyncContexts.Begin(); it != mActiveSyncContexts.End(); ++it) {
+    for (it = mActiveSyncContexts.Begin(); it != mActiveSyncContexts.End(); ++it) {
         ActiveSyncContext* sync = *it;
         if (sync == activeSyncContext) {
             return TRUE;

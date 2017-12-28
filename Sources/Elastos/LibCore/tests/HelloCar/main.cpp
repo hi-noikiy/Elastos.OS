@@ -162,7 +162,8 @@ public:
 void lockTest()
 {
     AutoPtr<AutoLockTest> lock = new AutoLockTest();
-    {    AutoLock syncLock(lock->mLock);
+    {
+        AutoLock syncLock(lock->mLock);
         Int32 i = 0;
         ++i;
     }

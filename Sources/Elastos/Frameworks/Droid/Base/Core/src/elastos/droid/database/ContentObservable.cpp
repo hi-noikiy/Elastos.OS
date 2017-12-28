@@ -17,7 +17,6 @@
 #include "elastos/droid/database/ContentObservable.h"
 #include <elastos/core/AutoLock.h>
 
-#include <elastos/core/AutoLock.h>
 using Elastos::Core::AutoLock;
 
 namespace Elastos {
@@ -42,7 +41,8 @@ ECode ContentObservable::DispatchChange(
     /* [in] */ Boolean selfChange,
     /* [in] */ IUri* uri)
 {
-    {    AutoLock syncLock(mObserversLock);
+    {
+        AutoLock syncLock(mObserversLock);
         List< AutoPtr<IInterface> >::Iterator iter;
         for (iter = mObservers.Begin(); iter != mObservers.End(); ++iter) {
             AutoPtr<IContentObserver> observer = IContentObserver::Probe(*iter);
@@ -58,7 +58,8 @@ ECode ContentObservable::DispatchChange(
 ECode ContentObservable::NotifyChange(
     /* [in] */ Boolean selfChange)
 {
-    {    AutoLock syncLock(mObserversLock);
+    {
+        AutoLock syncLock(mObserversLock);
         List< AutoPtr<IInterface> >::Iterator iter;
         for (iter = mObservers.Begin(); iter != mObservers.End(); ++iter) {
             AutoPtr<IContentObserver> observer = IContentObserver::Probe(*iter);

@@ -27,7 +27,6 @@
 #include <elastos/core/AutoLock.h>
 #include <elastos/utility/logging/Logger.h>
 
-#include <elastos/core/AutoLock.h>
 using Elastos::Core::AutoLock;
 using Elastos::Droid::Manifest;
 using Elastos::Droid::Os::Process;
@@ -1272,7 +1271,8 @@ ECode AppOpsManager::StartWatchingMode(
     /* [in] */ const String& packageName,
     /* [in] */ IAppOpsManagerOnOpChangedListener* callback)
 {
-    {    AutoLock syncLock(mModeWatchersLock);
+    {
+        AutoLock syncLock(mModeWatchersLock);
         HashMap<AutoPtr<IAppOpsManagerOnOpChangedListener>, AutoPtr<IIAppOpsCallback> >::Iterator it;
         AutoPtr<IAppOpsManagerOnOpChangedListener> listener;
         it = mModeWatchers.Find(listener);
@@ -1293,7 +1293,8 @@ ECode AppOpsManager::StartWatchingMode(
 ECode AppOpsManager::StopWatchingMode(
     /* [in] */ IAppOpsManagerOnOpChangedListener* callback)
 {
-    {    AutoLock syncLock(mModeWatchersLock);
+    {
+        AutoLock syncLock(mModeWatchersLock);
         HashMap<AutoPtr<IAppOpsManagerOnOpChangedListener>, AutoPtr<IIAppOpsCallback> >::Iterator it;
         AutoPtr<IAppOpsManagerOnOpChangedListener> listener;
         it = mModeWatchers.Find(listener);
@@ -1573,7 +1574,8 @@ ECode AppOpsManager::AppOpsManager::GetToken(
 {
     VALIDATE_NOT_NULL(binder)
     *binder = NULL;
-    {    AutoLock syncLock(sClassLock);
+    {
+        AutoLock syncLock(sClassLock);
         if (sToken == NULL) {
             AutoPtr<IBinder> binder;
             CBinder::New((IBinder**)&binder);

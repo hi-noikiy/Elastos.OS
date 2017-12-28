@@ -27,14 +27,13 @@
 #include <utils/misc.h>
 #include <utils/Log.h>
 
-#include <elastos/core/AutoLock.h>
-using Elastos::Core::AutoLock;
 using Elastos::Droid::Content::IContext;
 using Elastos::Droid::Content::Pm::IPackageManager;
 using Elastos::Droid::Os::EIID_IBinder;
 using Elastos::Droid::Os::EIID_IIHardwareService;
 using Elastos::Droid::Os::ServiceManager;
 using Elastos::Droid::Server::Lights::CLegacyFlashlightHack;
+using Elastos::Core::AutoLock;
 using Elastos::IO::CFileInputStream;
 using Elastos::IO::IFileInputStream;
 using Elastos::IO::CFileOutputStream;

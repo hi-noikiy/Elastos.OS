@@ -30,8 +30,6 @@
 #include "elastos/core/IntegralToString.h"
 #include <elastos/utility/logging/Logger.h>
 
-#include <elastos/core/AutoLock.h>
-using Elastos::Core::AutoLock;
 using Elastos::Droid::Content::CIntent;
 using Elastos::Droid::Content::CIntentFilter;
 using Elastos::Droid::Content::IBroadcastReceiver;

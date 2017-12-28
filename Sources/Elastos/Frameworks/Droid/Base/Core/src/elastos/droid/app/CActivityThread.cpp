@@ -1694,7 +1694,8 @@ ECode CActivityThread::InstallSystemApplicationInfo(
     /* [in] */ IApplicationInfo* info,
     /* [in] */ IClassLoader* classLoader)
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         AutoPtr<IContextImpl> ctx;
         GetSystemContext((IContextImpl**)&ctx);
         CContextImpl* cctx = (CContextImpl*)ctx.Get();
@@ -4906,7 +4907,8 @@ ECode CActivityThread::HandleDispatchPackageBroadcast(
 {
     Boolean hasPkgInfo = FALSE;
     if (packages != NULL) {
-        {    AutoLock syncLock(mResourcesManager);
+        {
+            AutoLock syncLock(mResourcesManager);
             for (Int32 i = packages->GetLength() - 1; i >= 0; --i) {
                 //Slogger::I(TAG, "Cleaning old package: %s", (*packages)[i].string());
                 if (!hasPkgInfo) {
@@ -5897,9 +5899,10 @@ ECode CActivityThread::HandleUnstableProviderDiedLocked(
 }
 
 ECode CActivityThread::AppNotRespondingViaProvider(
-        /* [in] */ IBinder* provider)
+    /* [in] */ IBinder* provider)
 {
-    {    AutoLock syncLock(mProviderMapLock);
+    {
+        AutoLock syncLock(mProviderMapLock);
         HashMap< AutoPtr<IBinder>, AutoPtr<ProviderRefCount> >::Iterator it;
         AutoPtr<IBinder> tmp = provider;
         it = mProviderRefCountMap.Find(tmp);

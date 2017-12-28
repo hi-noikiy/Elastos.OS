@@ -581,7 +581,8 @@ void FlashlightController::DispatchListeners(
     /* [in] */ Int32 message,
     /* [in] */ Boolean argument)
 {
-    {    AutoLock syncLock(mListeners);
+    {
+        AutoLock syncLock(mListeners);
         Int32 N = 0;
         mListeners->GetSize(&N);
         Boolean cleanup = FALSE;

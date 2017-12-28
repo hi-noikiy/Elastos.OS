@@ -25,14 +25,13 @@
 #include <elastos/core/AutoLock.h>
 #include <elastos/utility/logging/Logger.h>
 
-#include <elastos/core/AutoLock.h>
-using Elastos::Core::AutoLock;
 using Elastos::Droid::Os::CLooperHelper;
 using Elastos::Droid::Os::CMessageHelper;
 using Elastos::Droid::Os::ILooper;
 using Elastos::Droid::Os::ILooperHelper;
 using Elastos::Droid::Os::IMessageHelper;
 using Elastos::Droid::Utility::CSparseArray;
+using Elastos::Core::AutoLock;
 using Elastos::Utility::CArrayList;
 using Elastos::Utility::Logging::Logger;
 
@@ -129,7 +128,8 @@ ECode CTvInputManagerSession::PendingEvent::Run()
 {
     mCallback->OnFinishedInputEvent(mEventToken, mHandled);
 
-    {    AutoLock syncLock(mEventHandler);
+    {
+        AutoLock syncLock(mEventHandler);
         mHost->RecyclePendingEventLocked(this);
     }
     return NOERROR;
@@ -416,7 +416,8 @@ ECode CTvInputManagerSession::DispatchInputEvent(
         // throw new IllegalArgumentException("handler cannot be NULL");
         return NOERROR;
     }
-    {    AutoLock syncLock(mHandler);
+    {
+        AutoLock syncLock(mHandler);
         if (mChannel == NULL) {
             *result = ITvInputManagerSession::DISPATCH_NOT_HANDLED;
             return NOERROR;
@@ -547,7 +548,8 @@ ECode CTvInputManagerSession::FinishedInputEvent(
     /* [in] */ Boolean timeout)
 {
     AutoPtr<PendingEvent> p;
-    {    AutoLock syncLock(mHandler);
+    {
+        AutoLock syncLock(mHandler);
         Int32 index;
         mPendingEvents->IndexOfKey(seq, &index);
         if (index < 0) {
@@ -600,7 +602,8 @@ Boolean CTvInputManagerSession::ContainsTrack(
 void CTvInputManagerSession::SendInputEventAndReportResultOnMainLooper(
     /* [in] */ PendingEvent* p)
 {
-    {    AutoLock syncLock(mHandler);
+    {
+        AutoLock syncLock(mHandler);
         Int32 result = SendInputEventOnMainLooperLocked(p);
         if (result == ITvInputManagerSession::DISPATCH_IN_PROGRESS) {
             return;
@@ -709,7 +712,8 @@ void CTvInputManagerSession::RecyclePendingEventLocked(
 ECode CTvInputManagerSession::ReleaseInternal()
 {
     mToken = NULL;
-    {    AutoLock syncLock(mHandler);
+    {
+        AutoLock syncLock(mHandler);
         if (mChannel != NULL) {
             if (mSender != NULL) {
                 FlushPendingEventsLocked();
@@ -720,7 +724,8 @@ ECode CTvInputManagerSession::ReleaseInternal()
             mChannel = NULL;
         }
     }
-    {    AutoLock syncLock(mSessionCallbackRecordMap);
+    {
+        AutoLock syncLock(mSessionCallbackRecordMap);
         mSessionCallbackRecordMap->Remove(mSeq);
     }
     return NOERROR;

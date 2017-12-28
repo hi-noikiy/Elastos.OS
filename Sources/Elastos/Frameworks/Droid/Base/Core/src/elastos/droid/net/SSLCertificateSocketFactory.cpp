@@ -20,20 +20,18 @@
 #include "elastos/droid/net/SSLCertificateSocketFactory.h"
 #include "elastos/droid/net/CSSLCertificateSocketFactory.h"
 #include "elastos/droid/net/http/Connection.h"
-#include "elastos/droid/net/ReturnOutValue.h"
 #include "elastos/droid/net/SSLSessionCache.h"
 #include "elastos/droid/os/SystemProperties.h"
 #include <elastos/core/AutoLock.h>
 #include <elastos/utility/logging/Logger.h>
 
-#include <elastos/core/AutoLock.h>
-using Elastos::Core::AutoLock;
 using Elastos::Droid::Net::ISSLCertificateSocketFactory;
 using Elastos::Droid::Net::ISSLSessionCache;
 using Elastos::Droid::Os::ISystemProperties;
 using Elastos::Droid::Os::SystemProperties;
 using Elastos::Droid::Utility::ILog;
 
+using Elastos::Core::AutoLock;
 using Elastos::Core::IArrayOf;
 using Elastos::Core::IByte;
 using Elastos::Net::CURI;
@@ -237,7 +235,9 @@ ECode SSLCertificateSocketFactory::MakeSocketFactory(
             AutoPtr<ISSLSocketFactoryHelper> helper;
             CSSLSocketFactoryHelper::AcquireSingleton((ISSLSocketFactoryHelper**)&helper);
             helper->GetDefault((ISocketFactory**)&rev);
-            FUNC_RETURN(ISSLSocketFactory::Probe(rev))
+            *result = ISSLSocketFactory::Probe(rev);
+            REFCOUNT_ADD(*result);
+            return NOERROR;
         }
         return ec;
     }
@@ -252,7 +252,9 @@ ECode SSLCertificateSocketFactory::MakeSocketFactory(
     ISSLContextSpi::Probe(sslContext)->EngineGetSocketFactory((ISSLSocketFactory**)&factory);
     rev = ISocketFactory::Probe(factory);
 
-    FUNC_RETURN(ISSLSocketFactory::Probe(rev))
+    *result = ISSLSocketFactory::Probe(rev);
+    REFCOUNT_ADD(*result);
+    return NOERROR;
     //} catch (KeyManagementException e) {
     //    Log.wtf(TAG, e);
     //    return (SSLSocketFactory) SSLSocketFactory.getDefault();  // Fallback
@@ -269,7 +271,8 @@ Boolean SSLCertificateSocketFactory::IsSslCheckRelaxed()
 
 AutoPtr<ISSLSocketFactory> SSLCertificateSocketFactory::GetDelegate()
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         // Relax the SSL check if instructed (for this factory, or systemwide)
         if (!mSecure || IsSslCheckRelaxed()) {
             if (mInsecureFactory == NULL) {
@@ -354,15 +357,17 @@ ECode SSLCertificateSocketFactory::ToLengthPrefixedList(
         Int32 length3;
         s->GetLength(&length3);
         (*rev)[pos++] = (Byte)length3;
-        for (Int32 j = 0; j < Ptr(s)->Func(s->GetLength); ++j) {
-            AutoPtr<IByte> byte;
+        for (Int32 j = 0; j < length3; ++j) {
             AutoPtr<IInterface> obj;
             s->Get(j, (IInterface**)&obj);
-            byte = IByte::Probe(obj);
-            (*rev)[pos++] = Ptr(byte)->Func(byte->GetValue);
+            Byte bv;
+            IByte::Probe(obj)->GetValue(&bv);
+            (*rev)[pos++] = bv;
         }
     }
-    FUNC_RETURN(rev)
+    *result = rev;
+    REFCOUNT_ADD(*result);
+    return NOERROR;
 }
 
 ECode SSLCertificateSocketFactory::GetNpnSelectedProtocol(

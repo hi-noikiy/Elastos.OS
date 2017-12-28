@@ -734,7 +734,8 @@ String MediaSessionRecord::GetShortMetadataString()
 
 void MediaSessionRecord::PushPlaybackStateUpdate()
 {
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         if (mDestroyed) {
             return;
         }
@@ -764,7 +765,8 @@ void MediaSessionRecord::PushPlaybackStateUpdate()
 
 void MediaSessionRecord::PushMetadataUpdate()
 {
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         if (mDestroyed) {
             return;
         }
@@ -794,7 +796,8 @@ void MediaSessionRecord::PushMetadataUpdate()
 
 void MediaSessionRecord::PushQueueUpdate()
 {
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         if (mDestroyed) {
             return;
         }
@@ -824,7 +827,8 @@ void MediaSessionRecord::PushQueueUpdate()
 
 void MediaSessionRecord::PushQueueTitleUpdate()
 {
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         if (mDestroyed) {
             return;
         }
@@ -854,7 +858,8 @@ void MediaSessionRecord::PushQueueTitleUpdate()
 
 void MediaSessionRecord::PushExtrasUpdate()
 {
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         if (mDestroyed) {
             return;
         }
@@ -884,7 +889,8 @@ void MediaSessionRecord::PushExtrasUpdate()
 
 void MediaSessionRecord::PushVolumeUpdate()
 {
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         if (mDestroyed) {
             return;
         }
@@ -916,7 +922,8 @@ void MediaSessionRecord::PushEvent(
     /* [in] */ const String& event,
     /* [in] */ IBundle* data)
 {
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         if (mDestroyed) {
             return;
         }
@@ -946,7 +953,8 @@ void MediaSessionRecord::PushEvent(
 
 void MediaSessionRecord::PushSessionDestroyed()
 {
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         // This is the only method that may be (and can only be) called
         // after the session is destroyed.
         if (!mDestroyed) {
@@ -982,7 +990,8 @@ AutoPtr<IPlaybackState> MediaSessionRecord::GetStateWithUpdatedPosition()
 {
     AutoPtr<IPlaybackState> state;
     Int64 duration = -1;
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         state = mPlaybackState;
         Boolean containsKey;
         if (mMetadata != NULL &&

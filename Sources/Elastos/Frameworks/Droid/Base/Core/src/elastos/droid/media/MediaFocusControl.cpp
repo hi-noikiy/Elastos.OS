@@ -34,7 +34,6 @@
 #include <elastos/core/StringUtils.h>
 #include <elastos/utility/logging/Logger.h>
 
-#include <elastos/core/AutoLock.h>
 using Elastos::Core::AutoLock;
 using Elastos::Droid::App::CActivityManager;
 using Elastos::Droid::App::IActivity;
@@ -280,13 +279,15 @@ ECode MediaFocusControl::MyPhoneStateListener::OnCallStateChanged(
 {
     if (state == ITelephonyManager::CALL_STATE_RINGING) {
         //Log.v(TAG, " CALL_STATE_RINGING");
-        {    AutoLock syncLock(mRingingLock);
+        {
+            AutoLock syncLock(mRingingLock);
             mHost->mIsRinging = TRUE;
         }
     }
     else if ((state == ITelephonyManager::CALL_STATE_OFFHOOK)
             || (state == ITelephonyManager::CALL_STATE_IDLE)) {
-        {    AutoLock syncLock(mRingingLock);
+        {
+            AutoLock syncLock(mRingingLock);
             mHost->mIsRinging = FALSE;
         }
     }
@@ -301,7 +302,8 @@ CAR_INTERFACE_IMPL(MediaFocusControl::AudioFocusDeathHandler, Object, IProxyDeat
 
 ECode MediaFocusControl::AudioFocusDeathHandler::ProxyDied()
 {
-    {    AutoLock syncLock(mAudioFocusLock);
+    {
+        AutoLock syncLock(mAudioFocusLock);
         Logger::W(TAG, "  AudioFocus   audio focus client died");
         mHost->RemoveFocusStackEntryForClient(mCb);
     }
@@ -395,7 +397,8 @@ ECode MediaFocusControl::DisplayInfoForServer::ReleaseResources()
 ECode MediaFocusControl::DisplayInfoForServer::ProxyDied()
 {
     AutoPtr<IStack> lock = mHost->mPRStack;
-    {    AutoLock syncLock(lock);
+    {
+        AutoLock syncLock(lock);
         Logger::W(TAG, "RemoteControl: display %p died", mRcDisplay.Get());
         // remove the display from the list
         AutoPtr<IIterator> displayIterator;
@@ -583,7 +586,8 @@ void MediaFocusControl::OnSetRemoteControlClientPlayItem(
 {
     String strUid = StringUtils::ToString(uid);
     Logger::D(TAG, String("onSetRemoteControlClientPlayItem: ") + strUid);
-    {    AutoLock syncLock(mCurrentRcLock);
+    {
+        AutoLock syncLock(mCurrentRcLock);
         if (mCurrentRcClient != NULL) {
             // try {
                 mCurrentRcClient->SetPlayItem(scope, uid);
@@ -598,7 +602,8 @@ void MediaFocusControl::OnSetRemoteControlClientPlayItem(
 void MediaFocusControl::OnGetRemoteControlClientNowPlayingEntries()
 {
     Logger::D(TAG, "onGetRemoteControlClientNowPlayingEntries: ");
-    {    AutoLock syncLock(mCurrentRcLock);
+    {
+        AutoLock syncLock(mCurrentRcLock);
         if (mCurrentRcClient != NULL) {
             // try {
                 mCurrentRcClient->GetNowPlayingEntries();
@@ -635,7 +640,8 @@ void MediaFocusControl::OnSetRemoteControlClientBrowsedPlayer()
 
 void MediaFocusControl::DiscardAudioFocusOwner()
 {
-    {    AutoLock syncLock(mAudioFocusLock);
+    {
+        AutoLock syncLock(mAudioFocusLock);
         Boolean b;
         if (!(mFocusStack->IsEmpty(&b), b)) {
             // notify the current focus owner it lost focus after removing it from stack
@@ -650,7 +656,8 @@ void MediaFocusControl::DiscardAudioFocusOwner()
 
 Int32 MediaFocusControl::GetCurrentAudioFocus()
 {
-    {    AutoLock syncLock(mAudioFocusLock);
+    {
+        AutoLock syncLock(mAudioFocusLock);
         Boolean b;
         if ((mFocusStack->IsEmpty(&b), b)) {
             return IAudioManager::AUDIOFOCUS_NONE;
@@ -690,7 +697,8 @@ Int32 MediaFocusControl::RequestAudioFocus(
         return IAudioManager::AUDIOFOCUS_REQUEST_FAILED;
     }
 
-    {    AutoLock syncLock(mAudioFocusLock);
+    {
+        AutoLock syncLock(mAudioFocusLock);
         if (!CanReassignAudioFocus(clientId)) {
             return IAudioManager::AUDIOFOCUS_REQUEST_FAILED;
         }
@@ -768,7 +776,8 @@ Int32 MediaFocusControl::AbandonAudioFocus(
     Logger::I(TAG, " AudioFocus  abandonAudioFocus() from %s", clientId.string());
     // try {
     // this will take care of notifying the new focus owner if needed
-    {    AutoLock syncLock(mAudioFocusLock);
+    {
+        AutoLock syncLock(mAudioFocusLock);
         RemoveFocusStackEntry(clientId, TRUE /*signal*/);
     }
     // } catch (java.util.ConcurrentModificationException cme) {
@@ -785,7 +794,8 @@ Int32 MediaFocusControl::AbandonAudioFocus(
 void MediaFocusControl::UnregisterAudioFocusClient(
     /* [in] */ const String& clientId)
 {
-    {    AutoLock syncLock(mAudioFocusLock);
+    {
+        AutoLock syncLock(mAudioFocusLock);
         RemoveFocusStackEntry(clientId, FALSE);
     }
 }
@@ -809,7 +819,8 @@ void MediaFocusControl::RegisterMediaButtonIntent(
 {
     Logger::I(TAG, "  Remote Control   registerMediaButtonIntent() for %p", mediaIntent);
 
-    {    AutoLock syncLock(mPRStack);
+    {
+        AutoLock syncLock(mPRStack);
         if (PushMediaButtonReceiver_syncPrs(mediaIntent, eventReceiver, token)) {
             // new RC client, assume every type of information shall be queried
             CheckUpdateRemoteControlDisplay_syncPrs(RC_INFO_ALL);
@@ -822,7 +833,8 @@ void MediaFocusControl::UnregisterMediaButtonIntent(
 {
     Logger::I(TAG, "  Remote Control   unregisterMediaButtonIntent() for %p", mediaIntent);
 
-    {    AutoLock syncLock(mPRStack);
+    {
+        AutoLock syncLock(mPRStack);
         Boolean topOfStackWillChange = IsCurrentRcController(mediaIntent);
         RemoveMediaButtonReceiver_syncPrs(mediaIntent);
         if (topOfStackWillChange) {
@@ -851,7 +863,8 @@ void MediaFocusControl::RegisterMediaButtonEventReceiverForCalls(
         Logger::E(TAG, "Invalid permissions to register media button receiver for calls");
         return;
     }
-    {    AutoLock syncLock(mPRStack);
+    {
+        AutoLock syncLock(mPRStack);
         mMediaReceiverForCalls = c;
     }
 }
@@ -864,7 +877,8 @@ void MediaFocusControl::UnregisterMediaButtonEventReceiverForCalls()
         Logger::E(TAG, "Invalid permissions to unregister media button receiver for calls");
         return;
     }
-    {    AutoLock syncLock(mPRStack);
+    {
+        AutoLock syncLock(mPRStack);
         mMediaReceiverForCalls = NULL;
     }
 }
@@ -876,7 +890,8 @@ Int32 MediaFocusControl::RegisterRemoteControlClient(
 {
     if (DEBUG_RC) Logger::I(TAG, "Register remote control client rcClient=%p", rcClient);
     Int32 rccId = IRemoteControlClient::RCSE_ID_UNREGISTERED;
-    {    AutoLock syncLock(mPRStack);
+    {
+        AutoLock syncLock(mPRStack);
         // store the new display information
         // try {
         Int32 size;
@@ -928,7 +943,8 @@ void MediaFocusControl::UnregisterRemoteControlClient(
     /* [in] */ IIRemoteControlClient* rcClient)
 {
     if (DEBUG_RC) Logger::I(TAG, "Unregister remote control client rcClient=%p", rcClient);
-    {    AutoLock syncLock(mPRStack);
+    {
+        AutoLock syncLock(mPRStack);
         Boolean topRccChange = FALSE;
         // try {
         Int32 size;
@@ -966,7 +982,8 @@ void MediaFocusControl::UnregisterRemoteControlDisplay(
     /* [in] */ IIRemoteControlDisplay* rcd)
 {
     if (DEBUG_RC) Logger::D(TAG, "<<< unregisterRemoteControlDisplay(%p)", rcd);
-    {    AutoLock syncLock(mPRStack);
+    {
+        AutoLock syncLock(mPRStack);
         if (rcd == NULL) {
             return;
         }
@@ -1018,7 +1035,8 @@ void MediaFocusControl::RemoteControlDisplayUsesBitmapSize(
     /* [in] */ Int32 w,
     /* [in] */ Int32 h)
 {
-    {    AutoLock syncLock(mPRStack);
+    {
+        AutoLock syncLock(mPRStack);
         AutoPtr<IIterator> displayIterator;
         mRcDisplays->GetIterator((IIterator**)&displayIterator);
         Boolean artworkSizeUpdate = FALSE;
@@ -1064,7 +1082,8 @@ void MediaFocusControl::RemoteControlDisplayWantsPlaybackPositionSync(
     /* [in] */ IIRemoteControlDisplay* rcd,
     /* [in] */ Boolean wantsSync)
 {
-    {    AutoLock syncLock(mPRStack);
+    {
+        AutoLock syncLock(mPRStack);
         Boolean rcdRegistered = FALSE;
         // store the information about this display
         // (display stack traversal order doesn't matter).
@@ -1106,7 +1125,8 @@ void MediaFocusControl::RemoteControlDisplayWantsPlaybackPositionSync(
 Boolean MediaFocusControl::CheckUpdateRemoteStateIfActive(
     /* [in] */ Int32 streamType)
 {
-    {    AutoLock syncLock(mPRStack);
+    {
+        AutoLock syncLock(mPRStack);
         // iterating from top of stack as active playback is more likely on entries at the top
         // try {
         Int32 size;
@@ -1139,7 +1159,8 @@ Boolean MediaFocusControl::CheckUpdateRemoteStateIfActive(
         //     Logger::E(TAG, "Wrong index accessing RC stack, lock error? ", e);
         // }
     }
-    {    AutoLock syncLock(mMainRemote);
+    {
+        AutoLock syncLock(mMainRemote);
         mMainRemoteIsActive = FALSE;
     }
     return FALSE;
@@ -1163,7 +1184,8 @@ Boolean MediaFocusControl::IsPlaystateActive(
 
 Int32 MediaFocusControl::GetRemoteStreamMaxVolume()
 {
-    {    AutoLock syncLock(mMainRemote);
+    {
+        AutoLock syncLock(mMainRemote);
         AutoPtr<CPlayerRecordRemotePlaybackState> rps =
                 (CPlayerRecordRemotePlaybackState*)mMainRemote.Get();
         if (rps->mRccId == IRemoteControlClient::RCSE_ID_UNREGISTERED) {
@@ -1176,7 +1198,8 @@ Int32 MediaFocusControl::GetRemoteStreamMaxVolume()
 
 Int32 MediaFocusControl::GetRemoteStreamVolume()
 {
-    {    AutoLock syncLock(mMainRemote);
+    {
+        AutoLock syncLock(mMainRemote);
         AutoPtr<CPlayerRecordRemotePlaybackState> rps =
                 (CPlayerRecordRemotePlaybackState*)mMainRemote.Get();
         if (rps->mRccId == IRemoteControlClient::RCSE_ID_UNREGISTERED) {
@@ -1192,7 +1215,8 @@ void MediaFocusControl::SetRemoteStreamVolume(
 {
     if (DEBUG_VOL) { Logger::D(TAG, "setRemoteStreamVolume(vol=%d)", vol); }
     Int32 rccId = IRemoteControlClient::RCSE_ID_UNREGISTERED;
-    {    AutoLock syncLock(mMainRemote);
+    {
+        AutoLock syncLock(mMainRemote);
         AutoPtr<CPlayerRecordRemotePlaybackState> rps =
                 (CPlayerRecordRemotePlaybackState*)mMainRemote.Get();
         if (rps->mRccId == IRemoteControlClient::RCSE_ID_UNREGISTERED) {
@@ -1201,7 +1225,8 @@ void MediaFocusControl::SetRemoteStreamVolume(
         rccId = rps->mRccId;
     }
     AutoPtr<IIRemoteVolumeObserver> rvo;
-    {    AutoLock syncLock(mPRStack);
+    {
+        AutoLock syncLock(mPRStack);
         // The stack traversal order doesn't matter because there is only one stack entry
         //  with this RCC ID, but the matching ID is more likely at the top of the stack, so
         //  start iterating from the top.
@@ -1309,8 +1334,10 @@ void MediaFocusControl::OnReevaluateRemoteControlDisplays()
             ISettingsSecure::ENABLED_NOTIFICATION_LISTENERS,
             currentUser, &enabledNotifListeners);
     if (DEBUG_RC) { Logger::D(TAG, " > enabled list: %s", enabledNotifListeners.string()); }
-    {    AutoLock syncLock(mAudioFocusLock);
-        {    AutoLock syncLock(mPRStack);
+    {
+        AutoLock syncLock(mAudioFocusLock);
+        {
+            AutoLock syncLock(mPRStack);
             // check whether the "enable" status of each RCD with a notification listener
             // has changed
             AutoPtr<ArrayOf<String> > enabledComponents;
@@ -1432,7 +1459,8 @@ void MediaFocusControl::DumpFocusStack(
     /* [in] */ IPrintWriter* pw)
 {
     pw->Println(String("\nAudio Focus stack entries (last is top of stack):"));
-    {    AutoLock syncLock(mAudioFocusLock);
+    {
+        AutoLock syncLock(mAudioFocusLock);
         AutoPtr<ArrayOf<IInterface*> > array;
         mFocusStack->ToArray((ArrayOf<IInterface*>**)&array);
         for (Int32 i = 0; i < array->GetLength(); i++) {
@@ -1579,8 +1607,10 @@ void MediaFocusControl::FilterMediaKeyEvent(
         return;
     }
     // event filtering for telephony
-    {    AutoLock syncLock(mRingingLock);
-        {    AutoLock syncLock(mPRStack);
+    {
+        AutoLock syncLock(mRingingLock);
+        {
+            AutoLock syncLock(mPRStack);
             Int32 mode;
             mAudioService->GetMode(&mode);
             if ((mMediaReceiverForCalls != NULL) &&
@@ -1688,7 +1718,8 @@ void MediaFocusControl::FilterVoiceInputKeyEvent(
     keyEvent->GetAction(&keyAction);
     Int32 flag;
     keyEvent->GetFlags(&flag);
-    {    AutoLock syncLock(mVoiceEventLock);
+    {
+        AutoLock syncLock(mVoiceEventLock);
         if (keyAction == IKeyEvent::ACTION_DOWN) {
             Int32 count;
             keyEvent->GetRepeatCount(&count);
@@ -1820,7 +1851,8 @@ void MediaFocusControl::DumpRCStack(
     /* [in] */ IPrintWriter* pw)
 {
     pw->Println(String("\nRemote Control stack entries (last is top of stack):"));
-    {    AutoLock syncLock(mPRStack);
+    {
+        AutoLock syncLock(mPRStack);
         AutoPtr<ArrayOf<IInterface*> > array;
         array = NULL;
         mPRStack->ToArray((ArrayOf<IInterface*>**)&array);
@@ -1835,7 +1867,8 @@ void MediaFocusControl::DumpRCCStack(
     /* [in] */ IPrintWriter* pw)
 {
     pw->Println(String("\nRemote Control Client stack entries (last is top of stack):"));
-    {    AutoLock syncLock(mPRStack);
+    {
+        AutoLock syncLock(mPRStack);
         AutoPtr<ArrayOf<IInterface*> > array;
         array = NULL;
         mPRStack->ToArray((ArrayOf<IInterface*>**)&array);
@@ -1843,7 +1876,8 @@ void MediaFocusControl::DumpRCCStack(
             AutoPtr<IPlayerRecord> prse = IPlayerRecord::Probe((*array)[i]);
             prse->Dump(pw, FALSE);
         }
-        {    AutoLock syncLock(mCurrentRcLock);
+        {
+            AutoLock syncLock(mCurrentRcLock);
             pw->Println(String("\nCurrent remote control generation ID = ") + StringUtils::ToString(mCurrentRcClientGen));
         }
     }
@@ -1867,7 +1901,8 @@ void MediaFocusControl::DumpRCDList(
     /* [in] */ IPrintWriter* pw)
 {
     pw->Println(String("\nRemote Control Display list entries:"));
-    {    AutoLock syncLock(mPRStack);
+    {
+        AutoLock syncLock(mPRStack);
         AutoPtr<ArrayOf<IInterface*> > array;
         mRcDisplays->ToArray((ArrayOf<IInterface*>**)&array);
         for (Int32 i = 0; i < array->GetLength(); i++) {
@@ -2028,7 +2063,8 @@ void MediaFocusControl::SetNewRcClientOnDisplays_syncRcsCurrc(
     /* [in] */ IPendingIntent* newMediaIntent,
     /* [in] */ Boolean clearing)
 {
-    {    AutoLock syncLock(mPRStack);
+    {
+        AutoLock syncLock(mPRStack);
         Int32 size;
         mRcDisplays->GetSize(&size);
         if (size > 0) {
@@ -2090,8 +2126,10 @@ void MediaFocusControl::OnRcDisplayClear()
 {
     if (DEBUG_RC) Logger::I(TAG, "Clear remote control display");
 
-    {    AutoLock syncLock(mPRStack);
-        {    AutoLock syncLock(mCurrentRcLock);
+    {
+        AutoLock syncLock(mPRStack);
+        {
+            AutoLock syncLock(mCurrentRcLock);
             mCurrentRcClientGen++;
             // synchronously update the displays and clients with the new client generation
             SetNewRcClient_syncRcsCurrc(mCurrentRcClientGen,
@@ -2104,8 +2142,10 @@ void MediaFocusControl::OnRcDisplayUpdate(
     /* [in] */ IPlayerRecord* pr,
     /* [in] */ Int32 flags /* USED ?*/)
 {
-    {    AutoLock syncLock(mPRStack);
-        {    AutoLock syncLock(mCurrentRcLock);
+    {
+        AutoLock syncLock(mPRStack);
+        {
+            AutoLock syncLock(mCurrentRcLock);
             Boolean b = FALSE;
             AutoPtr<PlayerRecord> prse = (PlayerRecord*)pr;
             AutoPtr<IIRemoteControlClient> controlClient;
@@ -2145,8 +2185,10 @@ void MediaFocusControl::OnRcDisplayInitInfo(
     /* [in] */ Int32 w,
     /* [in] */ Int32 h)
 {
-    {    AutoLock syncLock(mPRStack);
-        {    AutoLock syncLock(mCurrentRcLock);
+    {
+        AutoLock syncLock(mPRStack);
+        {
+            AutoLock syncLock(mCurrentRcLock);
             if (mCurrentRcClient != NULL) {
                 if (DEBUG_RC) { Logger::I(TAG, "Init RCD with current info"); }
                 // try {
@@ -2172,7 +2214,8 @@ void MediaFocusControl::OnRcDisplayInitInfo(
 
 void MediaFocusControl::ClearRemoteControlDisplay_syncPrs()
 {
-    {    AutoLock syncLock(mCurrentRcLock);
+    {
+        AutoLock syncLock(mCurrentRcLock);
         mCurrentRcClient = NULL;
     }
     // will cause onRcDisplayClear() to be called in AudioService's handler thread
@@ -2198,7 +2241,8 @@ void MediaFocusControl::UpdateRemoteControlDisplay_syncPrs(
         ClearRemoteControlDisplay_syncPrs();
         return;
     }
-    {    AutoLock syncLock(mCurrentRcLock);
+    {
+        AutoLock syncLock(mCurrentRcLock);
         Boolean b;
         if (IObject::Probe(controlClient)->Equals(mCurrentRcClient, &b), !b) {
             // new RC client, assume every type of information shall be queried
@@ -2299,8 +2343,10 @@ void MediaFocusControl::RegisterRemoteControlDisplay_int(
     /* [in] */ IComponentName* listenerComp)
 {
     if (DEBUG_RC) Logger::D(TAG, ">>> registerRemoteControlDisplay(%p)", rcd);
-    {    AutoLock syncLock(mAudioFocusLock);
-        {    AutoLock syncLock(mPRStack);
+    {
+        AutoLock syncLock(mAudioFocusLock);
+        {
+            AutoLock syncLock(mPRStack);
             if ((rcd == NULL) || RcDisplayIsPluggedIn_syncRcStack(rcd)) {
                 return;
             }
@@ -2347,7 +2393,8 @@ void MediaFocusControl::OnRegisterVolumeObserverForRcc(
     /* [in] */ Int32 rccId,
     /* [in] */ IIRemoteVolumeObserver* rvo)
 {
-    {    AutoLock syncLock(mPRStack);
+    {
+        AutoLock syncLock(mPRStack);
         // The stack traversal order doesn't matter because there is only one stack entry
         //  with this RCC ID, but the matching ID is more likely at the top of the stack, so
         //  start iterating from the top.
@@ -2383,7 +2430,8 @@ void MediaFocusControl::SendVolumeUpdateToRemote(
         return;
     }
     AutoPtr<IIRemoteVolumeObserver> rvo;
-    {    AutoLock syncLock(mPRStack);
+    {
+        AutoLock syncLock(mPRStack);
         // The stack traversal order doesn't matter because there is only one stack entry
         //  with this RCC ID, but the matching ID is more likely at the top of the stack, so
         //  start iterating from the top.

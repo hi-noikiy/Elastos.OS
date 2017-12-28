@@ -32,8 +32,6 @@
 #include <elastos/core/AutoLock.h>
 #include <elastos/utility/logging/Logger.h>
 
-#include <elastos/core/AutoLock.h>
-using Elastos::Core::AutoLock;
 using Elastos::Droid::AccessibilityService::IAccessibilityServiceInfo;
 using Elastos::Droid::Content::Pm::IPackageManager;
 using Elastos::Droid::Content::Pm::IResolveInfo;
@@ -44,6 +42,7 @@ using Elastos::Droid::Os::SystemClock;
 using Elastos::Droid::Os::ServiceManager;
 using Elastos::Droid::Os::Binder;
 using Elastos::Droid::Os::IProcess;
+using Elastos::Core::AutoLock;
 using Elastos::Utility::ICollections;
 using Elastos::Utility::CCollections;
 using Elastos::Utility::ICollection;
@@ -97,7 +96,8 @@ ECode CAccessibilityManager::MyHandler::HandleMessage(
             Int32 state;
             msg->GetArg1(&state);
             Object& lock = mHost->mLock;
-            {    AutoLock syncLock(lock);
+            {
+                AutoLock syncLock(lock);
                 mHost->SetStateLocked(state);
             }
         } break;
@@ -137,7 +137,8 @@ ECode CAccessibilityManager::constructor(
     mHandler->constructor();
     mService = service;
     mUserId = userId;
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         TryConnectToServiceLocked();
     }
     return NOERROR;
@@ -156,12 +157,12 @@ ECode CAccessibilityManager::GetInstance(
             Int32 userId;
             Int32 result1, result2;
             if (Binder::GetCallingUid() == IProcess::SYSTEM_UID
-                    || context->CheckCallingOrSelfPermission(
+                    || (context->CheckCallingOrSelfPermission(
                             Elastos::Droid::Manifest::permission::INTERACT_ACROSS_USERS, &result1), result1
-                                    == IPackageManager::PERMISSION_GRANTED
-                    || context->CheckCallingOrSelfPermission(
+                                    == IPackageManager::PERMISSION_GRANTED)
+                    || (context->CheckCallingOrSelfPermission(
                             Elastos::Droid::Manifest::permission::INTERACT_ACROSS_USERS_FULL, &result2), result2
-                                    == IPackageManager::PERMISSION_GRANTED) {
+                                    == IPackageManager::PERMISSION_GRANTED)) {
                 userId = IUserHandle::USER_CURRENT;
             }
             else {
@@ -206,7 +207,8 @@ ECode CAccessibilityManager::IsTouchExplorationEnabled(
     /* [out] */ Boolean* result)
 {
     VALIDATE_NOT_NULL(result);
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         AutoPtr<IIAccessibilityManager> service = GetServiceLocked();
         if (service == NULL) {
             *result = FALSE;
@@ -221,7 +223,8 @@ ECode CAccessibilityManager::IsHighTextContrastEnabled(
     /* [out] */ Boolean* result)
 {
     VALIDATE_NOT_NULL(result);
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         AutoPtr<IIAccessibilityManager> service = GetServiceLocked();
         if (service == NULL) {
             *result = FALSE;
@@ -237,7 +240,8 @@ ECode CAccessibilityManager::SendAccessibilityEvent(
 {
     AutoPtr<IIAccessibilityManager> service;
     Int32 userId = 0;
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         service = GetServiceLocked();
         if (service == NULL) {
             return NOERROR;
@@ -285,7 +289,8 @@ ECode CAccessibilityManager::Interrupt()
 {
     AutoPtr<IIAccessibilityManager> service;
     Int32 userId = 0;
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         service = GetServiceLocked();
         if (service == NULL) {
             return NOERROR;
@@ -347,7 +352,8 @@ ECode CAccessibilityManager::GetInstalledAccessibilityServiceList(
 
     AutoPtr<IIAccessibilityManager> service;
     Int32 userId = 0;
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         service = GetServiceLocked();
         if (service == NULL) {
             AutoPtr<ICollections> coll;
@@ -392,7 +398,8 @@ ECode CAccessibilityManager::GetEnabledAccessibilityServiceList(
 
     AutoPtr<IIAccessibilityManager> service;
     Int32 userId = 0;
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         service = GetServiceLocked();
         if (service == NULL) {
             AutoPtr<ICollections> coll;
@@ -525,7 +532,8 @@ ECode CAccessibilityManager::AddAccessibilityInteractionConnection(
 
     AutoPtr<IIAccessibilityManager> service;
     Int32 userId = 0;
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         service = GetServiceLocked();
         if (service == NULL) {
             *add = IView::NO_ID;
@@ -550,7 +558,8 @@ ECode CAccessibilityManager::RemoveAccessibilityInteractionConnection(
     /* [in] */ IIWindow* windowToken)
 {
     AutoPtr<IIAccessibilityManager> service;
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         service = GetServiceLocked();
         if (service == NULL) {
             return NOERROR;
@@ -600,7 +609,8 @@ void CAccessibilityManager::TryConnectToServiceLocked()
 void CAccessibilityManager::HandleNotifyAccessibilityStateChanged()
 {
     Boolean isEnabled = FALSE;
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         isEnabled = mIsEnabled;
     }
     Int32 listenerCount;
@@ -615,7 +625,8 @@ void CAccessibilityManager::HandleNotifyAccessibilityStateChanged()
 void CAccessibilityManager::HandleNotifyTouchExplorationStateChanged()
 {
     Boolean isTouchExplorationEnabled = FALSE;
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         isTouchExplorationEnabled = mIsTouchExplorationEnabled;
     }
     Int32 listenerCount;
@@ -630,7 +641,8 @@ void CAccessibilityManager::HandleNotifyTouchExplorationStateChanged()
 void CAccessibilityManager::HandleNotifyHighTextContrastStateChanged()
 {
     Boolean isHighTextContrastEnabled = FALSE;
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         isHighTextContrastEnabled = mIsHighTextContrastEnabled;
     }
     Int32 listenerCount;

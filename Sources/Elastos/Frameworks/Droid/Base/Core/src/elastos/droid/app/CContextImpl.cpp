@@ -724,7 +724,8 @@ ECode CContextImpl::GetSharedPreferences(
 
     String name(inName);
     AutoPtr<SharedPreferencesImpl> sp;
-    {    AutoLock syncLock(sLock);
+    {
+        AutoLock syncLock(sLock);
         if (sSharedPrefs == NULL) {
             CArrayMap::New((IArrayMap**)&sSharedPrefs);
         }
@@ -934,7 +935,8 @@ ECode CContextImpl::GetNoBackupFilesDir(
     VALIDATE_NOT_NULL(filesDir)
     *filesDir = NULL;
 
-    {    AutoLock syncLock(mSync);
+    {
+        AutoLock syncLock(mSync);
         if (mNoBackupFilesDir == NULL) {
             AutoPtr<IFile> file;
             GetDataDirFile((IFile**)&file);
@@ -972,7 +974,8 @@ ECode CContextImpl::GetExternalFilesDirs(
     VALIDATE_NOT_NULL(filesDirs)
     *filesDirs = NULL;
 
-    {    AutoLock syncLock(mSync);
+    {
+        AutoLock syncLock(mSync);
         if (mExternalFilesDirs == NULL) {
             String packageName;
             GetPackageName(&packageName);
@@ -1018,7 +1021,8 @@ ECode CContextImpl::GetObbDirs(
     VALIDATE_NOT_NULL(dirs)
     *dirs = NULL;
 
-    {    AutoLock syncLock(mSync);
+    {
+        AutoLock syncLock(mSync);
         if (mExternalObbDirs == NULL) {
             String packageName;
             GetPackageName(&packageName);
@@ -1096,7 +1100,8 @@ ECode CContextImpl::GetExternalCacheDirs(
     VALIDATE_NOT_NULL(dirs)
     *dirs = NULL;
 
-    {    AutoLock syncLock(mSync);
+    {
+        AutoLock syncLock(mSync);
         if (mExternalCacheDirs == NULL) {
             String packageName;
             GetPackageName(&packageName);
@@ -1118,7 +1123,8 @@ ECode CContextImpl::GetExternalMediaDirs(
     VALIDATE_NOT_NULL(dirs)
     *dirs = NULL;
 
-    {    AutoLock syncLock(mSync);
+    {
+        AutoLock syncLock(mSync);
         if (mExternalMediaDirs == NULL) {
             String packageName;
             GetPackageName(&packageName);

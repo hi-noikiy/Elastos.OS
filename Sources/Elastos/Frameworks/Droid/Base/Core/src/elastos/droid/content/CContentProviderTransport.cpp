@@ -59,7 +59,7 @@ CContentProviderTransport::CContentProviderTransport()
 {
 }
 
-CContentProviderTransport::ToString(
+ECode CContentProviderTransport::ToString(
     /* [out] */ String* str)
 {
     VALIDATE_NOT_NULL(str)
@@ -663,7 +663,7 @@ ECode CContentProviderTransport::EnforceReadPermission(
 ECode CContentProviderTransport::EnforceWritePermission(
     /* [in] */ const String& callingPkg,
     /* [in] */ IUri* uri,
-        /* [out] */ Int32* result)
+    /* [out] */ Int32* result)
 {
     VALIDATE_NOT_NULL(result)
     Int32 op = IAppOpsManager::OP_NONE;

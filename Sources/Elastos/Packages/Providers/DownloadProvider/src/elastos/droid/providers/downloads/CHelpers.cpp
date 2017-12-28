@@ -375,7 +375,8 @@ ECode CHelpers::GenerateSaveFile(
         }
     }
 
-    {    AutoLock syncLock(sUniqueLock);
+    {
+        AutoLock syncLock(sUniqueLock);
         name = GenerateAvailableFilenameLocked(parentTest, prefix, suffix);
 
         // Claim this filename inside lock to prevent other threads from

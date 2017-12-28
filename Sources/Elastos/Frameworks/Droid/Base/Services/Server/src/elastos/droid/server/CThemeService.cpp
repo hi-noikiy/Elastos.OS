@@ -280,7 +280,7 @@ ECode CThemeService::ResourceProcessingHandler::HandleMessage(
 //-----------------------------------------------------------------------------------
 //                          CThemeService::SettingsObserver
 //-----------------------------------------------------------------------------------
-CThemeService::SettingsObserver::constructor(
+ECode CThemeService::SettingsObserver::constructor(
     /* [in] */ IIThemeService* host)
 {
     mHost = (CThemeService*)host;
@@ -701,7 +701,8 @@ void CThemeService::DoApplyTheme(
     /* [in] */ IThemeChangeRequest* request,
     /* [in] */ Boolean removePerAppTheme)
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         mProgress = 0;
     }
 
@@ -1523,7 +1524,8 @@ void CThemeService::PostFinish(
     /* [in] */ IThemeChangeRequest* request,
     /* [in] */ Int64 updateTime)
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         mProgress = 0;
     }
 
@@ -1702,7 +1704,8 @@ ECode CThemeService::GetProgress(
 {
     VALIDATE_NOT_NULL(result);
     mContext->EnforceCallingOrSelfPermission(Manifest::permission::ACCESS_THEME_MANAGER, String(NULL));
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         *result = mProgress;
         return NOERROR;
     }

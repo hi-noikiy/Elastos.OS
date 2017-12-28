@@ -28,6 +28,7 @@
 #include "elastos/droid/view/CPointerProperties.h"
 #include "elastos/droid/graphics/CMatrix.h"
 #include "elastos/droid/utility/CSparseArray.h"
+#include <elastos/core/AutoLock.h>
 #include <elastos/core/CoreUtils.h>
 #include <elastos/core/Math.h>
 #include <elastos/core/StringBuilder.h>
@@ -37,10 +38,9 @@
 #include <skia/core/SkMatrix.h>
 #include <utils/BitSet.h>
 
-#include <elastos/core/AutoLock.h>
-using Elastos::Core::AutoLock;
 using Elastos::Droid::Graphics::CMatrix;
 using Elastos::Droid::Utility::CSparseArray;
+using Elastos::Core::AutoLock;
 using Elastos::Core::CoreUtils;
 using Elastos::Core::ICharSequence;
 using Elastos::Core::StringBuilder;
@@ -895,7 +895,8 @@ AutoPtr<MotionEvent> MotionEvent::Obtain()
 {
     AutoPtr<MotionEvent> ev;
 
-    {    AutoLock syncLock(sRecyclerLock);
+    {
+        AutoLock syncLock(sRecyclerLock);
         ev = sRecyclerTop;
         if (ev == NULL) {
             AutoPtr<IMotionEvent> event;
@@ -963,7 +964,8 @@ ECode MotionEvent::Obtain(
 {
     VALIDATE_NOT_NULL(event);
 
-    {    AutoLock syncLock(sSharedTempLock);
+    {
+        AutoLock syncLock(sSharedTempLock);
         EnsureSharedTempPointerCapacity(pointerCount);
         ArrayOf<IPointerProperties*>* pp = sSharedTempPointerProperties;
         for (Int32 i = 0; i < pointerCount; i++) {
@@ -999,7 +1001,8 @@ ECode MotionEvent::Obtain(
 
     AutoPtr<MotionEvent> ev = Obtain();
 
-    {    AutoLock syncLock(sSharedTempLock);
+    {
+        AutoLock syncLock(sSharedTempLock);
         EnsureSharedTempPointerCapacity(1);
 
         AutoPtr< ArrayOf<IPointerProperties*> > pp = sSharedTempPointerProperties;
@@ -1117,7 +1120,8 @@ ECode MotionEvent::Recycle()
 {
     InputEvent::Recycle();
 
-    {    AutoLock syncLock(sRecyclerLock);
+    {
+        AutoLock syncLock(sRecyclerLock);
         if (sRecyclerUsed < MAX_RECYCLED) {
             sRecyclerUsed++;
             mNext = sRecyclerTop;
@@ -1859,7 +1863,8 @@ ECode MotionEvent::AddBatch(
     /* [in] */ Float size,
     /* [in] */ Int32 metaState)
 {
-    {    AutoLock syncLock(sSharedTempLock);
+    {
+        AutoLock syncLock(sSharedTempLock);
         EnsureSharedTempPointerCapacity(1);
 
         AutoPtr< ArrayOf<IPointerCoords*> > pc = sSharedTempPointerCoords;
@@ -1911,7 +1916,8 @@ ECode MotionEvent::AddBatch(
         return NOERROR;
     }
 
-    {    AutoLock syncLock(sSharedTempLock);
+    {
+        AutoLock syncLock(sSharedTempLock);
         AutoLock lock(sSharedTempLock);
         EnsureSharedTempPointerCapacity(Elastos::Core::Math::Max(pointerCount, 2));
 
@@ -1994,7 +2000,8 @@ ECode MotionEvent::ClampNoHistory(
 
     AutoPtr<MotionEvent> ev = Obtain();
 
-    {    AutoLock syncLock(sSharedTempLock);
+    {
+        AutoLock syncLock(sSharedTempLock);
         const Int32 pointerCount = NativeGetPointerCount(mNativePtr);
 
         EnsureSharedTempPointerCapacity(pointerCount);
@@ -2056,7 +2063,8 @@ ECode MotionEvent::Split(
 
     AutoPtr<MotionEvent> ev = Obtain();
 
-    {    AutoLock syncLock(sSharedTempLock);
+    {
+        AutoLock syncLock(sSharedTempLock);
         const Int32 oldPointerCount = NativeGetPointerCount(mNativePtr);
         EnsureSharedTempPointerCapacity(oldPointerCount);
         ArrayOf<IPointerProperties*>* pp = sSharedTempPointerProperties;

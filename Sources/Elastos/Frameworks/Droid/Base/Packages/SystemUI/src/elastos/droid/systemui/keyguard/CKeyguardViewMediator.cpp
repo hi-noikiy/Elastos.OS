@@ -460,7 +460,8 @@ ECode CKeyguardViewMediator::MyHandler::HandleMessage(
             break;
         }
         case KEYGUARD_TIMEOUT:
-            {    AutoLock syncLock(mHost);
+            {
+                AutoLock syncLock(mHost);
                 AutoPtr<IInterface> obj;
                 msg->GetObj((IInterface**)&obj);
                 AutoPtr<IBundle> b = IBundle::Probe(obj);

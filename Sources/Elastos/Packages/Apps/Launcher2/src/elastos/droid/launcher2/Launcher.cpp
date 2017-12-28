@@ -1545,7 +1545,8 @@ ECode Launcher::GetScreen(
 {
     VALIDATE_NOT_NULL(screen);
 
-    {    AutoLock syncLock(sLock);
+    {
+        AutoLock syncLock(sLock);
         *screen = sScreen;
     }
     return NOERROR;
@@ -1554,7 +1555,8 @@ ECode Launcher::GetScreen(
 ECode Launcher::SetScreen(
     /* [in] */ Int32 screen)
 {
-    {    AutoLock syncLock(sLock);
+    {
+        AutoLock syncLock(sLock);
         sScreen = screen;
     }
     return NOERROR;
@@ -2654,7 +2656,7 @@ ECode Launcher::OnNewIntent(
         CSystem::AcquireSingleton((ISystem**)&system);
         Int64 ctime;
         system->GetCurrentTimeMillis(&ctime);
-        Slogger::D(TAG, "Time spent in onNewIntent: " + (ctime - startTime));
+        Slogger::D(TAG, "Time spent in onNewIntent: %lld", (ctime - startTime));
     }
     return NOERROR;
 }

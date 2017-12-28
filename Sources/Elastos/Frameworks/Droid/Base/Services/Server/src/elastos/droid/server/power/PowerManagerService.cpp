@@ -236,7 +236,8 @@ ECode PowerManagerService::BinderService::UpdateBlockedUids(
         return NOERROR;
     }
 
-    {    AutoLock syncLock(mHost->mLock);
+    {
+        AutoLock syncLock(mHost->mLock);
         if(isBlocked) {
             AutoPtr<IInteger32> integer;
             CInteger32::New(uid, (IInteger32**)&integer);
@@ -1258,7 +1259,8 @@ PowerManagerService::SuspendBlockerImpl::~SuspendBlockerImpl()
 
 ECode PowerManagerService::SuspendBlockerImpl::AcquireBlocker()
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         mReferenceCount += 1;
         if (mReferenceCount == 1) {
             if (DEBUG_SPEW) {
@@ -1273,7 +1275,8 @@ ECode PowerManagerService::SuspendBlockerImpl::AcquireBlocker()
 
 ECode PowerManagerService::SuspendBlockerImpl::ReleaseBlocker()
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         mReferenceCount -= 1;
         if (mReferenceCount == 0) {
             if (DEBUG_SPEW) {
@@ -1296,7 +1299,8 @@ ECode PowerManagerService::SuspendBlockerImpl::ToString(
     /* [out] */ String* str)
 {
     VALIDATE_NOT_NULL(str);
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         StringBuilder buider;
         buider += mName;
         buider += ": ref count=";
@@ -1577,7 +1581,8 @@ PowerManagerService::ShutdownOrRebootRunnable::ShutdownOrRebootRunnable(
 
 ECode PowerManagerService::ShutdownOrRebootRunnable::Run()
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         if (mShutdown) {
             ShutdownThread::Shutdown(mContext, mConfirm);
         }
@@ -1883,7 +1888,8 @@ ECode PowerManagerService::OnBootPhase(
 ECode PowerManagerService::SystemReady(
     /* [in] */ IIAppOpsService* appOps)
 {
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         mSystemReady = TRUE;
         mAppOps = appOps;
         AutoPtr<IInterface> obj = GetLocalService(EIID_IDreamManagerInternal);
@@ -2869,7 +2875,8 @@ void PowerManagerService::NapInternal(
     /* [in] */ Int64 eventTime,
     /* [in] */ Int32 uid)
 {
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         if (NapNoUpdateLocked(eventTime, uid)) {
             UpdatePowerStateLocked();
         }
@@ -4060,7 +4067,8 @@ ECode PowerManagerService::LowLevelReboot(
 ECode PowerManagerService::Monitor()
 {
     // Grab and release lock for watchdog monitor to detect deadlocks.
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         return NOERROR;
     }
     return NOERROR;

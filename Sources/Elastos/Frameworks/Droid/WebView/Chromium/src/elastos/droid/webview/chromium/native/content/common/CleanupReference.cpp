@@ -23,10 +23,6 @@
 #include <elastos/core/StringUtils.h>
 #include <elastos/utility/logging/Slogger.h>
 
-#include <elastos/core/AutoLock.h>
-using Elastos::Core::AutoLock;
-using Elastos::Core::AutoLock;
-using Elastos::Core::StringUtils;
 using Elastos::Droid::Os::ILooperHelper;
 using Elastos::Droid::Os::CLooperHelper;
 using Elastos::Droid::Os::IMessage;
@@ -34,6 +30,8 @@ using Elastos::Droid::Os::IMessageHelper;
 using Elastos::Droid::Os::CMessageHelper;
 using Elastos::Droid::Webkit::Webview::Chromium::Base::TraceEvent;
 using Elastos::Droid::Webkit::Webview::Chromium::Base::ThreadUtils;
+using Elastos::Core::AutoLock;
+using Elastos::Core::StringUtils;
 using Elastos::Utility::CHashSet;
 using Elastos::Utility::IHashSet;
 using Elastos::Utility::EIID_IHashSet;
@@ -92,7 +90,8 @@ ECode CleanupReference::LazyHolder::InnerHandler::HandleMessage(
         Slogger::D(TAG, log);
     }
 
-    {    AutoLock syncLock(sCleanupMonitor);
+    {
+        AutoLock syncLock(sCleanupMonitor);
         // Always run the cleanup loop here even when adding or removing refs, to avoid
         // falling behind on rapid garbage allocation inner loops.
         assert(0);
@@ -143,7 +142,8 @@ ECode CleanupReference::InnerThread::Run()
                 Slogger::D(TAG, "removed one ref from GC queue");
             }
 
-            {    AutoLock syncLock(sCleanupMonitor);
+            {
+                AutoLock syncLock(sCleanupMonitor);
                 AutoPtr<IMessageHelper> helper;
                 CMessageHelper::AcquireSingleton((IMessageHelper**)&helper);
                 AutoPtr<IMessage> msg;

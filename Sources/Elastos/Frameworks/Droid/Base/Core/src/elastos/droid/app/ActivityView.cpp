@@ -341,7 +341,8 @@ ECode ActivityView::ActivityContainerWrapper::InjectEvent(
 
 ECode ActivityView::ActivityContainerWrapper::ReleaseResources()
 {
-    {    AutoLock syncLock(mGuard);
+    {
+        AutoLock syncLock(mGuard);
         if (mOpened) {
             if (ActivityView::DEBUG)
                 Logger::V("ActivityView", "ActivityContainerWrapper: release called");

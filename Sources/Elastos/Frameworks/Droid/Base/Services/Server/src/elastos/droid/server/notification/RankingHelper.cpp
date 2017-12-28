@@ -26,8 +26,6 @@
 #include <elastos/utility/logging/Logger.h>
 #include <elastos/utility/logging/Slogger.h>
 
-#include <elastos/core/AutoLock.h>
-using Elastos::Core::AutoLock;
 using Elastos::Droid::Os::IHandler;
 using Elastos::Droid::Os::CMessageHelper;
 using Elastos::Droid::Os::IMessageHelper;
@@ -38,6 +36,7 @@ using Elastos::Droid::Utility::CArrayMap;
 using Elastos::Droid::Utility::CArraySet;
 using Elastos::Droid::Utility::ISparseInt32Array;
 using Elastos::Droid::Utility::CSparseInt32Array;
+using Elastos::Core::AutoLock;
 using Elastos::Core::CoreUtils;
 using Elastos::Core::CPathClassLoader;
 using Elastos::Core::IClassLoader;
@@ -413,7 +412,8 @@ ECode RankingHelper::Sort(
     }
     // }
 
-    {    AutoLock syncLock(mProxyByGroupTmp);
+    {
+        AutoLock syncLock(mProxyByGroupTmp);
         // record individual ranking result and nominate proxies for each group
         for (Int32 i = N - 1; i >= 0; i--) {
             AutoPtr<IInterface> obj;

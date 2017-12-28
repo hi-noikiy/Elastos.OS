@@ -1701,7 +1701,8 @@ ECode VolumePanel::OnPlaySound(
         OnStopSounds();
     }
 
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         AutoPtr<IToneGenerator> toneGen = GetOrCreateToneGenerator(streamType);
         if (toneGen != NULL) {
             Boolean start;
@@ -1717,7 +1718,8 @@ ECode VolumePanel::OnPlaySound(
 
 ECode VolumePanel::OnStopSounds()
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         AutoPtr<IAudioSystem> as;
         CAudioSystem::AcquireSingleton((IAudioSystem**)&as);
         Int32 numStreamTypes;
@@ -1755,7 +1757,8 @@ ECode VolumePanel::OnRemoteVolumeChanged(
     if (LOGD) Logger::D(mTag, "onRemoteVolumeChanged(controller:%s, flags: %08x)", TO_CSTR(controller),flags);
 
     if (((flags & IAudioManager::FLAG_SHOW_UI) != 0) || IsShowing()) {
-        {    AutoLock syncLock(this);
+        {
+            AutoLock syncLock(this);
             if (mActiveStreamType != STREAM_REMOTE_MUSIC) {
                 ReorderSliders(STREAM_REMOTE_MUSIC);
             }

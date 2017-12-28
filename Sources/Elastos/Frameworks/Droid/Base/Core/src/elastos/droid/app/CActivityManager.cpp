@@ -330,7 +330,8 @@ ECode CActivityManager::GetAppTaskThumbnailSize(
     VALIDATE_NOT_NULL(result)
     *result = NULL;
 
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         FAIL_RETURN(EnsureAppTaskThumbnailSizeLocked())
         Int32 x, y;
         mAppTaskThumbnailSize->GetX(&x);
@@ -370,7 +371,8 @@ ECode CActivityManager::AddAppTask(
     *value = 0;
 
     AutoPtr<IPoint> size;
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         FAIL_RETURN(EnsureAppTaskThumbnailSizeLocked())
         size = mAppTaskThumbnailSize;
     }

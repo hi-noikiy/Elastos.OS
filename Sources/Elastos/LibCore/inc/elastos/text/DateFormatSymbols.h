@@ -99,9 +99,9 @@ public:
     CARAPI GetZoneStrings(
         /* [out, callee] */ ArrayOf<IArrayOf*> ** zoneStrings);
 
-//    @Override
+    // @Override
     CARAPI GetHashCode(
-        /* [out] */ Int32 hash);
+        /* [out] */ Int32* hash);
 
     CARAPI SetAmPmStrings(
         /* [in] */ ArrayOf<String> * data);

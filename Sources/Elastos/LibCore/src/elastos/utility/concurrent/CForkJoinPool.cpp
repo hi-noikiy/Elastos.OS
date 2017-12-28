@@ -30,7 +30,6 @@
 #include "CThreadLocalRandom.h"
 #include "CLibcore.h"
 #include <elastos/droid/system/OsConstants.h>
-#include <elastos/core/AutoLock.h>
 
 using Elastos::Core::AutoLock;
 using Elastos::Core::StringUtils;
@@ -62,11 +61,14 @@ namespace Concurrent {
 //====================================================================
 CAR_INTERFACE_IMPL(CForkJoinPool::DefaultForkJoinWorkerThreadFactory, Object, IForkJoinPoolForkJoinWorkerThreadFactory)
 
-AutoPtr<IForkJoinWorkerThread> CForkJoinPool::DefaultForkJoinWorkerThreadFactory::NewThread(
-    /* [in] */ IForkJoinPool* pool)
+ECode CForkJoinPool::DefaultForkJoinWorkerThreadFactory::NewThread(
+    /* [in] */ IForkJoinPool* pool,
+    /* [out] */ IForkJoinWorkerThread** thread)
 {
     AutoPtr<IForkJoinWorkerThread> p = new ForkJoinWorkerThread(pool);
-   return p;
+    *thread = p;
+    REFCOUNT_ADD(*thread);
+    return NOERROR;
 }
 
 //====================================================================
@@ -2003,7 +2005,8 @@ ECode CForkJoinPool::AwaitTermination(
     Int64 nas;
     system->GetNanoTime(&nas);
     Int64 deadline = nas + nanos;
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         for (;;) {
             Boolean b2 = FALSE;
             if ((IsTerminated(&b2), b2)) {

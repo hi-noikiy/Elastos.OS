@@ -36,8 +36,6 @@
 #include <elastos/droid/os/CHandler.h>
 #include <elastos/core/Math.h>
 
-#include <elastos/core/AutoLock.h>
-using Elastos::Core::AutoLock;
 using Elastos::Droid::App::CActivityManager;
 using Elastos::Droid::App::IPendingIntent;
 using Elastos::Droid::Content::CComponentName;
@@ -56,9 +54,9 @@ using Elastos::Droid::Media::Session::CPlaybackState;
 using Elastos::Droid::Media::Session::IMediaController;
 using Elastos::Droid::Media::Session::IMediaControllerTransportControls;
 using Elastos::Droid::Media::Session::IMediaSessionToken;
+using Elastos::Droid::Utility::IDisplayMetrics;
 using Elastos::Droid::View::KeyEvent;
 using Elastos::Utility::Logging::Slogger;
-using Elastos::Droid::Utility::IDisplayMetrics;
 using Elastos::Core::AutoLock;
 using Elastos::Core::Math;
 using Elastos::Core::StringUtils;
@@ -88,7 +86,8 @@ ECode RemoteController::RcDisplay::SetCurrentClientId(
         return NOERROR;
     }
     Boolean isNew = FALSE;
-    {    AutoLock syncLock(mController->mGenLock);
+    {
+        AutoLock syncLock(mController->mGenLock);
         if (mController->mClientGenerationIdCurrent != genId) {
             mController->mClientGenerationIdCurrent = genId;
             isNew = TRUE;
@@ -131,7 +130,8 @@ ECode RemoteController::RcDisplay::SetPlaybackState(
                 ,state ,stateChangeTimeMs, currentPosMs, speed);
     }
 
-    {    AutoLock syncLock(mController->mGenLock);
+    {
+        AutoLock syncLock(mController->mGenLock);
         if (mController->mClientGenerationIdCurrent != genId) {
             return NOERROR;
         }
@@ -153,7 +153,8 @@ ECode RemoteController::RcDisplay::SetTransportControlInfo(
     if (mController == NULL) {
         return NOERROR;
     }
-    {    AutoLock syncLock(mController->mGenLock);
+    {
+        AutoLock syncLock(mController->mGenLock);
         if (mController->mClientGenerationIdCurrent != genId) {
             return NOERROR;
         }
@@ -178,7 +179,8 @@ ECode RemoteController::RcDisplay::SetMetadata(
     if (metadata == NULL) {
         return NOERROR;
     }
-    {    AutoLock syncLock(mController->mGenLock);
+    {
+        AutoLock syncLock(mController->mGenLock);
         if (mController->mClientGenerationIdCurrent != genId) {
             return NOERROR;
         }
@@ -201,7 +203,8 @@ ECode RemoteController::RcDisplay::SetArtwork(
         Slogger::V(TAG, "setArtwork(\"%d\")", genId);
     }
 
-    {    AutoLock syncLock(mController->mGenLock);
+    {
+        AutoLock syncLock(mController->mGenLock);
         if (mController->mClientGenerationIdCurrent != genId) {
             return NOERROR;
         }
@@ -228,7 +231,8 @@ ECode RemoteController::RcDisplay::SetAllMetadata(
     if ((metadata == NULL) && (artwork == NULL)) {
         return NOERROR;
     }
-    {    AutoLock syncLock(mController->mGenLock);
+    {
+        AutoLock syncLock(mController->mGenLock);
         if (mController->mClientGenerationIdCurrent != genId) {
             return NOERROR;
         }
@@ -462,7 +466,8 @@ ECode RemoteController::MetadataEditor::Apply()
     if (!mMetadataChanged) {
         return NOERROR;
     }
-    {    AutoLock syncLock(mHost->mInfoLock);
+    {
+        AutoLock syncLock(mHost->mInfoLock);
         if (mHost->mCurrentSession != NULL) {
             Boolean flag = FALSE;
             mEditorMetadata->ContainsKey(
@@ -608,7 +613,8 @@ ECode RemoteController::GetRemoteControlClientPackageName(
     VALIDATE_NOT_NULL(result);
     String packageName;
     if (USE_SESSIONS) {
-        {    AutoLock syncLock(mInfoLock);
+        {
+            AutoLock syncLock(mInfoLock);
             if (mCurrentSession != NULL) {
                 return mCurrentSession->GetPackageName(&packageName);
             } else {
@@ -632,7 +638,8 @@ ECode RemoteController::GetEstimatedMediaPosition(
     VALIDATE_NOT_NULL(result);
 
     if (USE_SESSIONS) {
-        {    AutoLock syncLock(mInfoLock);
+        {
+            AutoLock syncLock(mInfoLock);
             if (mCurrentSession != NULL) {
                 AutoPtr<IPlaybackState> state;
                 mCurrentSession->GetPlaybackState((IPlaybackState**)&state);
@@ -643,7 +650,8 @@ ECode RemoteController::GetEstimatedMediaPosition(
         }
     } else {
         AutoPtr<PlaybackInfo> lastPlaybackInfo;
-        {    AutoLock syncLock(mInfoLock);
+        {
+            AutoLock syncLock(mInfoLock);
             lastPlaybackInfo = mLastPlaybackInfo;
         }
         if (lastPlaybackInfo != NULL) {
@@ -679,7 +687,7 @@ ECode RemoteController::SendMediaKeyEvent(
     /* [out] */ Boolean* result)
 {
     VALIDATE_NOT_NULL(result);
-    *result = 0;
+    *result = FALSE;
 
     Int32 keyCode;
     keyEvent->GetKeyCode(&keyCode);
@@ -688,25 +696,24 @@ ECode RemoteController::SendMediaKeyEvent(
         return E_ILLEGAL_ARGUMENT_EXCEPTION;
     }
     if (USE_SESSIONS) {
-        {    AutoLock syncLock(mInfoLock);
+        {
+            AutoLock syncLock(mInfoLock);
             if (mCurrentSession != NULL) {
                 return mCurrentSession->DispatchMediaButtonEvent(keyEvent, result);
             }
-            *result = FALSE;
             return NOERROR;
         }
     } else {
         AutoPtr<IPendingIntent> pi;
-        {    AutoLock syncLock(mInfoLock);
+        {
+            AutoLock syncLock(mInfoLock);
             if (!mIsRegistered) {
                 Slogger::E(TAG,
                         "Cannot use sendMediaKeyEvent() from an unregistered RemoteController");
-                *result = FALSE;
                 return NOERROR;
             }
             if (!mEnabled) {
                 Slogger::E(TAG, "Cannot use sendMediaKeyEvent() from a disabled RemoteController");
-                *result = FALSE;
                 return NOERROR;
             }
             pi = mClientPendingIntentCurrent;
@@ -719,7 +726,6 @@ ECode RemoteController::SendMediaKeyEvent(
                 ECode ec = pi->Send(mContext, 0, intent.Get());
                 if (ec == (ECode)E_CANCELED_EXCEPTION) {
                     Slogger::E(TAG, "Error sending intent for media button down: ");
-                    *result = FALSE;
                     return NOERROR;
                 }
             // } catch (CanceledException e) {
@@ -728,7 +734,6 @@ ECode RemoteController::SendMediaKeyEvent(
             // }
         } else {
             Slogger::I(TAG, "No-op when sending key click, no receiver right now");
-            *result = FALSE;
             return NOERROR;
         }
     }
@@ -741,17 +746,19 @@ ECode RemoteController::SeekTo(
     /* [out] */ Boolean* result)
 {
     VALIDATE_NOT_NULL(result);
+    *result = FALSE;
+
     Logger::E(TAG, "seekTo() in RemoteController");
     if (!mEnabled) {
         Slogger::E(TAG, "Cannot use seekTo() from a disabled RemoteController");
-        *result = FALSE;
         return NOERROR;
     }
     if (timeMs < 0) {
         Slogger::E(TAG, "illegal negative time value");
         return E_ILLEGAL_ARGUMENT_EXCEPTION;
     }
-    {    AutoLock syncLock(mInfoLock);
+    {
+        AutoLock syncLock(mInfoLock);
         if (mCurrentSession != NULL) {
             AutoPtr<IMediaControllerTransportControls> mt;
             mCurrentSession->GetTransportControls((IMediaControllerTransportControls**)&mt);
@@ -771,7 +778,8 @@ ECode RemoteController::SetRemoteControlClientPlayItem(
         Logger::E(TAG, "Cannot use setRemoteControlClientPlayItem() from a disabled RemoteController");
         return NOERROR;
     }
-    {    AutoLock syncLock(mInfoLock);
+    {
+        AutoLock syncLock(mInfoLock);
         if (mCurrentSession != NULL) {
             AutoPtr<IMediaControllerTransportControls> control;
             mCurrentSession->GetTransportControls((IMediaControllerTransportControls**)&control);
@@ -788,7 +796,8 @@ ECode RemoteController::GetRemoteControlClientNowPlayingEntries()
         Logger::E(TAG, "Cannot use getRemoteControlClientNowPlayingEntries() from a disabled RemoteController");
         return NOERROR;
     }
-    {    AutoLock syncLock(mInfoLock);
+    {
+        AutoLock syncLock(mInfoLock);
         if (mCurrentSession != NULL) {
             AutoPtr<IMediaControllerTransportControls> control;
             mCurrentSession->GetTransportControls((IMediaControllerTransportControls**)&control);
@@ -805,7 +814,8 @@ ECode RemoteController::SetRemoteControlClientBrowsedPlayer()
         Logger::E(TAG, "Cannot use setRemoteControlClientBrowsedPlayer() from a disabled RemoteController");
         return NOERROR;
     }
-    {    AutoLock syncLock(mInfoLock);
+    {
+        AutoLock syncLock(mInfoLock);
         if (mCurrentSession != NULL) {
             AutoPtr<IMediaControllerTransportControls> control;
             mCurrentSession->GetTransportControls((IMediaControllerTransportControls**)&control);
@@ -822,8 +832,10 @@ ECode RemoteController::SetArtworkConfiguration(
     /* [out] */ Boolean* result)
 {
     VALIDATE_NOT_NULL(result);
+    *result = FALSE;
 
-    {    AutoLock syncLock(mInfoLock);
+    {
+        AutoLock syncLock(mInfoLock);
         if (wantBitmap) {
             if ((width > 0) && (height > 0)) {
                 if (width > mMaxBitmapDimension) { width = mMaxBitmapDimension; }
@@ -839,7 +851,7 @@ ECode RemoteController::SetArtworkConfiguration(
             mArtworkHeight = -1;
         }
     }
-    *result = -1;
+    *result = TRUE;
     return NOERROR;
 }
 
@@ -864,6 +876,7 @@ ECode RemoteController::SetSynchronizationMode(
     /* [out] */ Boolean* result)
 {
     VALIDATE_NOT_NULL(result);
+    *result = FALSE;
 
     if ((sync != POSITION_SYNCHRONIZATION_NONE) && (sync != POSITION_SYNCHRONIZATION_CHECK)) {
         Slogger::E(TAG, "Unknown synchronization mode %d", sync);
@@ -871,7 +884,6 @@ ECode RemoteController::SetSynchronizationMode(
     }
     if (!mIsRegistered) {
         Slogger::E(TAG, "Cannot set synchronization mode on an unregistered RemoteController");
-        *result = FALSE;
         return NOERROR;
     }
     mAudioManager->RemoteControlDisplayWantsPlaybackPositionSync(mRcd.Get(),
@@ -935,7 +947,8 @@ ECode RemoteController::OnFolderInfoBrowsedPlayer(
 {
     Logger::D(TAG, "RemoteController: onFolderInfoBrowsedPlayer");
     AutoPtr<IRemoteControllerOnClientUpdateListener> l;
-    {    AutoLock syncLock(mInfoLock);
+    {
+        AutoLock syncLock(mInfoLock);
         l = mOnClientUpdateListener;
     }
     if (l != NULL) {
@@ -949,7 +962,8 @@ ECode RemoteController::OnNowPlayingEntriesUpdate(
 {
     Logger::D(TAG, "RemoteController: onUpdateNowPlayingEntries");
     AutoPtr<IRemoteControllerOnClientUpdateListener> l;
-    {    AutoLock syncLock(mInfoLock);
+    {
+        AutoLock syncLock(mInfoLock);
         l = mOnClientUpdateListener;
     }
     if (l != NULL) {
@@ -962,7 +976,8 @@ ECode RemoteController::OnNowPlayingContentChange()
 {
     Logger::D(TAG, "RemoteController: onNowPlayingContentChange");
     AutoPtr<IRemoteControllerOnClientUpdateListener> l;
-    {    AutoLock syncLock(mInfoLock);
+    {
+        AutoLock syncLock(mInfoLock);
         l = mOnClientUpdateListener;
     }
     if (l != NULL) {
@@ -976,7 +991,8 @@ ECode RemoteController::OnSetPlayItemResponse(
 {
     Logger::D(TAG, "RemoteController: onPlayItemResponse");
     AutoPtr<IRemoteControllerOnClientUpdateListener> l;
-    {    AutoLock syncLock(mInfoLock);
+    {
+        AutoLock syncLock(mInfoLock);
         l = mOnClientUpdateListener;
     }
     if (l != NULL) {
@@ -988,7 +1004,8 @@ ECode RemoteController::OnSetPlayItemResponse(
 ECode RemoteController::SetIsRegistered(
     /* [in] */ Boolean registered)
 {
-    {    AutoLock syncLock(mInfoLock);
+    {
+        AutoLock syncLock(mInfoLock);
         mIsRegistered = registered;
     }
     return NOERROR;
@@ -1007,7 +1024,8 @@ ECode RemoteController::GetArtworkSize(
     /* [out, callee] */ ArrayOf<Int32>** result)
 {
     VALIDATE_NOT_NULL(result);
-    {    AutoLock syncLock(mInfoLock);
+    {
+        AutoLock syncLock(mInfoLock);
         AutoPtr<ArrayOf<Int32> > size = ArrayOf<Int32>::Alloc(2);
         (*size)[0] = mArtworkWidth;
         (*size)[1] = mArtworkHeight;
@@ -1054,12 +1072,14 @@ void RemoteController::OnNewPendingIntent(
     /* [in] */ Int32 genId,
     /* [in] */ IPendingIntent* pi)
 {
-    {    AutoLock syncLock(mGenLock);
+    {
+        AutoLock syncLock(mGenLock);
         if (mClientGenerationIdCurrent != genId) {
             return;
         }
     }
-    {    AutoLock syncLock(mInfoLock);
+    {
+        AutoLock syncLock(mInfoLock);
         mClientPendingIntentCurrent = pi;
     }
 }
@@ -1068,13 +1088,15 @@ void RemoteController::OnNewPlaybackInfo(
     /* [in] */ Int32 genId,
     /* [in] */ PlaybackInfo* pi)
 {
-    {    AutoLock syncLock(mGenLock);
+    {
+        AutoLock syncLock(mGenLock);
         if (mClientGenerationIdCurrent != genId) {
             return;
         }
     }
     AutoPtr<IRemoteControllerOnClientUpdateListener> l;
-    {    AutoLock syncLock(mInfoLock);
+    {
+        AutoLock syncLock(mInfoLock);
         l = mOnClientUpdateListener;
         mLastPlaybackInfo = pi;
     }
@@ -1092,13 +1114,15 @@ void RemoteController::OnNewTransportInfo(
     /* [in] */ Int32 genId,
     /* [in] */ Int32 transportControlFlags)
 {
-    {    AutoLock syncLock(mGenLock);
+    {
+        AutoLock syncLock(mGenLock);
         if (mClientGenerationIdCurrent != genId) {
             return;
         }
     }
     AutoPtr<IRemoteControllerOnClientUpdateListener> l;
-    {    AutoLock syncLock(mInfoLock);
+    {
+        AutoLock syncLock(mInfoLock);
         l = mOnClientUpdateListener;
     }
     if (l != NULL) {
@@ -1110,7 +1134,8 @@ void RemoteController::OnNewMetadata(
     /* [in] */ Int32 genId,
     /* [in] */ IBundle* metadata)
 {
-    {    AutoLock syncLock(mGenLock);
+    {
+        AutoLock syncLock(mGenLock);
         if (mClientGenerationIdCurrent != genId) {
             return;
         }
@@ -1124,7 +1149,8 @@ void RemoteController::OnNewMetadata(
     if (editableKeys != 0) {
         metadata->Remove(StringUtils::ToString(IMediaMetadataEditor::KEY_EDITABLE_MASK));
     }
-    {    AutoLock syncLock(mInfoLock);
+    {
+        AutoLock syncLock(mInfoLock);
         l = mOnClientUpdateListener;
         if ((mMetadataEditor != NULL) && (mMetadataEditor->mEditorMetadata != NULL)) {
             if (TO_IINTERFACE(mMetadataEditor->mEditorMetadata) != TO_IINTERFACE(metadata)) {
@@ -1152,13 +1178,15 @@ void RemoteController::OnClientChange(
     /* [in] */ Int32 genId,
     /* [in] */ Boolean clearing)
 {
-    {    AutoLock syncLock(mGenLock);
+    {
+        AutoLock syncLock(mGenLock);
         if (mClientGenerationIdCurrent != genId) {
             return;
         }
     }
     AutoPtr<IRemoteControllerOnClientUpdateListener> l;
-    {    AutoLock syncLock(mInfoLock);
+    {
+        AutoLock syncLock(mInfoLock);
         l = mOnClientUpdateListener;
         mMetadataEditor = NULL;
     }
@@ -1171,14 +1199,16 @@ void RemoteController::OnDisplayEnable(
     /* [in] */ Boolean enabled)
 {
     AutoPtr<IRemoteControllerOnClientUpdateListener> l;
-    {    AutoLock syncLock(mInfoLock);
+    {
+        AutoLock syncLock(mInfoLock);
         mEnabled = enabled;
         l = mOnClientUpdateListener;
     }
     if (!enabled) {
         // when disabling, reset all info sent to the userId
         Int32 genId;
-        {    AutoLock syncLock(mGenLock);
+        {
+            AutoLock syncLock(mGenLock);
             genId = mClientGenerationIdCurrent;
         }
         Int64 realTime = SystemClock::GetElapsedRealtime();
@@ -1209,7 +1239,8 @@ void RemoteController::UpdateController(
     if (DEBUG) {
         Slogger::D(TAG, "Updating controller to %p previous controller is %p", controller, mCurrentSession.Get());
     }
-    {    AutoLock syncLock(mInfoLock);
+    {
+        AutoLock syncLock(mInfoLock);
         AutoPtr<IMediaSessionToken> msToken;
         controller->GetSessionToken((IMediaSessionToken**)&msToken);
         AutoPtr<IMediaSessionToken> _msToken;
@@ -1270,7 +1301,8 @@ void RemoteController::OnNewPlaybackState(
     /* [in] */ IPlaybackState* state)
 {
     AutoPtr<IRemoteControllerOnClientUpdateListener> l;
-    {    AutoLock syncLock(mInfoLock);
+    {
+        AutoLock syncLock(mInfoLock);
         l = mOnClientUpdateListener;
     }
     if (l != NULL) {
@@ -1316,7 +1348,8 @@ void RemoteController::OnNewMediaMetadata(
     AutoPtr<IRemoteControllerOnClientUpdateListener> l;
     AutoPtr<MetadataEditor> metadataEditor;
     // prepare the received Bundle to be used inside a MetadataEditor
-    {    AutoLock syncLock(mInfoLock);
+    {
+        AutoLock syncLock(mInfoLock);
         l = mOnClientUpdateListener;
         Int32 ratingType;
         mCurrentSession->GetRatingType(&ratingType);

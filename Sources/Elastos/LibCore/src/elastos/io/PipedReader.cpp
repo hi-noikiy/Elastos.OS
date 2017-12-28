@@ -19,7 +19,6 @@
 #include "Arrays.h"
 #include "CThread.h"
 
-#include <elastos/core/AutoLock.h>
 using Elastos::Core::AutoLock;
 using Elastos::Utility::Arrays;
 using Elastos::Core::CThread;
@@ -33,7 +32,8 @@ const Int32 PipedReader::PIPE_SIZE = 1024;
 
 ECode PipedReader::Close()
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         mBuffer = NULL;
         mIsClosed = TRUE;
         NotifyAll();
@@ -52,7 +52,8 @@ ECode PipedReader::Connect(
 
 ECode PipedReader::EstablishConnection()
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         if (mIsConnected) {
             // throw new IOException("Pipe already connected");
             return E_IO_EXCEPTION;
@@ -90,7 +91,8 @@ ECode PipedReader::Read(
     VALIDATE_NOT_NULL(buffer)
     VALIDATE_NOT_NULL(rev)
 
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         if (!mIsConnected) {
             // throw new IOException("Pipe not connected");
             return E_IO_EXCEPTION;
@@ -178,7 +180,8 @@ ECode PipedReader::Ready(
 {
     VALIDATE_NOT_NULL(rev)
 
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         if (!mIsConnected) {
             // throw new IOException("Pipe not connected");
             return E_IO_EXCEPTION;
@@ -195,7 +198,8 @@ ECode PipedReader::Ready(
 ECode PipedReader::Receive(
     /* [in] */ Char32 oneChar)
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         if (NULL == mBuffer) {
             // throw new IOException("Pipe is closed");
             return E_IO_EXCEPTION;
@@ -247,7 +251,8 @@ ECode PipedReader::Receive(
 {
     VALIDATE_NOT_NULL(chars)
 
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         FAIL_RETURN(Arrays::CheckOffsetAndCount(chars->GetLength(), offset, count));
         if (NULL == mBuffer) {
             // throw new IOException("Pipe is closed");
@@ -316,7 +321,8 @@ ECode PipedReader::Receive(
 
 ECode PipedReader::Done()
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         mIsClosed = true;
         FAIL_RETURN(NotifyAll());
     }

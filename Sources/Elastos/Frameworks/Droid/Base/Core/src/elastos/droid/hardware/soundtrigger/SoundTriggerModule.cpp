@@ -28,8 +28,6 @@
 #include <soundtrigger/SoundTrigger.h>
 #include <binder/MemoryDealer.h>
 
-#include <elastos/core/AutoLock.h>
-using Elastos::Core::AutoLock;
 using Elastos::Droid::Os::Looper;
 using Elastos::Droid::Media::IAudioFormat;
 using Elastos::Droid::Hardware::Soundtrigger::CSoundTriggerConfidenceLevel;
@@ -408,7 +406,8 @@ static Object gLock;
 
 static android::sp<android::SoundTrigger> getSoundTrigger(SoundTriggerModule* mode)
 {
-    {    AutoLock syncLock(gLock);
+    {
+        AutoLock syncLock(gLock);
         Int64 context;
         mode->GetNativeContext(&context);
         android::SoundTrigger* const st = reinterpret_cast<android::SoundTrigger*>(context);
@@ -420,7 +419,8 @@ static android::sp<android::SoundTrigger> getSoundTrigger(SoundTriggerModule* mo
 static android::sp<android::SoundTrigger> setSoundTrigger(SoundTriggerModule* mode,
         const android::sp<android::SoundTrigger>& module)
 {
-    {    AutoLock syncLock(gLock);
+    {
+        AutoLock syncLock(gLock);
         Int64 context;
         mode->GetNativeContext(&context);
         android::sp<android::SoundTrigger> old = reinterpret_cast<android::SoundTrigger*>(context);

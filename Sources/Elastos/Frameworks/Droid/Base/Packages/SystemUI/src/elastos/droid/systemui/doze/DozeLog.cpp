@@ -111,7 +111,8 @@ void DozeLog::TraceDozing(
 {
     if (!ENABLED) return;
     sPulsing = FALSE;
-    {    AutoLock syncLock(sDozeLog);
+    {
+        AutoLock syncLock(sDozeLog);
         if (dozing && sMessages == NULL) {
             sTimes = ArrayOf<Int64>::Alloc(SIZE);
             sMessages = ArrayOf<String>::Alloc(SIZE);
@@ -202,7 +203,8 @@ void DozeLog::TraceProximityResult(
 void DozeLog::Dump(
     /* [in] */ IPrintWriter* pw)
 {
-    {    AutoLock syncLock(sDozeLog);
+    {
+        AutoLock syncLock(sDozeLog);
         if (sMessages == NULL) return;
         pw->Println(String("  Doze log:"));
         Int32 start = (sPosition - sCount + SIZE) % SIZE;
@@ -238,7 +240,8 @@ void DozeLog::Dump(
 void DozeLog::Log(
     /* [in] */ const String& msg)
 {
-    {    AutoLock syncLock(sDozeLog);
+    {
+        AutoLock syncLock(sDozeLog);
         if (sMessages == NULL) return;
         AutoPtr<ISystem> system;
         Elastos::Core::CSystem::AcquireSingleton((ISystem**)&system);

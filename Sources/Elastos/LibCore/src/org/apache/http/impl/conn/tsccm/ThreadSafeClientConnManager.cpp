@@ -23,7 +23,6 @@
 #include "elastos/core/AutoLock.h"
 #include "elastos/utility/logging/Logger.h"
 
-#include <elastos/core/AutoLock.h>
 using Elastos::Core::AutoLock;
 using Libcore::IO::ISocketTagger;
 using Libcore::IO::ISocketTaggerHelper;
@@ -258,7 +257,8 @@ Int32 ThreadSafeClientConnManager::GetConnectionsInPool(
 Int32 ThreadSafeClientConnManager::GetConnectionsInPool()
 {
     Int32 value;
-    {    AutoLock syncLock(mConnectionPool);
+    {
+        AutoLock syncLock(mConnectionPool);
         value = mConnectionPool->mNumConnections;
     }
     return value;

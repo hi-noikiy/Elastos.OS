@@ -34,8 +34,6 @@
 #include <elastos/core/StringUtils.h>
 #include <elastos/utility/logging/Logger.h>
 
-#include <elastos/core/AutoLock.h>
-using Elastos::Core::AutoLock;
 using Elastos::Droid::Os::Build;
 using Elastos::Droid::Os::CBundle;
 using Elastos::Droid::Os::EIID_IBinder;
@@ -148,7 +146,7 @@ ECode LocationManager::ListenerTransport::OnProviderEnabled(
     return NOERROR;
 }
 
-LocationManager::ListenerTransport::OnProviderDisabled(
+ECode LocationManager::ListenerTransport::OnProviderDisabled(
     /* [in] */ const String& provider)
 {
     AutoPtr<IMessage> msg = CMessage::Obtain();
@@ -251,7 +249,8 @@ ECode LocationManager::GpsStatusListenerTransport::GpsHandler::HandleMessage(
     msg->GetWhat(&what);
     if (what == GpsStatusListenerTransport::NMEA_RECEIVED) {
         // {    AutoLock syncLock(mGLTHost->mNmeaBuffer);
-        {    AutoLock syncLock(mLock);
+        {
+            AutoLock syncLock(mLock);
             Int32 length;
             mGLTHost->mNmeaBuffer->GetSize(&length);
             for (Int32 i = 0; i < length; i++) {
@@ -267,7 +266,8 @@ ECode LocationManager::GpsStatusListenerTransport::GpsHandler::HandleMessage(
     else {
         // synchronize on mGpsStatus to ensure the data is copied atomically.
         // {    AutoLock syncLock(mGLTHost->mLMHost->mGpsStatus);
-        {    AutoLock syncLock(mLock);
+        {
+            AutoLock syncLock(mLock);
             mGLTHost->mListener->OnGpsStatusChanged(what);
         }
     }
@@ -374,7 +374,8 @@ ECode LocationManager::GpsStatusListenerTransport::OnNmeaReceived(
 {
     if (mNmeaListener != NULL)
     {
-        {    AutoLock syncLock(mNmeaBuffer);
+        {
+            AutoLock syncLock(mNmeaBuffer);
             assert(0);
             // AutoPtr<Nmea> nmea = new Nmea(timestamp, nmea);
             // Boolean result = FALSE;
@@ -671,7 +672,8 @@ ECode LocationManager::RemoveUpdates(
     String packageName;
     mContext->GetPackageName(&packageName);
     AutoPtr<IILocationListener> transport;
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         HashMap<AutoPtr<ILocationListener>, AutoPtr<IILocationListener> >::Iterator it
                 = mListeners.Find(listener);
         if (it != mListeners.End()) {
@@ -1063,7 +1065,8 @@ AutoPtr<IILocationListener> LocationManager::WrapListener(
     /* [in] */ ILooper* looper)
 {
     if (listener == NULL) return NULL;
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         AutoPtr<ILocationListener> tempKey = listener;
         HashMap<AutoPtr<ILocationListener>, AutoPtr<IILocationListener> >::Iterator it =
                 mListeners.Find(tempKey);

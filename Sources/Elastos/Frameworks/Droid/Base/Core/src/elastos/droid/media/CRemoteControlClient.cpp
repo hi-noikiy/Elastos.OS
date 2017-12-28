@@ -34,28 +34,9 @@
 #include <elastos/core/CoreUtils.h>
 #include <elastos/utility/logging/Slogger.h>
 
-#include <elastos/core/AutoLock.h>
-using Elastos::Core::AutoLock;
-using Elastos::Core::AutoLock;
-using Elastos::Core::StringUtils;
-using Elastos::Utility::Logging::Logger;
-using Elastos::Utility::Logging::Slogger;
+
 using Elastos::Droid::App::IPendingIntent;
-using Elastos::Droid::Os::CBundle;
-using Elastos::Droid::Os::ILooperHelper;
-using Elastos::Droid::Os::CLooperHelper;
-using Elastos::Droid::Os::SystemClock;
-using Elastos::Core::IInteger32;
-using Elastos::Core::CInteger32;
-using Elastos::Droid::Os::IServiceManager;
-using Elastos::Droid::Os::CServiceManager;
 using Elastos::Droid::Content::IContext;
-using Elastos::Droid::Media::Session::EIID_IMediaSessionCallback;
-using Elastos::Droid::Media::Session::CPlaybackState;
-using Elastos::Droid::Media::Session::CPlaybackStateBuilder;
-using Elastos::Droid::Media::Session::IPlaybackStateBuilder;
-using Elastos::Droid::Media::Session::MediaSessionCallback;
-using Elastos::Droid::Media::CMediaMetadataBuilder;
 using Elastos::Droid::Graphics::BitmapConfig;
 using Elastos::Droid::Graphics::BitmapConfig_ARGB_8888;
 using Elastos::Droid::Graphics::BitmapConfig_NONE;
@@ -66,8 +47,26 @@ using Elastos::Droid::Graphics::IPaint;
 using Elastos::Droid::Graphics::CPaint;
 using Elastos::Droid::Graphics::IRectF;
 using Elastos::Droid::Graphics::CRectF;
-using Elastos::Core::IInteger64;
+using Elastos::Droid::Os::CBundle;
+using Elastos::Droid::Os::ILooperHelper;
+using Elastos::Droid::Os::CLooperHelper;
+using Elastos::Droid::Os::SystemClock;
+using Elastos::Droid::Os::IServiceManager;
+using Elastos::Droid::Os::CServiceManager;
+using Elastos::Droid::Media::Session::EIID_IMediaSessionCallback;
+using Elastos::Droid::Media::Session::CPlaybackState;
+using Elastos::Droid::Media::Session::CPlaybackStateBuilder;
+using Elastos::Droid::Media::Session::IPlaybackStateBuilder;
+using Elastos::Droid::Media::Session::MediaSessionCallback;
+using Elastos::Droid::Media::CMediaMetadataBuilder;
+using Elastos::Core::AutoLock;
 using Elastos::Core::CoreUtils;
+using Elastos::Core::IInteger32;
+using Elastos::Core::CInteger32;
+using Elastos::Core::IInteger64;
+using Elastos::Core::StringUtils;
+using Elastos::Utility::Logging::Logger;
+using Elastos::Utility::Logging::Slogger;
 
 namespace Elastos {
 namespace Droid {
@@ -214,7 +213,8 @@ ECode CRemoteControlClient::MetadataEditor::Apply()
         Logger::E(CRemoteControlClient::TAG, "Can't apply a previously applied MetadataEditor");
         return NOERROR;
     }
-    {    AutoLock syncLock(mThisLock);
+    {
+        AutoLock syncLock(mThisLock);
         // Still build the old metadata so when creating a new editor
         // you get the expected values.
         // assign the edited data
@@ -456,7 +456,8 @@ ECode CRemoteControlClient::UpdateFolderInfoBrowsedPlayer(
     /* [in] */ const String& stringUri)
 {
     Logger::E(TAG, "updateFolderInfoBrowsedPlayer");
-    {    AutoLock syncLock(mCacheLock);
+    {
+        AutoLock syncLock(mCacheLock);
         UpdateFolderInfoBrowsedPlayerInt(stringUri);
     }
     return NOERROR;
@@ -465,7 +466,8 @@ ECode CRemoteControlClient::UpdateFolderInfoBrowsedPlayer(
 ECode CRemoteControlClient::UpdateNowPlayingContentChange()
 {
     Logger::E(TAG, "updateNowPlayingContentChange");
-    {    AutoLock syncLock(mCacheLock);
+    {
+        AutoLock syncLock(mCacheLock);
         UpdateNowPlayingContentChangeInt();
     }
     return NOERROR;
@@ -477,7 +479,8 @@ void CRemoteControlClient::SetPlaybackStateInt(
     /* [in] */ Float playbackSpeed,
     /* [in] */ Boolean hasPosition)
 {
-    {    AutoLock syncLock(mCacheLock);
+    {
+        AutoLock syncLock(mCacheLock);
         if ((mPlaybackState != state) || (mPlaybackPositionMs != timeInMs)
                 || (mPlaybackSpeed != playbackSpeed)) {
             // store locally
@@ -575,7 +578,8 @@ void CRemoteControlClient::OnPositionDriftCheck()
     if (DEBUG) {
      Slogger::D(TAG, "onPositionDriftCheck()");
     }
-    {    AutoLock syncLock(mCacheLock);
+    {
+        AutoLock syncLock(mCacheLock);
         if ((mEventHandler == NULL) || (mPositionProvider == NULL) || !mNeedsPositionSync) {
             return;
         }
@@ -616,7 +620,8 @@ void CRemoteControlClient::OnPositionDriftCheck()
 ECode CRemoteControlClient::SetTransportControlFlags(
     /* [in] */ Int32 transportControlFlags)
 {
-    {    AutoLock syncLock(mCacheLock);
+    {
+        AutoLock syncLock(mCacheLock);
         // store locally
         mTransportControlFlags = transportControlFlags;
 
@@ -639,7 +644,8 @@ ECode CRemoteControlClient::SetTransportControlFlags(
 ECode CRemoteControlClient::SetMetadataUpdateListener(
     /* [in] */ IRemoteControlClientOnMetadataUpdateListener * l)
 {
-    {    AutoLock syncLock(mCacheLock);
+    {
+        AutoLock syncLock(mCacheLock);
         mMetadataUpdateListener = l;
     }
     return NOERROR;
@@ -649,7 +655,8 @@ ECode CRemoteControlClient::SetNowPlayingEntriesUpdateListener(
     /* [in] */ IRemoteControlClientOnGetNowPlayingEntriesListener * l)
 {
     Logger::D(TAG, "setNowPlayingEntriesUpdateListener");
-    {    AutoLock syncLock(mCacheLock);
+    {
+        AutoLock syncLock(mCacheLock);
         mGetNowPlayingEntriesListener = l;
     }
     return NOERROR;
@@ -659,7 +666,8 @@ ECode CRemoteControlClient::SetBrowsedPlayerUpdateListener(
     /* [in] */ IRemoteControlClientOnSetBrowsedPlayerListener * l)
 {
     Logger::D(TAG, "setBrowsedPlayerUpdateListener");
-    {    AutoLock syncLock(mCacheLock);
+    {
+        AutoLock syncLock(mCacheLock);
         mSetBrowsedPlayerListener = l;
     }
     return NOERROR;
@@ -669,7 +677,8 @@ ECode CRemoteControlClient::SetPlayItemListener(
     /* [in] */ IRemoteControlClientOnSetPlayItemListener * l)
 {
     Logger::D(TAG, "setPlayItemListener");
-    {    AutoLock syncLock(mCacheLock);
+    {
+        AutoLock syncLock(mCacheLock);
         mSetPlayItemListener = l;
     }
     return NOERROR;
@@ -678,7 +687,8 @@ ECode CRemoteControlClient::SetPlayItemListener(
 ECode CRemoteControlClient::SetPlaybackPositionUpdateListener(
     /* [in] */ IRemoteControlClientOnPlaybackPositionUpdateListener * l)
 {
-    {    AutoLock syncLock(mCacheLock);
+    {
+        AutoLock syncLock(mCacheLock);
         mPositionUpdateListener = l;
     }
     return NOERROR;
@@ -687,7 +697,8 @@ ECode CRemoteControlClient::SetPlaybackPositionUpdateListener(
 ECode CRemoteControlClient::SetOnGetPlaybackPositionListener(
     /* [in] */ IRemoteControlClientOnGetPlaybackPositionListener * l)
 {
-    {    AutoLock syncLock(mCacheLock);
+    {
+        AutoLock syncLock(mCacheLock);
         mPositionProvider = l;
         Boolean flag = FALSE;
         if ((mPositionProvider != NULL) && (mEventHandler != NULL)
@@ -803,7 +814,8 @@ void CRemoteControlClient::OnSeekTo(
     /* [in] */ Int32 generationId,
     /* [in] */ Int64 timeMs)
 {
-    {    AutoLock syncLock(mCacheLock);
+    {
+        AutoLock syncLock(mCacheLock);
         if ((mCurrentClientGenId == generationId) && (mPositionUpdateListener != NULL)) {
             mPositionUpdateListener->OnPlaybackPositionUpdate(timeMs);
         }
@@ -815,7 +827,8 @@ void CRemoteControlClient::OnUpdateMetadata(
     /* [in] */ Int32 key,
     /* [in] */ IInterface* value)
 {
-    {    AutoLock syncLock(mCacheLock);
+    {
+        AutoLock syncLock(mCacheLock);
         if ((mCurrentClientGenId == generationId) && (mMetadataUpdateListener != NULL)) {
                 mMetadataUpdateListener->OnMetadataUpdate(key, value);
             }
@@ -827,7 +840,8 @@ void CRemoteControlClient::OnSetPlayItem(
     /* [in] */ Int64 uid)
 {
     Logger::D(TAG, "onSetPlayItem");
-    {    AutoLock syncLock(mCacheLock);
+    {
+        AutoLock syncLock(mCacheLock);
         if (mSetPlayItemListener != NULL) {
             Logger::D(TAG, "mSetPlayItemListener.onSetPlayItem");
             mSetPlayItemListener->OnSetPlayItem(scope, uid);
@@ -838,7 +852,8 @@ void CRemoteControlClient::OnSetPlayItem(
 void CRemoteControlClient::OnSetBrowsedPlayer()
 {
     Logger::D(TAG, "onSetBrowsedPlayer");
-    {    AutoLock syncLock(mCacheLock);
+    {
+        AutoLock syncLock(mCacheLock);
         if (mSetBrowsedPlayerListener != NULL) {
             Logger::D(TAG, "mSetBrowsedPlayerListener.onSetBrowsedPlayer");
             mSetBrowsedPlayerListener->OnSetBrowsedPlayer();
@@ -849,7 +864,8 @@ void CRemoteControlClient::OnSetBrowsedPlayer()
 void CRemoteControlClient::OnGetNowPlayingEntries()
 {
     Logger::D(TAG, "onGetNowPlayingEntries");
-    {    AutoLock syncLock(mCacheLock);
+    {
+        AutoLock syncLock(mCacheLock);
         if (mGetNowPlayingEntriesListener != NULL) {
             Logger::D(TAG, "mGetNowPlayingEntriesListener.onGetNowPlayingEntries");
             mGetNowPlayingEntriesListener->OnGetNowPlayingEntries();

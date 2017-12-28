@@ -23,7 +23,6 @@
 #include <elastos/utility/logging/Slogger.h>
 #include "R.h"
 
-#include <elastos/core/AutoLock.h>
 using Elastos::Core::AutoLock;
 using Elastos::Droid::Content::Res::IResources;
 using Elastos::Droid::Graphics::BitmapConfig_ARGB_8888;
@@ -242,7 +241,8 @@ ECode Utilities::DrawSelectedAllAppsBitmap(
     /* [in] */ Boolean pressed,
     /* [in] */ IBitmap* src)
 {
-    {    AutoLock syncLock(sCanvasLock); // we share the statics :-(
+    {
+        AutoLock syncLock(sCanvasLock); // we share the statics :-(
         if (sIconWidth == -1) {
             // We can't have gotten to here without src being initialized, which
             // comes from this file already.  So just assert.

@@ -25,7 +25,6 @@
 #include <elastos/core/Math.h>
 #include <elastos/utility/logging/Slogger.h>
 
-#include <elastos/core/AutoLock.h>
 using Elastos::Core::AutoLock;
 using Elastos::Utility::Logging::Slogger;
 
@@ -463,7 +462,8 @@ ECode CMessageQueue::IsIdling(
     /* [out] */ Boolean* result)
 {
     VALIDATE_NOT_NULL(result)
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         *result = IsIdlingLocked();
     }
     return NOERROR;

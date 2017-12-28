@@ -52,8 +52,6 @@
 #include <elastos/utility/etl/List.h>
 #include <elastos/utility/logging/Slogger.h>
 
-#include <elastos/core/AutoLock.h>
-using Elastos::Core::AutoLock;
 using Elastos::Droid::App::INotification;
 using Elastos::Droid::App::INotificationBuilder;
 using Elastos::Droid::App::CNotificationBuilder;
@@ -116,6 +114,7 @@ using Elastos::Droid::Widget::CToastHelper;
 using Elastos::Droid::Widget::IToastHelper;
 using Elastos::Droid::Manifest;
 using Elastos::Droid::R;
+using Elastos::Core::AutoLock;
 using Elastos::Core::CoreUtils;
 using Elastos::Core::IArrayOf;
 using Elastos::Core::CArrayOf;
@@ -238,7 +237,8 @@ ECode CInputManagerService::InputFilterHost::SendInputEvent(
     }
 
     Object& lock = mHost->mInputFilterLock;
-    {    AutoLock syncLock(lock);
+    {
+        AutoLock syncLock(lock);
         if (!mDisconnected) {
             mHost->NativeInjectInputEvent(event, IDisplay::DEFAULT_DISPLAY, 0, 0,
                     IInputManager::INJECT_INPUT_EVENT_MODE_ASYNC, 0,
@@ -309,7 +309,8 @@ ECode CInputManagerService::ChainedInputFilterHost::SendInputEvent(
         return E_ILLEGAL_ARGUMENT_EXCEPTION;
     }
 
-    {    AutoLock syncLock(mHost->mInputFilterLock);
+    {
+        AutoLock syncLock(mHost->mInputFilterLock);
         if (!mDisconnected) {
             if (mNext == NULL) {
                 mHost->NativeInjectInputEvent(event, IDisplay::DEFAULT_DISPLAY, 0, 0,
@@ -1656,7 +1657,8 @@ ECode CInputManagerService::GetInputDevice(
     VALIDATE_NOT_NULL(inputDevice);
     *inputDevice = NULL;
 
-    {    AutoLock syncLock(mInputDevicesLock);
+    {
+        AutoLock syncLock(mInputDevicesLock);
         Int32 count = mInputDevices->GetLength();
         for (Int32 i = 0; i < count; i++) {
             AutoPtr<IInputDevice> device = (*mInputDevices)[i];
@@ -1683,7 +1685,8 @@ ECode CInputManagerService::GetInputDeviceIds(
     VALIDATE_NOT_NULL(deviceIds);
     *deviceIds = NULL;
 
-    {    AutoLock syncLock(mInputDevicesLock);
+    {
+        AutoLock syncLock(mInputDevicesLock);
         Int32 count = mInputDevices->GetLength();
         AutoPtr< ArrayOf<Int32> > ids = ArrayOf<Int32>::Alloc(count);
         for (Int32 i = 0; i < count; i++) {
@@ -1706,7 +1709,8 @@ ECode CInputManagerService::GetInputDevices(
     /* [out, callee] */ ArrayOf<IInputDevice*>** inputDevices)
 {
     VALIDATE_NOT_NULL(inputDevices)
-    {    AutoLock syncLock(mInputDevicesLock);
+    {
+        AutoLock syncLock(mInputDevicesLock);
         *inputDevices = mInputDevices;
         REFCOUNT_ADD(*inputDevices);
     }
@@ -1824,7 +1828,8 @@ void CInputManagerService::DeliverInputDevicesChanged(
         Boolean missingLayoutForExternalKeyboardAdded = FALSE;
         Boolean multipleMissingLayoutsForExternalKeyboardsAdded = FALSE;
         AutoPtr<IInputDevice> keyboardMissingLayout;
-        {    AutoLock syncLock(mDataStore);
+        {
+            AutoLock syncLock(mDataStore);
             for (int i = 0; i < numFullKeyboards; i++) {
                 AutoPtr<IInterface> obj;
                 mTempFullKeyboards->Get(i, (IInterface**)&obj);
@@ -1880,7 +1885,8 @@ ECode CInputManagerService::GetTouchCalibrationForInputDevice(
         return E_ILLEGAL_ARGUMENT_EXCEPTION;
     }
 
-    {    AutoLock syncLock(mDataStore);
+    {
+        AutoLock syncLock(mDataStore);
         AutoPtr<ITouchCalibration> tc = mDataStore->GetTouchCalibration(inputDeviceDescriptor, surfaceRotation);
         *inputDevice = tc;
         REFCOUNT_ADD(*inputDevice);
@@ -1917,7 +1923,8 @@ ECode CInputManagerService::SetTouchCalibrationForInputDevice(
         return E_ILLEGAL_ARGUMENT_EXCEPTION;
     }
 
-    {    AutoLock syncLock(mDataStore);
+    {
+        AutoLock syncLock(mDataStore);
         if (mDataStore->SetTouchCalibration(inputDeviceDescriptor, surfaceRotation,
                 calibration)) {
             NativeReloadCalibration();
@@ -1997,7 +2004,8 @@ void CInputManagerService::UpdateKeyboardLayouts()
             new KeyboardLayoutVisitorInUpdateKeyboardLayouts(availableKeyboardLayouts);
     VisitAllKeyboardLayouts(myKV);
 
-    {    AutoLock syncLock(mDataStore);
+    {
+        AutoLock syncLock(mDataStore);
         mDataStore->RemoveUninstalledKeyboardLayouts(ISet::Probe(availableKeyboardLayouts));
         mDataStore->SaveIfNeeded();
     }
@@ -2265,7 +2273,8 @@ ECode CInputManagerService::GetCurrentKeyboardLayoutForInputDevice(
 
     String key;
     GetLayoutDescriptor(identifier, &key);
-    {    AutoLock syncLock(mDataStore);
+    {
+        AutoLock syncLock(mDataStore);
         // try loading it using the layout descriptor if we have it
         String layout = mDataStore->GetCurrentKeyboardLayout(key);
         String str;
@@ -2300,7 +2309,8 @@ ECode CInputManagerService::SetCurrentKeyboardLayoutForInputDevice(
 
     String key;
     GetLayoutDescriptor(identifier, &key);
-    {    AutoLock syncLock(mDataStore);
+    {
+        AutoLock syncLock(mDataStore);
         if (mDataStore->SetCurrentKeyboardLayout(key, keyboardLayoutDescriptor)) {
             if (DEBUG) {
                 Slogger::D(TAG, "Saved keyboard layout using %s", key.string());
@@ -2322,7 +2332,8 @@ ECode CInputManagerService::GetKeyboardLayoutsForInputDevice(
 
     String key;
     GetLayoutDescriptor(identifier, &key);
-    {    AutoLock syncLock(mDataStore);
+    {
+        AutoLock syncLock(mDataStore);
         AutoPtr<ArrayOf<String> > layouts = mDataStore->GetKeyboardLayouts(key);
         String str;
         identifier->GetDescriptor(&str);
@@ -2354,7 +2365,8 @@ ECode CInputManagerService::AddKeyboardLayoutForInputDevice(
 
     String key;
     GetLayoutDescriptor(identifier, &key);
-    {    AutoLock syncLock(mDataStore);
+    {
+        AutoLock syncLock(mDataStore);
         String oldLayout = mDataStore->GetCurrentKeyboardLayout(key);
         String str;
         identifier->GetDescriptor(&str);
@@ -2389,7 +2401,8 @@ ECode CInputManagerService::RemoveKeyboardLayoutForInputDevice(
 
     String key;
     GetLayoutDescriptor(identifier, &key);
-    {    AutoLock syncLock(mDataStore);
+    {
+        AutoLock syncLock(mDataStore);
         String oldLayout = mDataStore->GetCurrentKeyboardLayout(key);
         String str;
         identifier->GetDescriptor(&str);
@@ -2437,7 +2450,8 @@ void CInputManagerService::HandleSwitchKeyboardLayout(
         device->GetIdentifier((IInputDeviceIdentifier**)&identifier);
         String key;
         GetLayoutDescriptor((IInputDeviceIdentifier*)identifier, &key);
-        {    AutoLock syncLock(mDataStore);
+        {
+            AutoLock syncLock(mDataStore);
             changed = mDataStore->SwitchKeyboardLayout(key, direction);
             keyboardLayoutDescriptor = mDataStore->GetCurrentKeyboardLayout(key);
             mDataStore->SaveIfNeeded();
@@ -2692,7 +2706,8 @@ ECode CInputManagerService::Vibrate(
     }
 
     AutoPtr<VibratorToken> v;
-    {    AutoLock syncLock(mVibratorLock);
+    {
+        AutoLock syncLock(mVibratorLock);
         HashMap<AutoPtr<IBinder>, AutoPtr<VibratorToken> >::Iterator find
                 = mVibratorTokens.Find(token);
         if (find == mVibratorTokens.End()) {
@@ -2706,7 +2721,8 @@ ECode CInputManagerService::Vibrate(
         }
     }
 
-    {    AutoLock syncLock(v);
+    {
+        AutoLock syncLock(v);
         v->mVibrating = TRUE;
         NativeVibrate(deviceId, pattern, repeat, v->mTokenValue);
     }
@@ -2720,7 +2736,8 @@ ECode CInputManagerService::CancelVibrate(
     /* [in] */ IBinder* token)
 {
     AutoPtr<VibratorToken> v;
-    {    AutoLock syncLock(mVibratorLock);
+    {
+        AutoLock syncLock(mVibratorLock);
         HashMap<AutoPtr<IBinder>, AutoPtr<VibratorToken> >::Iterator find
                 = mVibratorTokens.Find(token);
         if (find == mVibratorTokens.End() || find->mSecond->mDeviceId != deviceId) {
@@ -2736,7 +2753,8 @@ ECode CInputManagerService::CancelVibrate(
 void CInputManagerService::OnVibratorTokenDied(
     /* [in] */ VibratorToken* v)
 {
-    {    AutoLock syncLock(mVibratorLock);
+    {
+        AutoLock syncLock(mVibratorLock);
         mVibratorTokens.Erase(v->mToken);
     }
 
@@ -2746,7 +2764,8 @@ void CInputManagerService::OnVibratorTokenDied(
 void CInputManagerService::CancelVibrateIfNeeded(
     /* [in] */ VibratorToken* v)
 {
-    {    AutoLock syncLock(v);
+    {
+        AutoLock syncLock(v);
         if (v->mVibrating) {
             NativeCancelVibrate(v->mDeviceId, v->mTokenValue);
             v->mVibrating = FALSE;
@@ -2822,7 +2841,8 @@ void CInputManagerService::NotifyConfigurationChanged(
 void CInputManagerService::NotifyInputDevicesChanged(
     /* [in] */ ArrayOf<IInputDevice*>* inputDevices)
 {
-    {    AutoLock syncLock(mInputDevicesLock);
+    {
+        AutoLock syncLock(mInputDevicesLock);
         if (!mInputDevicesChangedPending) {
             mInputDevicesChangedPending = TRUE;
             Int32 length = inputDevices->GetLength();

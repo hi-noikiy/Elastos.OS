@@ -88,7 +88,8 @@ Boolean DateFormat::Is24HourFormat(
         res->GetConfiguration((IConfiguration**)&config);
         AutoPtr<ILocale> locale;
         config->GetLocale((ILocale**)&locale);
-        {    AutoLock syncLock(sLocaleLock);
+        {
+            AutoLock syncLock(sLocaleLock);
             Boolean bIs24HourLocale;
             if (sIs24HourLocale != NULL &&
                     (sIs24HourLocale->Equals(locale, &bIs24HourLocale), bIs24HourLocale)) {
@@ -116,7 +117,8 @@ Boolean DateFormat::Is24HourFormat(
             value = "12";
         }
 
-        {    AutoLock syncLock(sLocaleLock);
+        {
+            AutoLock syncLock(sLocaleLock);
             sIs24HourLocale = locale;
             sIs24Hour = value.Equals("24");
         }

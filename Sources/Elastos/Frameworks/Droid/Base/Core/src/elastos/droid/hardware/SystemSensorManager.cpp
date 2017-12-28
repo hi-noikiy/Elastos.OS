@@ -425,7 +425,8 @@ void SystemSensorManager::SensorEventQueue::AddSensorEvent(
     AutoPtr<ISensorEvent> t;
     CSensorEvent::New(CSensor::GetMaxLengthValuesArray(sensor,
             ((SystemSensorManager*)mManager.Get())->mTargetSdkLevel), (ISensorEvent**)&t);
-    {    AutoLock syncLock(mSensorsEventsLock);
+    {
+        AutoLock syncLock(mSensorsEventsLock);
         Int32 handle;
         sensor->GetHandle(&handle);
         mSensorsEvents[handle] = t;
@@ -435,7 +436,8 @@ void SystemSensorManager::SensorEventQueue::AddSensorEvent(
 void SystemSensorManager::SensorEventQueue::RemoveSensorEvent(
     /* [in] */ ISensor* sensor)
 {
-    {    AutoLock syncLock(mSensorsEventsLock);
+    {
+        AutoLock syncLock(mSensorsEventsLock);
         Int32 handle;
         sensor->GetHandle(&handle);
         mSensorsEvents.Erase(handle);
@@ -505,7 +507,8 @@ void SystemSensorManager::TriggerEventQueue::AddSensorEvent(
     AutoPtr<ITriggerEvent> t;
     CTriggerEvent::New(CSensor::GetMaxLengthValuesArray(sensor,
             ((SystemSensorManager*)mManager.Get())->mTargetSdkLevel), (ITriggerEvent**)&t);
-    {    AutoLock syncLock(mTriggerEventsLock);
+    {
+        AutoLock syncLock(mTriggerEventsLock);
         Int32 handle;
         sensor->GetHandle(&handle);
         mTriggerEvents[handle] = t;
@@ -515,7 +518,8 @@ void SystemSensorManager::TriggerEventQueue::AddSensorEvent(
 void SystemSensorManager::TriggerEventQueue::RemoveSensorEvent(
     /* [in] */ ISensor* sensor)
 {
-    {    AutoLock syncLock(mTriggerEventsLock);
+    {
+        AutoLock syncLock(mTriggerEventsLock);
         Int32 handle;
         sensor->GetHandle(&handle);
         mTriggerEvents.Erase(handle);
@@ -530,7 +534,8 @@ void SystemSensorManager::TriggerEventQueue::DispatchSensorEvent(
 {
     const AutoPtr<ISensor> sensor = sHandleToSensor[handle];
     AutoPtr<ITriggerEvent> t = NULL;
-    {    AutoLock syncLock(mTriggerEventsLock);
+    {
+        AutoLock syncLock(mTriggerEventsLock);
         t = mTriggerEvents[handle];
     }
     if (t == NULL) {

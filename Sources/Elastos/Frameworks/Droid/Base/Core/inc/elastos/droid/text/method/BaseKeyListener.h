@@ -105,6 +105,13 @@ public:
         /* [in] */ IKeyEvent* event,
         /* [out] */ Boolean* ret);
 
+    using MetaKeyKeyListener::ClearMetaKeyState;
+
+    CARAPI ClearMetaKeyState(
+        /* [in] */ IView* view,
+        /* [in] */ IEditable* content,
+        /* [in] */ Int32 states);
+
 private:
     CARAPI_(Boolean) BackspaceOrForwardDelete(
         /* [in] */ IView* view,

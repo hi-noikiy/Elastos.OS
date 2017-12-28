@@ -30,8 +30,6 @@
 #include <Elastos.Droid.Content.h>
 #include <Elastos.CoreLibrary.IO.h>
 
-#include <elastos/core/AutoLock.h>
-using Elastos::Core::AutoLock;
 using Elastos::Droid::Content::CIntentFilter;
 using Elastos::Droid::Content::IContext;
 using Elastos::Droid::Content::IIntentFilter;
@@ -42,18 +40,19 @@ using Elastos::Droid::Os::IPowerManagerWakeLock;
 using Elastos::Droid::R;
 using Elastos::Droid::Server::Input::EIID_IWiredAccessoryCallbacks;
 using Elastos::Droid::View::IInputDevice;
-using Elastos::Utility::Logging::Logger;
-using Elastos::Utility::Logging::Slogger;
+using Elastos::Core::AutoLock;
+using Elastos::Core::CString;
+using Elastos::Core::ICharSequence;
+using Elastos::Core::StringBuilder;
+using Elastos::Core::StringUtils;
 using Elastos::IO::CFile;
 using Elastos::IO::CFileReader;
 using Elastos::IO::ICloseable;
 using Elastos::IO::IFile;
 using Elastos::IO::IFileReader;
 using Elastos::IO::IReader;
-using Elastos::Core::CString;
-using Elastos::Core::ICharSequence;
-using Elastos::Core::StringBuilder;
-using Elastos::Core::StringUtils;
+using Elastos::Utility::Logging::Logger;
+using Elastos::Utility::Logging::Slogger;
 
 namespace Elastos {
 namespace Droid {
@@ -420,7 +419,8 @@ ECode WiredAccessoryManager::NotifyWiredAccessoryChanged(
 
 ECode WiredAccessoryManager::SystemReady()
 {
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         mWakeLock->AcquireLock();
 
         AutoPtr<IMessage> msg;

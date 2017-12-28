@@ -1031,7 +1031,8 @@ AutoPtr<ScreenMagnifier::MotionEventInfo> ScreenMagnifier::MotionEventInfo::Obta
     /* [in] */ Int32 policyFlags)
 {
     AutoPtr<MotionEventInfo> info;
-    {    AutoLock syncLock(sLock);
+    {
+        AutoLock syncLock(sLock);
         if (sPoolSize > 0) {
             sPoolSize--;
             info = sPool;
@@ -1064,7 +1065,8 @@ void ScreenMagnifier::MotionEventInfo::Initialize(
 
 ECode ScreenMagnifier::MotionEventInfo::Recycle()
 {
-    {    AutoLock syncLock(sLock);
+    {
+        AutoLock syncLock(sLock);
         if (mInPool) {
             Slogger::E(ScreenMagnifier::TAG, "Already recycled.");
             return E_ILLEGAL_ARGUMENT_EXCEPTION;

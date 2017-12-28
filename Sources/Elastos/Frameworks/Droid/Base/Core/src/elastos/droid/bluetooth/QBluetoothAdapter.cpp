@@ -19,12 +19,9 @@
 #include "elastos/droid/bluetooth/CLeLppClientWrapper.h"
 #include "elastos/droid/bluetooth/CQBluetoothManagerCallback.h"
 #include "elastos/droid/bluetooth/CBluetoothManagerCallback.h"
-
 #include <elastos/core/AutoLock.h>
 #include <elastos/utility/logging/Slogger.h>
 
-#include <elastos/core/AutoLock.h>
-using Elastos::Core::AutoLock;
 using Elastos::Droid::Os::EIID_IBinder;
 using Elastos::Core::AutoLock;
 

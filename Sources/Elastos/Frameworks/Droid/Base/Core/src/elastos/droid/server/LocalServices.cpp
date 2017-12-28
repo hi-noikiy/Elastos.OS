@@ -18,7 +18,6 @@
 #include <elastos/core/AutoLock.h>
 #include <elastos/utility/logging/Slogger.h>
 
-#include <elastos/core/AutoLock.h>
 using Elastos::Core::AutoLock;
 using Elastos::Utility::Logging::Slogger;
 
@@ -33,7 +32,8 @@ AutoPtr<IInterface> LocalServices::GetService(
     /* [in] */ const InterfaceID& type)
 {
     AutoPtr<IInterface> service;
-    {    AutoLock syncLock(sLock);
+    {
+        AutoLock syncLock(sLock);
         HashMap<InterfaceID, AutoPtr<IInterface> >::Iterator it;
         it = sLocalServiceObjects.Find(type);
         if (it != sLocalServiceObjects.End()) {
@@ -47,7 +47,8 @@ ECode LocalServices::AddService(
     /* [in] */ const InterfaceID& type,
     /* [in] */ IInterface* service)
 {
-    {    AutoLock syncLock(sLock);
+    {
+        AutoLock syncLock(sLock);
         HashMap<InterfaceID, AutoPtr<IInterface> >::Iterator it;
         it = sLocalServiceObjects.Find(type);
         if (it != sLocalServiceObjects.End()) {

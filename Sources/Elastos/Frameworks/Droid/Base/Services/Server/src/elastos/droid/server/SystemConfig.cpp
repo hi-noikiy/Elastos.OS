@@ -23,8 +23,6 @@
 #include <elastos/utility/logging/Slogger.h>
 #include <elastos/core/AutoLock.h>
 
-#include <elastos/core/AutoLock.h>
-using Elastos::Core::AutoLock;
 using Elastos::Droid::Content::Pm::CFeatureInfo;
 using Elastos::Droid::Content::Pm::CSignature;
 using Elastos::Droid::Os::Process;
@@ -35,6 +33,7 @@ using Elastos::Droid::Os::CSystemProperties;
 using Elastos::Droid::Utility::Xml;
 using Elastos::Droid::Internal::Utility::XmlUtils;
 using Elastos::Droid::Internal::Utility::ArrayUtils;
+using Elastos::Core::AutoLock;
 using Elastos::IO::CFile;
 using Elastos::IO::ICloseable;
 using Elastos::IO::IReader;

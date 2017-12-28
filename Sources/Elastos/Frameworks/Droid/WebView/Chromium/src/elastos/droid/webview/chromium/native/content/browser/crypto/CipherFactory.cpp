@@ -23,9 +23,17 @@
 #include "elastos/utility/Arrays.h"
 #include <elastos/utility/logging/Slogger.h>
 
-#include <elastos/core/AutoLock.h>
+using Elastos::Droid::Os::AsyncTask;
 using Elastos::Core::AutoLock;
-using Elastos::Core::AutoLock;
+using Elastos::Security::EIID_IKey;
+using Elastos::Security::ISecureRandom;
+using Elastos::Security::ISecureRandomHelper;
+//TODO using Elastos::Security::CSecureRandomHelper;
+using Elastos::Security::Spec::IAlgorithmParameterSpec;
+using Elastos::Security::Spec::EIID_IAlgorithmParameterSpec;
+using Elastos::Utility::Concurrent::EIID_ICallable;
+using Elastos::Utility::Arrays;
+using Elastos::Utility::Logging::Slogger;
 using Elastosx::Crypto::ICipherHelper;
 using Elastosx::Crypto::CCipherHelper;
 using Elastosx::Crypto::ISecretKey;
@@ -36,16 +44,6 @@ using Elastosx::Crypto::Spec::IIvParameterSpec;
 using Elastosx::Crypto::Spec::CIvParameterSpec;
 using Elastosx::Crypto::Spec::CSecretKeySpec;
 using Elastosx::Crypto::Spec::ISecretKeySpec;
-using Elastos::Droid::Os::AsyncTask;
-using Elastos::Security::EIID_IKey;
-using Elastos::Security::ISecureRandom;
-using Elastos::Security::ISecureRandomHelper;
-//TODO using Elastos::Security::CSecureRandomHelper;
-using Elastos::Security::Spec::IAlgorithmParameterSpec;
-using Elastos::Security::Spec::EIID_IAlgorithmParameterSpec;
-using Elastos::Utility::Concurrent::EIID_ICallable;
-using Elastos::Utility::Arrays;
-using Elastos::Utility::Logging::Slogger;
 
 namespace Elastos {
 namespace Droid {

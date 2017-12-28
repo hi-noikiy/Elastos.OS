@@ -541,7 +541,8 @@ ECode CameraDeviceUserShim::SubmitRequest(
         return NOERROR;
     }
 
-    {    AutoLock syncLock(mConfigureLock);
+    {
+        AutoLock syncLock(mConfigureLock);
         if (mConfiguring) {
             Logger::E(TAG, "Cannot submit request, configuration change in progress.");
             *result = ICameraBinderDecorator::ICameraBinderDecorator_INVALID_OPERATION;
@@ -572,7 +573,8 @@ ECode CameraDeviceUserShim::SubmitRequestList(
         return NOERROR;
     }
 
-    {    AutoLock syncLock(mConfigureLock);
+    {
+        AutoLock syncLock(mConfigureLock);
         if (mConfiguring) {
             Logger::E(TAG, "Cannot submit request, configuration change in progress.");
             *result = ICameraBinderDecorator::ICameraBinderDecorator_INVALID_OPERATION;
@@ -602,7 +604,8 @@ ECode CameraDeviceUserShim::CancelRequest(
         return NOERROR;
     }
 
-    {    AutoLock syncLock(mConfigureLock);
+    {
+        AutoLock syncLock(mConfigureLock);
         if (mConfiguring) {
             Logger::E(TAG, "Cannot cancel request, configuration change in progress.");
             *result = ICameraBinderDecorator::ICameraBinderDecorator_INVALID_OPERATION;
@@ -707,7 +710,8 @@ ECode CameraDeviceUserShim::DeleteStream(
         return NOERROR;
     }
 
-    {    AutoLock syncLock(mConfigureLock);
+    {
+        AutoLock syncLock(mConfigureLock);
         if (!mConfiguring) {
             Logger::E(TAG, "Cannot delete stream, beginConfigure hasn't been called yet.");
             *result = ICameraBinderDecorator::ICameraBinderDecorator_INVALID_OPERATION;
@@ -839,7 +843,8 @@ ECode CameraDeviceUserShim::WaitUntilIdle(
         return NOERROR;
     }
 
-    {    AutoLock syncLock(mConfigureLock);
+    {
+        AutoLock syncLock(mConfigureLock);
         if (mConfiguring) {
             Logger::E(TAG, "Cannot wait until idle, configuration change in progress.");
             *result = ICameraBinderDecorator::ICameraBinderDecorator_INVALID_OPERATION;
@@ -870,7 +875,8 @@ ECode CameraDeviceUserShim::Flush(
         return NOERROR;
     }
 
-    {    AutoLock syncLock(mConfigureLock);
+    {
+        AutoLock syncLock(mConfigureLock);
         if (mConfiguring) {
             Logger::E(TAG, "Cannot flush, configuration change in progress.");
             *result = ICameraBinderDecorator::ICameraBinderDecorator_INVALID_OPERATION;

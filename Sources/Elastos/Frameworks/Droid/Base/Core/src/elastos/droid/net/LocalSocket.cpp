@@ -21,7 +21,6 @@
 #include <elastos/core/StringBuilder.h>
 #include <elastos/utility/logging/Logger.h>
 
-#include <elastos/core/AutoLock.h>
 using Elastos::Core::AutoLock;
 using Elastos::Core::CInteger32;
 using Elastos::Core::IInteger32;
@@ -93,7 +92,8 @@ ECode LocalSocket::ToString(
 ECode LocalSocket::ImplCreateIfNeeded()
 {
     if (!mImplCreated) {
-        {    AutoLock syncLock(this);
+        {
+            AutoLock syncLock(this);
             if (!mImplCreated) {
     //            try {
                 ECode ec = mImpl->Create(mSockType);
@@ -115,7 +115,8 @@ ECode LocalSocket::ImplCreateIfNeeded()
 ECode LocalSocket::Connect(
     /* [in] */ ILocalSocketAddress* endpoint)
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         if (mIsConnected) {
             Logger::E("LocalSocket", "already connected");
             return E_IO_EXCEPTION;
@@ -134,7 +135,8 @@ ECode LocalSocket::Bind(
 {
     FAIL_RETURN(ImplCreateIfNeeded())
 
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         if (mIsBound) {
             Logger::E("LocalSocket", "already bound");
             return E_IO_EXCEPTION;
@@ -266,7 +268,8 @@ ECode LocalSocket::IsConnected(
 {
     VALIDATE_NOT_NULL(result);
 
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         *result = mIsConnected;
     }
     return NOERROR;
@@ -285,7 +288,8 @@ ECode LocalSocket::IsBound(
 {
     VALIDATE_NOT_NULL(result);
 
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         *result = mIsBound;
     }
     return NOERROR;

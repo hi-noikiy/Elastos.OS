@@ -22,7 +22,6 @@
 #include <elastos/utility/logging/Slogger.h>
 #include <elastos/core/AutoLock.h>
 
-#include <elastos/core/AutoLock.h>
 using Elastos::Core::AutoLock;
 using Elastos::IO::IFile;
 using Elastos::IO::ICloseable;
@@ -84,7 +83,8 @@ ECode SQLiteOpenHelper::GetDatabaseName(
 ECode SQLiteOpenHelper::SetWriteAheadLoggingEnabled(
     /* [in] */ Boolean enabled)
 {
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         if (mEnableWriteAheadLogging != enabled) {
             Boolean isOpen, isReadOnly;
             if (mDatabase != NULL && (mDatabase->IsOpen(&isOpen), isOpen)
@@ -109,7 +109,8 @@ ECode SQLiteOpenHelper::GetWritableDatabase(
 {
     VALIDATE_NOT_NULL(database)
     ECode ec = NOERROR;
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         ec = GetDatabaseLocked(TRUE, database);
     }
     return ec;
@@ -120,7 +121,8 @@ ECode SQLiteOpenHelper::GetReadableDatabase(
 {
     VALIDATE_NOT_NULL(database)
     ECode ec = NOERROR;
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         ec =  GetDatabaseLocked(FALSE, database);
     }
     return ec;
@@ -258,7 +260,8 @@ ECode SQLiteOpenHelper::GetDatabaseLocked(
 
 ECode SQLiteOpenHelper::Close()
 {
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         if (mIsInitializing) {
             //throw new IllegalStateException("Closed during initialization");
             Slogger::E(TAG, "Closed during initialization");

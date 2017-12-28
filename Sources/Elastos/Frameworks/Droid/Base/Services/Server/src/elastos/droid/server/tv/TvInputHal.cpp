@@ -19,7 +19,6 @@
 #include <Elastos.Droid.Media.h>
 #include <Elastos.Droid.Utility.h>
 #include <elastos/core/AutoLock.h>
-#include <elastos/droid/net/ReturnOutValue.h>
 #include <elastos/utility/logging/Slogger.h>
 #include <Elastos.Droid.View.h>
 
@@ -31,7 +30,6 @@
 #include <utils/NativeHandle.h>
 #include <hardware/tv_input.h>
 
-#include <elastos/core/AutoLock.h>
 using Elastos::Core::AutoLock;
 using Elastos::Core::CArrayOf;
 using Elastos::Core::CObject;
@@ -648,7 +646,8 @@ ECode TvInputHal::constructor(
 
 ECode TvInputHal::Init()
 {
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         mPtr = NativeOpen(this);
     }
     return NOERROR;
@@ -662,18 +661,22 @@ ECode TvInputHal::AddStream(
 {
     VALIDATE_NOT_NULL(result)
 
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         if (mPtr == 0) {
             *result = ERROR_NO_INIT;
             return NOERROR;
         }
-        Int32 generation;
+        Int32 generation, othGeneration;
         mStreamConfigGenerations->Get(deviceId, 0, &generation);
-        if (generation != Ptr(streamConfig)->Func(streamConfig->GetGeneration)) {
+        streamConfig->GetGeneration(&othGeneration);
+        if (generation != othGeneration) {
             *result = ERROR_STALE_CONFIG;
             return NOERROR;
         }
-        if (NativeAddStream(mPtr, deviceId, Ptr(streamConfig)->Func(streamConfig->GetStreamId), surface) == 0) {
+        Int32 streamId;
+        streamConfig->GetStreamId(&streamId);
+        if (NativeAddStream(mPtr, deviceId, streamId, surface) == 0) {
             *result = SUCCESS;
             return NOERROR;
         } else {
@@ -691,18 +694,22 @@ ECode TvInputHal::RemoveStream(
 {
     VALIDATE_NOT_NULL(result)
 
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         if (mPtr == 0) {
             *result = ERROR_NO_INIT;
             return NOERROR;
         }
-        Int32 generation;
+        Int32 generation, othGeneration;
         mStreamConfigGenerations->Get(deviceId, 0, &generation);
-        if (generation != Ptr(streamConfig)->Func(streamConfig->GetGeneration)) {
+        streamConfig->GetGeneration(&othGeneration);
+        if (generation != othGeneration) {
             *result = ERROR_STALE_CONFIG;
             return NOERROR;
         }
-        if (NativeRemoveStream(mPtr, deviceId, Ptr(streamConfig)->Func(streamConfig->GetStreamId)) == 0) {
+        Int32 streamId;
+        streamConfig->GetStreamId(&streamId);
+        if (NativeRemoveStream(mPtr, deviceId, streamId) == 0) {
             *result = SUCCESS;
             return NOERROR;
         } else {
@@ -715,7 +722,8 @@ ECode TvInputHal::RemoveStream(
 
 ECode TvInputHal::Close()
 {
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         if (mPtr != 0l) {
             NativeClose(mPtr);
             mPtr = 0;
@@ -792,13 +800,16 @@ ECode TvInputHal::HandleMessage(
         case EVENT_DEVICE_AVAILABLE: {
             AutoPtr<IArrayOf> configs;
             AutoPtr<ITvInputHardwareInfo> info = ITvInputHardwareInfo::Probe(obj);
-            {    AutoLock syncLock(mLock);
-                RetrieveStreamConfigsLocked(Ptr(info)->Func(info->GetDeviceId));
+            {
+                AutoLock syncLock(mLock);
+                Int32 deviceId;
+                info->GetDeviceId(&deviceId);
+                RetrieveStreamConfigsLocked(deviceId);
                 if (DEBUG) {
                     Slogger::D(TAG, "EVENT_DEVICE_AVAILABLE: info = %s", TO_CSTR(info));
                 }
                 AutoPtr<IInterface> obj;
-                mStreamConfigs->Get(Ptr(info)->Func(info->GetDeviceId), (IInterface**)&obj);
+                mStreamConfigs->Get(deviceId, (IInterface**)&obj);
                 configs = IArrayOf::Probe(obj);
             }
             Int32 size;
@@ -815,7 +826,7 @@ ECode TvInputHal::HandleMessage(
         case EVENT_DEVICE_UNAVAILABLE: {
             Int32 deviceId = arg1;
             if (DEBUG) {
-                Slogger::D(TAG, "EVENT_DEVICE_UNAVAILABLE: deviceId = " + deviceId);
+                Slogger::D(TAG, "EVENT_DEVICE_UNAVAILABLE: deviceId = %d", deviceId);
             }
             mCallback->OnDeviceUnavailable(deviceId);
             break;
@@ -823,7 +834,8 @@ ECode TvInputHal::HandleMessage(
         case EVENT_STREAM_CONFIGURATION_CHANGED: {
             AutoPtr<IArrayOf> configs;
             Int32 deviceId = arg1;
-            {    AutoLock syncLock(mLock);
+            {
+                AutoLock syncLock(mLock);
                 if (DEBUG) {
                     Slogger::D(TAG, "EVENT_STREAM_CONFIGURATION_CHANGED: deviceId = %d", deviceId);
                 }

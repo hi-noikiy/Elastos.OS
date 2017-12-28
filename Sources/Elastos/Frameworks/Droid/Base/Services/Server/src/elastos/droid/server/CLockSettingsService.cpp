@@ -352,8 +352,8 @@ ECode CLockSettingsService::UserAddedBroadcastReceiver::OnReceive(
     intent->GetAction(&action);
     if (action.Equals(IIntent::ACTION_USER_ADDED)) {
         Int32 userHandle;
-        Int32 userSysUid = UserHandle::GetUid(userHandle, IProcess::SYSTEM_UID);
         intent->GetInt32Extra(IIntent::EXTRA_USER_HANDLE, 0, &userHandle);
+        Int32 userSysUid = UserHandle::GetUid(userHandle, IProcess::SYSTEM_UID);
 
         AutoPtr<IKeyStoreHelper> helper;
         CKeyStoreHelper::AcquireSingleton((IKeyStoreHelper**)&helper);
@@ -665,7 +665,8 @@ ECode CLockSettingsService::RegisterObserver(
 {
     AutoPtr<ISystemProperties> sysprop;
     CSystemProperties::AcquireSingleton((ISystemProperties**)&sysprop);
-    {    AutoLock syncLock(mObserversLock);
+    {
+        AutoLock syncLock(mObserversLock);
         List<AutoPtr<LockSettingsObserver> >::Iterator it = mObservers.Begin();
         for (; it != mObservers.End(); ++it) {
             LockSettingsObserver* lso = *it;
@@ -696,7 +697,8 @@ ECode CLockSettingsService::RegisterObserver(
 ECode CLockSettingsService::UnregisterObserver(
     /* [in] */ IILockSettingsObserver* remote)
 {
-    {    AutoLock syncLock(mObserversLock);
+    {
+        AutoLock syncLock(mObserversLock);
         List<AutoPtr<LockSettingsObserver> >::Iterator it = mObservers.Begin();
         for (; it != mObservers.End(); ++it) {
             LockSettingsObserver* lso = *it;
@@ -713,7 +715,8 @@ ECode CLockSettingsService::NotifyObservers(
     /* [in] */ const String& key,
     /* [in] */ Int32 userId)
 {
-    {    AutoLock syncLock(mObserversLock);
+    {
+        AutoLock syncLock(mObserversLock);
         ECode ec = NOERROR;
         List<AutoPtr<LockSettingsObserver> >::Iterator it = mObservers.Begin();
         for (; it != mObservers.End(); ++it) {

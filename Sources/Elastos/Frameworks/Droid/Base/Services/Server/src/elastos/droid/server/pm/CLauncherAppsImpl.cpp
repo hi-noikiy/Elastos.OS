@@ -304,7 +304,8 @@ ECode CLauncherAppsImpl::constructor(
 ECode CLauncherAppsImpl::AddOnAppsChangedListener(
     /* [in] */ IOnAppsChangedListener* listener)
 {
-    {    AutoLock syncLock(mListenersLock);
+    {
+        AutoLock syncLock(mListenersLock);
         if (DEBUG) {
             Logger::D(TAG, "Adding listener from %p", Binder::GetCallingUserHandle().Get());
         }
@@ -326,7 +327,8 @@ ECode CLauncherAppsImpl::AddOnAppsChangedListener(
 ECode CLauncherAppsImpl::RemoveOnAppsChangedListener(
     /* [in] */ IOnAppsChangedListener* listener)
 {
-    {    AutoLock syncLock(mListenersLock);
+    {
+        AutoLock syncLock(mListenersLock);
         if (DEBUG) {
             Logger::D(TAG, "Removing listener from %p", Binder::GetCallingUserHandle().Get());
         }
@@ -355,7 +357,8 @@ void CLauncherAppsImpl::StopWatchingPackageBroadcasts()
 
 void CLauncherAppsImpl::CheckCallbackCount()
 {
-    {    AutoLock syncLock(mListenersLock);
+    {
+        AutoLock syncLock(mListenersLock);
         Int32 count;
         mListeners->GetRegisteredCallbackCount(&count);
         if (DEBUG) {

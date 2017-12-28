@@ -379,7 +379,8 @@ ECode SettingsProvider::SettingsFileObserver::OnEvent(
     /* [in] */ const String& path)
 {
     AutoPtr<IAtomicInteger32> mutationCount;
-    {    AutoLock syncLock(mHost);
+    {
+        AutoLock syncLock(mHost);
         AutoPtr<IInterface> obj;
         mHost->sKnownMutationsInFlight->Get(mUserHandle, (IInterface**)&obj);
         mutationCount = IAtomicInteger32::Probe(obj);
@@ -887,7 +888,8 @@ ECode SettingsProvider::EstablishDbTracking(
     // keeping our caches in sync.  We synchronize the observer set
     // separately, and of course it has to run after the db file
     // itself was set up by the DatabaseHelper.
-    {    AutoLock syncLock(sObserverInstances);
+    {
+        AutoLock syncLock(sObserverInstances);
         AutoPtr<IInterface> obj;
         sObserverInstances->Get(userHandle, (IInterface**)&obj);
         if (obj == NULL) {
@@ -1310,7 +1312,7 @@ ECode SettingsProvider::Call(
         return NOERROR;
     }
 
-    ECode ec;
+    ECode ec = NOERROR;
     AutoPtr<IContentValues> values;
     CContentValues::New((IContentValues**)&values);
     values->Put(ISettingsNameValueTable::NAME, CoreUtils::Convert(request));

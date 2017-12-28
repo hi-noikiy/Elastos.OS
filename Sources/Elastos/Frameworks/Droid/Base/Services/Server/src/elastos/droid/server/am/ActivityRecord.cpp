@@ -424,6 +424,7 @@ void ActivityRecord::Dump(
             pw->Print(label);
             pw->Print(String("\""));
             pw->Print(String(" color="));
+            mTaskDescription->GetPrimaryColor(&primaryColor);
             pw->Println(StringUtils::ToString(primaryColor, 16));
         }
         AutoPtr<IBitmap> icon;
@@ -1233,8 +1234,7 @@ ECode ActivityRecord::KeyDispatchingTimedOut(
         r = GetWaitingHistoryRecordLocked();
         anrApp = r != NULL ? r->mApp : NULL;
     }
-    *result = mService->InputDispatchingTimedOut(anrApp, r, this, FALSE, reason);
-    return NOERROR;
+    return mService->InputDispatchingTimedOut(anrApp, r, this, FALSE, reason, result);
 }
 
 ECode ActivityRecord::GetKeyDispatchingTimeout(

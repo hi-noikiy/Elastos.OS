@@ -62,7 +62,7 @@ public:
     public:
         IfaceObserver();
 
-        constructor(
+        CARAPI constructor(
             /* [in] */ IBinder* commonTimeManagementService);
 
         CARAPI InterfaceStatusChanged(
@@ -78,6 +78,7 @@ public:
 
         CARAPI InterfaceRemoved(
             /* [in] */ const String& iface);
+
     private:
         CCommonTimeManagementService* mHost;
     };
@@ -93,6 +94,7 @@ public:
         InterfaceScoreRule(
             /* [in] */ const String& prefix,
             /* [in] */ Byte score);
+
     public:
         const String mPrefix;
         const Byte mScore;
@@ -141,6 +143,7 @@ private:
             /* [in] */ IIntent* intent);
 
         TO_STRING_IMPL("CCommonTimeManagementService::ConnectivityMangerObserver: ")
+
     private:
         CCommonTimeManagementService* mHost;
     };

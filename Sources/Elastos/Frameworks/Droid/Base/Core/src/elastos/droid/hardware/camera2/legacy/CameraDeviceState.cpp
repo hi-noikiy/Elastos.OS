@@ -19,7 +19,6 @@
 #include <elastos/core/AutoLock.h>
 #include <elastos/utility/logging/Logger.h>
 
-#include <elastos/core/AutoLock.h>
 using Elastos::Core::AutoLock;
 using Elastos::Droid::Hardware::Camera2::Impl::ICameraDeviceImplCameraDeviceCallbacks;
 using Elastos::Utility::Logging::Logger;
@@ -135,7 +134,8 @@ CameraDeviceState::CameraDeviceState()
 CARAPI CameraDeviceState::SetError(
     /* [in] */ Int32 error)
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         mCurrentError = error;
         return DoStateTransition(STATE_ERROR);
     }
@@ -148,7 +148,8 @@ CARAPI CameraDeviceState::SetConfiguring(
     VALIDATE_NOT_NULL(value);
     *value = FALSE;
 
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         DoStateTransition(STATE_CONFIGURING);
         *value = mCurrentError == NO_CAPTURE_ERROR;
         return NOERROR;
@@ -162,7 +163,8 @@ CARAPI CameraDeviceState::SetIdle(
     VALIDATE_NOT_NULL(value);
     *value = FALSE;
 
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         DoStateTransition(STATE_IDLE);
         *value = mCurrentError == NO_CAPTURE_ERROR;
         return NOERROR;
@@ -179,7 +181,8 @@ CARAPI CameraDeviceState::SetCaptureStart(
     VALIDATE_NOT_NULL(value);
     *value = FALSE;
 
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         mCurrentRequest = request;
         DoStateTransition(STATE_CAPTURING, timestamp, captureError);
         *value = mCurrentError == NO_CAPTURE_ERROR;

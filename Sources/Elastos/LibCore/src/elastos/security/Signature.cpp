@@ -21,7 +21,6 @@
 #include "utility/logging/Logger.h"
 #include "org/apache/harmony/security/fortress/CEngine.h"
 
-#include <elastos/core/AutoLock.h>
 using Elastos::Core::AutoLock;
 using Elastos::Core::ICharSequence;
 using Elastos::Core::StringBuilder;

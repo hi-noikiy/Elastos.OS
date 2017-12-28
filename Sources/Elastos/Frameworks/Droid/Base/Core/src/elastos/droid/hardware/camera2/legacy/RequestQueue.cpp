@@ -22,8 +22,6 @@
 #include <elastos/core/CoreUtils.h>
 #include <elastos/utility/logging/Logger.h>
 
-#include <elastos/core/AutoLock.h>
-using Elastos::Core::AutoLock;
 using Elastos::Droid::Utility::IPairHelper;
 using Elastos::Droid::Utility::CPairHelper;
 using Elastos::Core::AutoLock;
@@ -109,7 +107,8 @@ ECode RequestQueue::StopRepeating(
     VALIDATE_NOT_NULL(value)
     *value = 0;
 
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         Int64 ret = INVALID_FRAME;
         if (mRepeatingRequest != NULL) {
             Int32 id;
@@ -136,7 +135,8 @@ ECode RequestQueue::StopRepeating(
     VALIDATE_NOT_NULL(value)
     *value = 0;
 
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         if (mRepeatingRequest == NULL) {
             Logger::E(TAG, "cancel failed: no repeating request exists.");
             *value = INVALID_FRAME;
@@ -159,7 +159,8 @@ ECode RequestQueue::Submit(
     VALIDATE_NOT_NULL(value)
     *value = 0;
 
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         Int32 requestId = mCurrentRequestId++;
         AutoPtr<IBurstHolder> burst;
         CBurstHolder::New(requestId, repeating, requests,

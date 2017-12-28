@@ -383,7 +383,8 @@ Boolean LegacySensorManager::RegisterLegacyListener(
             // that the invariants around listeners are maintained.  This is safe
             // because neither RegisterLegacyListener nor UnregisterLegacyListener
             // are called reentrantly while sensors are being registered or unregistered.
-            {    AutoLock syncLock(mLegacyListenersMapLock);
+            {
+                AutoLock syncLock(mLegacyListenersMapLock);
                 AutoPtr<ISensorListener> l = listener;
 
                 // If we don't already have one, create a LegacyListener
@@ -451,7 +452,8 @@ void LegacySensorManager::UnregisterLegacyListener(
             // that the invariants around listeners are maintained.  This is safe
             // because neither RegisterLegacyListener nor UnregisterLegacyListener
             // are called re-entrantly while sensors are being registered or unregistered.
-            {    AutoLock syncLock(mLegacyListenersMapLock);
+            {
+                AutoLock syncLock(mLegacyListenersMapLock);
                 AutoPtr<ISensorListener> l = listener;
                 // do we know about this listener?
                 HashMap<AutoPtr<ISensorListener>, AutoPtr<LegacyListener> >::Iterator it;

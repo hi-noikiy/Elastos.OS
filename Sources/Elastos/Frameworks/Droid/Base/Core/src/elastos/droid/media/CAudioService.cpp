@@ -444,7 +444,8 @@ ECode CAudioService::VolumeStreamState::ReadSettings()
                 (mStreamType == IAudioSystem::STREAM_SYSTEM_ENFORCED)) {
             Int32 index = 10 * CAudioManager::DEFAULT_STREAM_VOLUME[mStreamType];
             AutoPtr<IBoolean> lock = mHost->mCameraSoundForced;
-            {    AutoLock syncLock(lock);
+            {
+                AutoLock syncLock(lock);
                 Boolean b;
                 mHost->mCameraSoundForced->GetValue(&b);
                 if (b) {
@@ -1176,7 +1177,8 @@ const String CAudioService::AudioPolicyProxy::TAG("AudioPolicyProxy");
 ECode CAudioService::AudioPolicyProxy::ProxyDied()
 {
     AutoPtr<IHashMap> lock = mHost->mAudioPolicies;
-    {    AutoLock syncLock(lock);
+    {
+        AutoLock syncLock(lock);
         String str;
         mToken->ToString(&str);
         Logger::V(TAG, "audio policy %s died", str.string());
@@ -1244,7 +1246,8 @@ CAudioService::ForceControlStreamClient::ForceControlStreamClient(
 ECode CAudioService::ForceControlStreamClient::ProxyDied()
 {
     Object& lock = mHost->mForceControlStreamLock;
-    {    AutoLock syncLock(lock);
+    {
+        AutoLock syncLock(lock);
         Logger::W(TAG, "SCO client died");
         if (mHost->mForceControlStreamClient.Get() != this) {
             Logger::W(TAG, "unregistered control stream client died");
@@ -1330,7 +1333,8 @@ ECode CAudioService::SetModeDeathHandler::ProxyDied()
 {
     Int32 newModeOwnerPid = 0;
     AutoPtr<IArrayList> lock = mHost->mSetModeDeathHandlers;
-    {    AutoLock syncLock(lock);
+    {
+        AutoLock syncLock(lock);
         Logger::W(TAG, "setMode() client died");
         Int32 index;
         mHost->mSetModeDeathHandlers->IndexOf(TO_IINTERFACE(this), &index);
@@ -1402,7 +1406,8 @@ ECode CAudioService::SoundPoolCallback::OnLoadComplete(
     /* [in] */ Int32 sampleId,
     /* [in] */ Int32 status)
 {
-    {    AutoLock syncLock(mHost->mSoundEffectsLock);
+    {
+        AutoLock syncLock(mHost->mSoundEffectsLock);
         Int32 i;
         AutoPtr<IInteger32> i32;
         CInteger32::New(sampleId, (IInteger32**)&i32);
@@ -1460,7 +1465,8 @@ CAudioService::ScoClient::ScoClient(
 
 ECode CAudioService::ScoClient::ProxyDied()
 {
-    {    AutoLock syncLock(mHost->mScoClients.Get());
+    {
+        AutoLock syncLock(mHost->mScoClients.Get());
         Logger::W(TAG, "SCO client died");
         Int32 index;
         mHost->mScoClients->IndexOf(TO_IINTERFACE(this), &index);
@@ -1478,7 +1484,8 @@ ECode CAudioService::ScoClient::ProxyDied()
 ECode CAudioService::ScoClient::IncCount(
     /* [in] */ Int32 scoAudioMode)
 {
-    {    AutoLock syncLock(mHost->mScoClients.Get());
+    {
+        AutoLock syncLock(mHost->mScoClients.Get());
         RequestScoState(IBluetoothHeadset::STATE_AUDIO_CONNECTED, scoAudioMode);
         if (mStartcount == 0) {
             // try {
@@ -1496,7 +1503,8 @@ ECode CAudioService::ScoClient::IncCount(
 
 ECode CAudioService::ScoClient::DecCount()
 {
-    {    AutoLock syncLock(mHost->mScoClients.Get());
+    {
+        AutoLock syncLock(mHost->mScoClients.Get());
         if (mStartcount == 0) {
             Logger::W(TAG, "ScoClient.decCount() already 0");
         }
@@ -1520,7 +1528,8 @@ ECode CAudioService::ScoClient::DecCount()
 ECode CAudioService::ScoClient::ClearCount(
     /* [in] */ Boolean stopSco)
 {
-    {    AutoLock syncLock(mHost->mScoClients.Get());
+    {
+        AutoLock syncLock(mHost->mScoClients.Get());
         if (mStartcount != 0) {
             // try {
             AutoPtr<IProxy> proxy = (IProxy*)mCb->Probe(EIID_IProxy);
@@ -1567,7 +1576,8 @@ ECode CAudioService::ScoClient::TotalCount(
     /* [out] */ Int32* result)
 {
     VALIDATE_NOT_NULL(result)
-    {    AutoLock syncLock(mHost->mScoClients.Get());
+    {
+        AutoLock syncLock(mHost->mScoClients.Get());
         Int32 count = 0;
         Int32 size;
         mHost->mScoClients->GetSize(&size);
@@ -1598,7 +1608,8 @@ void CAudioService::ScoClient::RequestScoState(
             // Accept SCO audio activation only in NORMAL audio mode or if the mode is
             // currently controlled by the same client process.
             AutoPtr<IArrayList> lock = mHost->mSetModeDeathHandlers;
-            {    AutoLock syncLock(lock);
+            {
+                AutoLock syncLock(lock);
                 AutoPtr<IInterface> obj;
                 mHost->mSetModeDeathHandlers->Get(0, (IInterface**)&obj);
                 Int32 pid;
@@ -1696,7 +1707,8 @@ ECode CAudioService::AudioSystemThread::Run()
     // Set this thread up so the handler will work on it
     Looper::Prepare();
 
-    {    AutoLock syncLock(mHost);
+    {
+        AutoLock syncLock(mHost);
         mHost->mAudioHandler = new AudioHandler(mHost);
         mHost->mAudioHandler->constructor();
 
@@ -1790,7 +1802,8 @@ ECode CAudioService::AudioHandler::HandleMessage(
 
             // Restore device connection states
             AutoPtr<IHashMap> lock = mHost->mConnectedDevices;
-            {    AutoLock syncLock(lock);
+            {
+                AutoLock syncLock(lock);
                 AutoPtr<ISet> entrySet;
                 mHost->mConnectedDevices->GetEntrySet((ISet**)&entrySet);
                 AutoPtr<ArrayOf<IInterface*> > array;
@@ -1853,21 +1866,24 @@ ECode CAudioService::AudioHandler::HandleMessage(
             }
 
             Object& eLock = mHost->mBluetoothA2dpEnabledLock;
-            {    AutoLock syncLock(eLock);
+            {
+                AutoLock syncLock(eLock);
                 AudioSystem::SetForceUse(IAudioSystem::FOR_MEDIA,
                         mHost->mBluetoothA2dpEnabled ?
                                 IAudioSystem::FORCE_NONE : IAudioSystem::FORCE_NO_BT_A2DP);
             }
 
             Object& sLock = mHost->mSettingsLock;
-            {    AutoLock syncLock(sLock);
+            {
+                AutoLock syncLock(sLock);
                 AudioSystem::SetForceUse(IAudioSystem::FOR_DOCK,
                         mHost->mDockAudioMediaEnabled ?
                                 IAudioSystem::FORCE_ANALOG_DOCK : IAudioSystem::FORCE_NONE);
             }
             if (mHost->mHdmiManager != NULL) {
                 AutoPtr<IHdmiControlManager> lock = mHost->mHdmiManager;
-                {    AutoLock syncLock(lock);
+                {
+                    AutoLock syncLock(lock);
                     if (mHost->mHdmiTvClient != NULL) {
                         Int32 result;
                         mHost->SetHdmiSystemAudioSupported(mHost->mHdmiSystemAudioSupported, &result);
@@ -1888,7 +1904,8 @@ ECode CAudioService::AudioHandler::HandleMessage(
             Boolean loaded = OnLoadSoundEffects();
             if (obj != NULL) {
                 AutoPtr<LoadSoundEffectReply> reply = (LoadSoundEffectReply*)IObject::Probe(obj);
-                {    AutoLock syncLock(reply);
+                {
+                    AutoLock syncLock(reply);
                     reply->mStatus = loaded ? 0 : -1;
                     reply->Notify();
                 }
@@ -1904,7 +1921,8 @@ ECode CAudioService::AudioHandler::HandleMessage(
             String str;
             ICharSequence::Probe(obj)->ToString(&str);
             AutoPtr<IHashMap> lock = mHost->mConnectedDevices;
-            {    AutoLock syncLock(lock);
+            {
+                AutoLock syncLock(lock);
                 mHost->MakeA2dpDeviceUnavailableNow(str);
             }
             break;
@@ -1941,7 +1959,8 @@ ECode CAudioService::AudioHandler::HandleMessage(
             if (N > 0) {
                 AutoPtr<IAudioRoutesInfo> routes;
                 AutoPtr<IAudioRoutesInfo> lock = mHost->mCurAudioRoutes;
-                {    AutoLock syncLock(lock);
+                {
+                    AutoLock syncLock(lock);
                     CAudioRoutesInfo::New(mHost->mCurAudioRoutes, (IAudioRoutesInfo**)&routes);
                 }
                 while (N > 0) {
@@ -2088,7 +2107,8 @@ Boolean CAudioService::AudioHandler::OnLoadSoundEffects()
 {
     Int32 status = 0;
 
-    {    AutoLock syncLock(mHost->mSoundEffectsLock);
+    {
+        AutoLock syncLock(mHost->mSoundEffectsLock);
         if (!mHost->mSystemReady) {
             Logger::W(TAG, "onLoadSoundEffects() called before boot complete");
             return FALSE;
@@ -2226,7 +2246,8 @@ Boolean CAudioService::AudioHandler::OnLoadSoundEffects()
 
 void CAudioService::AudioHandler::OnUnloadSoundEffects()
 {
-    {    AutoLock syncLock(mHost->mSoundEffectsLock);
+    {
+        AutoLock syncLock(mHost->mSoundEffectsLock);
         if (mHost->mSoundPool == NULL) {
             return;
         }
@@ -2259,7 +2280,8 @@ void CAudioService::AudioHandler::OnPlaySoundEffect(
     /* [in] */ Int32 effectType,
     /* [in] */ Int32 volume)
 {
-    {    AutoLock syncLock(mHost->mSoundEffectsLock);
+    {
+        AutoLock syncLock(mHost->mSoundEffectsLock);
 
         OnLoadSoundEffects();
 
@@ -2382,7 +2404,8 @@ ECode CAudioService::SettingsObserver::OnChange(
     //       and mRingerModeAffectedStreams, so will leave this synchronized for now.
     //       mRingerModeMutedStreams and mMuteAffectedStreams are safe (only accessed once).
     Object& lock = mHost->mSettingsLock;
-    {    AutoLock syncLock(lock);
+    {
+        AutoLock syncLock(lock);
         Boolean b;
         if (mHost->UpdateRingerModeAffectedStreams(&b), b) {
             /*
@@ -2496,7 +2519,8 @@ ECode CAudioService::AudioServiceBroadcastReceiver::OnReceive(
                               mHost->HandleDeviceConnection(connected, inDevice, address);
         if (success) {
             AutoPtr<IArrayList> lock = mHost->mScoClients;
-            {    AutoLock syncLock(lock);
+            {
+                AutoLock syncLock(lock);
                 if (connected) {
                     mHost->mBluetoothHeadsetDevice = btDevice;
                 }
@@ -2567,7 +2591,8 @@ ECode CAudioService::AudioServiceBroadcastReceiver::OnReceive(
         Boolean broadcast = FALSE;
         Int32 scoAudioState = IAudioManager::SCO_AUDIO_STATE_ERROR;
         AutoPtr<IArrayList> lock = mHost->mScoClients;
-        {    AutoLock syncLock(lock);
+        {
+            AutoLock syncLock(lock);
             Int32 btState;
             intent->GetInt32Extra(IBluetoothProfile::EXTRA_STATE, -1, &btState);
             // broadcast intent if the connection was initated by AudioService
@@ -2668,7 +2693,8 @@ ECode CAudioService::MyDisplayStatusCallback::OnComplete(
 {
     if (mHost->mHdmiManager != NULL) {
         AutoPtr<IHdmiControlManager> lock = mHost->mHdmiManager;
-        {    AutoLock syncLock(lock);
+        {
+            AutoLock syncLock(lock);
             mHost->mHdmiCecSink = (status != IHdmiControlManager::POWER_STATUS_UNKNOWN);
             // Television devices without CEC service apply software volume on HDMI output
             if (mHost->IsPlatformTelevision() && !mHost->mHdmiCecSink) {
@@ -2850,7 +2876,8 @@ ECode CAudioService::BluetoothProfileServiceListener::OnServiceConnected(
     AutoPtr<IList> deviceList;
     switch(profile) {
     case IBluetoothProfile::A2DP:
-        {    AutoLock syncLock(mHost->mA2dpAvrcpLock);
+        {
+            AutoLock syncLock(mHost->mA2dpAvrcpLock);
             mHost->mA2dp = IBluetoothA2dp::Probe(proxy);
             IBluetoothProfile::Probe(mHost->mA2dp)->GetConnectedDevices((IList**)&deviceList);
             Int32 size;
@@ -2859,7 +2886,8 @@ ECode CAudioService::BluetoothProfileServiceListener::OnServiceConnected(
                 AutoPtr<IInterface> obj;
                 deviceList->Get(0, (IInterface**)&obj);
                 btDevice = IBluetoothDevice::Probe(obj);
-                {    AutoLock syncLock(mHost->mConnectedDevices);
+                {
+                    AutoLock syncLock(mHost->mConnectedDevices);
                     Int32 state;
                     IBluetoothProfile::Probe(mHost->mA2dp)->GetConnectionState(btDevice, &state);
                     Int32 delay = mHost->CheckSendBecomingNoisyIntent(
@@ -2884,7 +2912,8 @@ ECode CAudioService::BluetoothProfileServiceListener::OnServiceConnected(
             AutoPtr<IInterface> obj;
             deviceList->Get(0, (IInterface**)&obj);
             btDevice = IBluetoothDevice::Probe(obj);
-            {    AutoLock syncLock(mHost->mConnectedDevices);
+            {
+                AutoLock syncLock(mHost->mConnectedDevices);
                 Int32 state;
                 proxy->GetConnectionState(btDevice, &state);
                 mHost->QueueMsgUnderWakeLock(mHost->mAudioHandler,
@@ -2898,7 +2927,8 @@ ECode CAudioService::BluetoothProfileServiceListener::OnServiceConnected(
         break;
 
     case IBluetoothProfile::HEADSET:
-        {    AutoLock syncLock(mHost->mScoClients);
+        {
+            AutoLock syncLock(mHost->mScoClients);
             // Discard timeout message
             mHost->mAudioHandler->RemoveMessages(MSG_BT_HEADSET_CNCT_FAILED);
             mHost->mBluetoothHeadset = IBluetoothHeadset::Probe(proxy);
@@ -2970,9 +3000,11 @@ ECode CAudioService::BluetoothProfileServiceListener::OnServiceDisconnected(
     Logger::D(TAG, "onServiceDisconnected: Bluetooth profile: %d", profile);
     switch(profile) {
     case IBluetoothProfile::A2DP:
-        {    AutoLock syncLock(mHost->mA2dpAvrcpLock);
+        {
+            AutoLock syncLock(mHost->mA2dpAvrcpLock);
             mHost->mA2dp = NULL;
-            {    AutoLock syncLock(mHost->mConnectedDevices);
+            {
+            AutoLock syncLock(mHost->mConnectedDevices);
                 AutoPtr<IInteger32> i32;
                 CInteger32::New(IAudioSystem::DEVICE_OUT_BLUETOOTH_A2DP, (IInteger32**)&i32);
                 Boolean b;
@@ -2999,7 +3031,8 @@ ECode CAudioService::BluetoothProfileServiceListener::OnServiceDisconnected(
         break;
 
     case IBluetoothProfile::A2DP_SINK:
-        {    AutoLock syncLock(mHost->mConnectedDevices);
+        {
+            AutoLock syncLock(mHost->mConnectedDevices);
             AutoPtr<IInteger32> i32;
             CInteger32::New(IAudioSystem::DEVICE_IN_BLUETOOTH_A2DP, (IInteger32**)&i32);
             Boolean b;
@@ -3014,9 +3047,11 @@ ECode CAudioService::BluetoothProfileServiceListener::OnServiceDisconnected(
         break;
 
     case IBluetoothProfile::HEADSET:
-        {    AutoLock syncLock(mHost->mScoClients);
+        {
+            AutoLock syncLock(mHost->mScoClients);
             mHost->mBluetoothHeadset = NULL;
-            {    AutoLock syncLock(mHost->mConnectedDevices);
+            {
+                AutoLock syncLock(mHost->mConnectedDevices);
                 if (mHost->mForcedUseForComm == IAudioSystem::FORCE_BT_SCO) {
                     Logger::D(TAG, "Hfp service disconnects, update device to NONE");
                     mHost->mForcedUseForComm = IAudioSystem::FORCE_NONE;
@@ -3360,7 +3395,8 @@ ECode CAudioService::OnSystemReady()
     mHdmiManager = IHdmiControlManager::Probe(service);
 
     if (mHdmiManager != NULL) {
-        {    AutoLock syncLock(mHdmiManager);
+        {
+            AutoLock syncLock(mHdmiManager);
             mHdmiManager->GetTvClient((IHdmiTvClient**)&mHdmiTvClient);
             if (mHdmiTvClient != NULL) {
                 mFixedVolumeDevices &= ~IAudioSystem::DEVICE_ALL_HDMI_SYSTEM_AUDIO_AND_SPEAKER;
@@ -3582,7 +3618,8 @@ ECode CAudioService::ForceVolumeControlStream(
     /* [in] */ Int32 streamType,
     /* [in] */ IBinder* cb)
 {
-    {    AutoLock syncLock(mForceControlStreamLock);
+    {
+        AutoLock syncLock(mForceControlStreamLock);
         mVolumeControlStream = streamType;
         if (mVolumeControlStream == -1) {
             if (mForceControlStreamClient != NULL) {
@@ -3627,9 +3664,11 @@ ECode CAudioService::SetStreamMute(
     Boolean b;
     if (IsStreamAffectedByMute(streamType, &b), b) {
         if (mHdmiManager != NULL) {
-            {    AutoLock syncLock(mHdmiManager);
+            {
+                AutoLock syncLock(mHdmiManager);
                 if (streamType == IAudioSystem::STREAM_MUSIC && mHdmiTvClient != NULL) {
-                    {    AutoLock syncLock(mHdmiTvClient);
+                    {
+                        AutoLock syncLock(mHdmiTvClient);
                         if (mHdmiSystemAudioSupported) {
                             mHdmiTvClient->SetSystemAudioMute(state);
                         }
@@ -3666,7 +3705,8 @@ ECode CAudioService::ForceRemoteSubmixFullVolume(
         Logger::W(TAG, "Trying to call forceRemoteSubmixFullVolume() without CAPTURE_AUDIO_OUTPUT");
         return NOERROR;
     }
-    {    AutoLock syncLock(mRmtSbmxFullVolDeathHandlers);
+    {
+        AutoLock syncLock(mRmtSbmxFullVolDeathHandlers);
         Boolean applyRequired = FALSE;
         if (startForcing) {
             if (!HasRmtSbmxFullVolDeathHandlerFor(cb)) {
@@ -4012,7 +4052,8 @@ ECode CAudioService::SetMode(
     }
 
     Int32 newModeOwnerPid = 0;
-    {    AutoLock syncLock(mSetModeDeathHandlers);
+    {
+        AutoLock syncLock(mSetModeDeathHandlers);
         if (mode == IAudioSystem::MODE_CURRENT) {
             mode = mMode;
         }
@@ -4065,7 +4106,8 @@ ECode CAudioService::LoadSoundEffects(
     Int32 attempts = 3;
     AutoPtr<LoadSoundEffectReply> reply = new LoadSoundEffectReply();
 
-    {    AutoLock syncLock(reply);
+    {
+        AutoLock syncLock(reply);
         SendMsg(mAudioHandler, MSG_LOAD_SOUND_EFFECTS, SENDMSG_QUEUE, 0, 0,
                 (IInterface*)(IObject*)reply, 0);
         while ((reply->mStatus == 1) && (attempts-- > 0)) {
@@ -4159,7 +4201,8 @@ ECode CAudioService::IsBluetoothScoOn(
 ECode CAudioService::SetBluetoothA2dpOn(
     /* [in] */ Boolean on)
 {
-    {    AutoLock syncLock(mBluetoothA2dpEnabledLock);
+    {
+        AutoLock syncLock(mBluetoothA2dpEnabledLock);
         mBluetoothA2dpEnabled = on;
         SendMsg(mAudioHandler, MSG_SET_FORCE_BT_A2DP_USE, SENDMSG_QUEUE,
                 IAudioSystem::FOR_MEDIA,
@@ -4174,7 +4217,8 @@ ECode CAudioService::IsBluetoothA2dpOn(
 {
     VALIDATE_NOT_NULL(result)
 
-    {    AutoLock syncLock(mBluetoothA2dpEnabledLock);
+    {
+        AutoLock syncLock(mBluetoothA2dpEnabledLock);
         *result = mBluetoothA2dpEnabled;
         return NOERROR;
     }
@@ -4221,7 +4265,8 @@ ECode CAudioService::ClearAllScoClients(
     /* [in] */ Int32 exceptPid,
     /* [in] */ Boolean stopSco)
 {
-    {    AutoLock syncLock(mScoClients);
+    {
+        AutoLock syncLock(mScoClients);
         AutoPtr<ScoClient> savedClient;
         Int32 size;
         mScoClients->GetSize(&size);
@@ -4261,7 +4306,8 @@ ECode CAudioService::SetWiredDeviceConnectionState(
     /* [in] */ Int32 state,
     /* [in] */ const String& name)
 {
-    {    AutoLock syncLock(mConnectedDevices);
+    {
+        AutoLock syncLock(mConnectedDevices);
         Int32 delay = CheckSendBecomingNoisyIntent(device, state);
         AutoPtr<ICharSequence> cs;
         CString::New(name, (ICharSequence**)&cs);
@@ -4287,7 +4333,8 @@ ECode CAudioService::SetBluetoothA2dpDeviceConnectionState(
         // Logger::E(TAG, "invalid profile " + profile);
         return E_ILLEGAL_ARGUMENT_EXCEPTION;
     }
-    {    AutoLock syncLock(mConnectedDevices);
+    {
+        AutoLock syncLock(mConnectedDevices);
         if (profile == IBluetoothProfile::A2DP) {
             delay = CheckSendBecomingNoisyIntent(IAudioSystem::DEVICE_OUT_BLUETOOTH_A2DP,
                     (state == IBluetoothProfile::STATE_CONNECTED) ? 1 : 0);
@@ -4309,7 +4356,8 @@ ECode CAudioService::AvrcpSupportsAbsoluteVolume(
     /* [in] */ Boolean support)
 {
     // address is not used for now, but may be used when multiple a2dp devices are supported
-    {    AutoLock syncLock(mA2dpAvrcpLock);
+    {
+        AutoLock syncLock(mA2dpAvrcpLock);
         mAvrcpAbsVolSupported = support;
         SendMsg(mAudioHandler, MSG_SET_DEVICE_VOLUME, SENDMSG_QUEUE,
                 IAudioSystem::DEVICE_OUT_BLUETOOTH_A2DP, 0,
@@ -4436,7 +4484,8 @@ ECode CAudioService::GetCurrentAudioFocus(
 ECode CAudioService::SetBluetoothA2dpOnInt(
     /* [in] */ Boolean on)
 {
-    {    AutoLock syncLock(mBluetoothA2dpEnabledLock);
+    {
+        AutoLock syncLock(mBluetoothA2dpEnabledLock);
         mBluetoothA2dpEnabled = on;
         mAudioHandler->RemoveMessages(MSG_SET_FORCE_BT_A2DP_USE);
         AudioSystem::SetForceUse(IAudioSystem::FOR_MEDIA,
@@ -4450,7 +4499,8 @@ ECode CAudioService::IsCameraSoundForced(
 {
     VALIDATE_NOT_NULL(result)
 
-    {    AutoLock syncLock(mCameraSoundForced);
+    {
+        AutoLock syncLock(mCameraSoundForced);
         mCameraSoundForced->GetValue(result);
         return NOERROR;
     }
@@ -4476,7 +4526,8 @@ ECode CAudioService::RegisterAudioPolicy(
         *result = FALSE;
         return NOERROR;
     }
-    {    AutoLock syncLock(mAudioPolicies);
+    {
+        AutoLock syncLock(mAudioPolicies);
         AutoPtr<AudioPolicyProxy> app = new AudioPolicyProxy(this, policyConfig, cb);
         // try {
         AutoPtr<IProxy> proxy = (IProxy*)cb->Probe(EIID_IProxy);
@@ -4497,7 +4548,8 @@ ECode CAudioService::RegisterAudioPolicy(
 ECode CAudioService::UnregisterAudioPolicyAsync(
     /* [in] */ IBinder* cb)
 {
-    {    AutoLock syncLock(mAudioPolicies);
+    {
+        AutoLock syncLock(mAudioPolicies);
         AutoPtr<IInterface> obj;
         mAudioPolicies->Remove(cb, (IInterface**)&obj);
         AutoPtr<AudioPolicyProxy> app = (AudioPolicyProxy*)IObject::Probe(obj);
@@ -4575,7 +4627,8 @@ ECode CAudioService::UpdateRingerModeAffectedStreams(
             break;
     }
 
-    {    AutoLock syncLock(mCameraSoundForced);
+    {
+        AutoLock syncLock(mCameraSoundForced);
         if (mCameraSoundForced) {
             ringerModeAffectedStreams &= ~(1 << IAudioSystem::STREAM_SYSTEM_ENFORCED);
         }
@@ -4661,7 +4714,8 @@ ECode CAudioService::StartWatchingRoutes(
 {
     VALIDATE_NOT_NULL(result)
 
-    {    AutoLock syncLock(mCurAudioRoutes);
+    {
+        AutoLock syncLock(mCurAudioRoutes);
         AutoPtr<IAudioRoutesInfo> routes;
         CAudioRoutesInfo::New(mCurAudioRoutes, (IAudioRoutesInfo**)&routes);
         Boolean b;
@@ -4676,7 +4730,8 @@ ECode CAudioService::StartWatchingRoutes(
 ECode CAudioService::DisableSafeMediaVolume()
 {
     FAIL_RETURN(EnforceSelfOrSystemUI(String("disable the safe media volume")))
-    {    AutoLock syncLock(mSafeMediaVolumeStateLock);
+    {
+        AutoLock syncLock(mSafeMediaVolumeStateLock);
         SetSafeMediaVolumeEnabled(FALSE);
         if (mPendingVolumeCommand != NULL) {
             OnSetStreamVolume(mPendingVolumeCommand->mStreamType,
@@ -4697,14 +4752,16 @@ ECode CAudioService::SetHdmiSystemAudioSupported(
 
     Int32 device = IAudioSystem::DEVICE_NONE;
     if (mHdmiManager != NULL) {
-        {    AutoLock syncLock(mHdmiManager);
+        {
+            AutoLock syncLock(mHdmiManager);
             if (mHdmiTvClient == NULL) {
                 Logger::W(TAG, "Only Hdmi-Cec enabled TV device supports system audio mode.");
                 *result = device;
                 return NOERROR;
             }
 
-            {    AutoLock syncLock(mHdmiTvClient);
+            {
+                AutoLock syncLock(mHdmiTvClient);
                 if (mHdmiSystemAudioSupported != on) {
                     mHdmiSystemAudioSupported = on;
                     AudioSystem::SetForceUse(IAudioSystem::FOR_HDMI_SYSTEM_AUDIO,
@@ -5364,7 +5421,8 @@ void CAudioService::SetStreamVolume(
         return;
     }
 
-    {    AutoLock syncLock(mSafeMediaVolumeStateLock);
+    {
+        AutoLock syncLock(mSafeMediaVolumeStateLock);
         // reset any pending volume command
         mPendingVolumeCommand = NULL;
 
@@ -5375,7 +5433,8 @@ void CAudioService::SetStreamVolume(
         if (streamTypeAlias == IAudioSystem::STREAM_MUSIC &&
             (device & IAudioSystem::DEVICE_OUT_ALL_A2DP) != 0 &&
             (flags & IAudioManager::FLAG_BLUETOOTH_ABS_VOLUME) == 0) {
-            {    AutoLock syncLock(mA2dpAvrcpLock);
+            {
+                AutoLock syncLock(mA2dpAvrcpLock);
                 if (mA2dp != NULL && mAvrcpAbsVolSupported) {
                     mA2dp->SetAvrcpAbsoluteVolume(index / 10);
                 }
@@ -5383,14 +5442,16 @@ void CAudioService::SetStreamVolume(
         }
 
         if (mHdmiManager != NULL) {
-            {    AutoLock syncLock(mHdmiManager);
+            {
+                AutoLock syncLock(mHdmiManager);
                 if (mHdmiTvClient != NULL &&
                     streamTypeAlias == IAudioSystem::STREAM_MUSIC &&
                     (flags & IAudioManager::FLAG_HDMI_SYSTEM_AUDIO_VOLUME) == 0 &&
                     oldIndex != index) {
                     Int32 maxIndex;
                     GetStreamMaxVolume(streamType, &maxIndex);
-                    {    AutoLock syncLock(mHdmiTvClient);
+                    {
+                        AutoLock syncLock(mHdmiTvClient);
                         if (mHdmiSystemAudioSupported) {
                             mHdmiTvClient->SetSystemAudioVolume(
                                     (oldIndex + 5) / 10, (index + 5) / 10, maxIndex);
@@ -5682,7 +5743,8 @@ void CAudioService::SetRingerModeInt(
     /* [in] */ Int32 ringerMode,
     /* [in] */ Boolean persist)
 {
-    {    AutoLock syncLock(mSettingsLock);
+    {
+        AutoLock syncLock(mSettingsLock);
         mRingerMode = ringerMode;
     }
 
@@ -6024,7 +6086,8 @@ void CAudioService::ReadAudioSettings(
     CheckAllFixedVolumeDevices();
     CheckAllAliasStreamVolumes();
 
-    {    AutoLock syncLock(mSafeMediaVolumeStateLock);
+    {
+        AutoLock syncLock(mSafeMediaVolumeStateLock);
         Int32 val;
         Settings::System::GetInt32ForUser(mContentResolver,
                 ISettingsSecure::UNSAFE_VOLUME_MUSIC_ACTIVE_MS, 0, IUserHandle::USER_CURRENT, &val);
@@ -6053,7 +6116,8 @@ AutoPtr<CAudioService::ScoClient> CAudioService::GetScoClient(
     /* [in] */ IBinder* cb,
     /* [in] */ Boolean create)
 {
-    {    AutoLock syncLock(mScoClients);
+    {
+        AutoLock syncLock(mScoClients);
         AutoPtr<ScoClient> client;
         Int32 size;
         mScoClients->GetSize(&size);
@@ -6097,7 +6161,8 @@ Boolean CAudioService::GetBluetoothHeadset()
 void CAudioService::DisconnectBluetoothSco(
     /* [in] */ Int32 exceptPid)
 {
-    {    AutoLock syncLock(mScoClients);
+    {
+        AutoLock syncLock(mScoClients);
         CheckScoAudioState();
         if (mScoAudioState == SCO_STATE_ACTIVE_EXTERNAL ||
                 mScoAudioState == SCO_STATE_DEACTIVATE_EXT_REQ) {
@@ -6124,7 +6189,8 @@ void CAudioService::DisconnectBluetoothSco(
 
 void CAudioService::ResetBluetoothSco()
 {
-    {    AutoLock syncLock(mScoClients);
+    {
+        AutoLock syncLock(mScoClients);
         ClearAllScoClients(0, FALSE);
         mScoAudioState = SCO_STATE_INACTIVE;
         BroadcastScoConnectionState(IAudioManager::SCO_AUDIO_STATE_DISCONNECTED);
@@ -6154,7 +6220,8 @@ void CAudioService::OnBroadcastScoConnectionState(
 
 void CAudioService::OnCheckMusicActive()
 {
-    {    AutoLock syncLock(mSafeMediaVolumeStateLock);
+    {
+        AutoLock syncLock(mSafeMediaVolumeStateLock);
         Int32 value;
         mSafeMediaVolumeState->GetValue(&value);
         if (value == SAFE_MEDIA_VOLUME_INACTIVE) {
@@ -6196,7 +6263,8 @@ void CAudioService::SaveMusicActiveMs()
 void CAudioService::OnConfigureSafeVolume(
     /* [in] */ Boolean force)
 {
-    {    AutoLock syncLock(mSafeMediaVolumeStateLock);
+    {
+        AutoLock syncLock(mSafeMediaVolumeStateLock);
         AutoPtr<IResources> res;
         mContext->GetResources((IResources**)&res);
         AutoPtr<IConfiguration> conf;
@@ -6289,7 +6357,7 @@ Int32 CAudioService::CheckForRingerModeChange(
                 "but no vibrator is present");
             break;
         }
-        if ((direction == IAudioManager::ADJUST_LOWER)) {
+        if (direction == IAudioManager::ADJUST_LOWER) {
             if (VOLUME_SETS_RINGER_MODE_SILENT
                     && mPrevVolDirection != IAudioManager::ADJUST_LOWER) {
                 ringerMode = IAudioManager::RINGER_MODE_SILENT;
@@ -6470,8 +6538,8 @@ Int32 CAudioService::GetActiveStreamType(
             break;
         }
     }
-    if (DEBUG_VOL) Logger::V(TAG, "getActiveStreamType: Returning suggested type "
-            + suggestedStreamType);
+    if (DEBUG_VOL) Logger::V(TAG, "getActiveStreamType: Returning suggested type %d",
+            suggestedStreamType);
     return suggestedStreamType;
 }
 
@@ -6602,7 +6670,8 @@ void CAudioService::OnSendBecomingNoisyIntent()
 void CAudioService::MakeA2dpDeviceUnavailableNow(
     /* [in] */ const String& address)
 {
-    {    AutoLock syncLock(mA2dpAvrcpLock);
+    {
+        AutoLock syncLock(mA2dpAvrcpLock);
         mAvrcpAbsVolSupported = FALSE;
     }
     AudioSystem::SetDeviceConnectionState(IAudioSystem::DEVICE_OUT_BLUETOOTH_A2DP,
@@ -6611,7 +6680,8 @@ void CAudioService::MakeA2dpDeviceUnavailableNow(
     AutoPtr<IInteger32> i32;
     CInteger32::New(IAudioSystem::DEVICE_OUT_BLUETOOTH_A2DP, (IInteger32**)&i32);
     mConnectedDevices->Remove(i32);
-    {    AutoLock syncLock(mCurAudioRoutes);
+    {
+        AutoLock syncLock(mCurAudioRoutes);
         // Remove A2DP routes as well
         AutoPtr<ICharSequence> cs;
         mCurAudioRoutes->GetBluetoothName((ICharSequence**)&cs);
@@ -6694,7 +6764,8 @@ void CAudioService::OnSetA2dpSinkConnectionState(
         address = String("");
     }
 
-    {    AutoLock syncLock(mConnectedDevices);
+    {
+        AutoLock syncLock(mConnectedDevices);
         AutoPtr<IInteger32> i32;
         CInteger32::New(IAudioSystem::DEVICE_OUT_BLUETOOTH_A2DP, (IInteger32**)&i32);
         Boolean b;
@@ -6718,7 +6789,8 @@ void CAudioService::OnSetA2dpSinkConnectionState(
             else {
                 MakeA2dpDeviceUnavailableNow(address);
             }
-            {    AutoLock syncLock(mCurAudioRoutes);
+            {
+                AutoLock syncLock(mCurAudioRoutes);
                 AutoPtr<ICharSequence> cs;
                 mCurAudioRoutes->GetBluetoothName((ICharSequence**)&cs);
                 if (cs != NULL) {
@@ -6743,7 +6815,8 @@ void CAudioService::OnSetA2dpSinkConnectionState(
                 }
             }
             MakeA2dpDeviceAvailable(address);
-            {    AutoLock syncLock(mCurAudioRoutes);
+            {
+                AutoLock syncLock(mCurAudioRoutes);
                 String name;
                 btDevice->GetAliasName(&name);
                 AutoPtr<ICharSequence> cs;
@@ -6778,7 +6851,8 @@ void CAudioService::OnSetA2dpSourceConnectionState(
         address = String("");
     }
 
-    {    AutoLock syncLock(mConnectedDevices);
+    {
+        AutoLock syncLock(mConnectedDevices);
         AutoPtr<IInteger32> i32;
         CInteger32::New(IAudioSystem::DEVICE_IN_BLUETOOTH_A2DP, (IInteger32**)&i32);
         Boolean b;
@@ -6803,7 +6877,8 @@ Boolean CAudioService::HandleDeviceConnection(
     /* [in] */ Int32 device,
     /* [in] */ const String& params)
 {
-    {    AutoLock syncLock(mConnectedDevices);
+    {
+        AutoLock syncLock(mConnectedDevices);
         AutoPtr<IInteger32> i32;
         CInteger32::New(device, (IInteger32**)&i32);
         Boolean b;
@@ -6931,7 +7006,8 @@ void CAudioService::SendDeviceConnectionIntent(
         ConfigureHdmiPlugIntent(intent, state);
     }
 
-    {    AutoLock syncLock(mCurAudioRoutes);
+    {
+        AutoLock syncLock(mCurAudioRoutes);
         if (connType != 0) {
             Int32 type;
             mCurAudioRoutes->GetMainType(&type);
@@ -6984,7 +7060,8 @@ void CAudioService::OnSetWiredDeviceConnectionState(
     /* [in] */ Int32 state,
     /* [in] */ const String& name)
 {
-    {    AutoLock syncLock(mConnectedDevices);
+    {
+        AutoLock syncLock(mConnectedDevices);
         if ((state == 0) && ((device == IAudioSystem::DEVICE_OUT_WIRED_HEADSET) ||
                 (device == IAudioSystem::DEVICE_OUT_WIRED_HEADPHONE) ||
                 (device == IAudioSystem::DEVICE_OUT_LINE))) {
@@ -7014,7 +7091,8 @@ void CAudioService::OnSetWiredDeviceConnectionState(
                 mFixedVolumeDevices |= IAudioSystem::DEVICE_OUT_HDMI;
                 CheckAllFixedVolumeDevices();
                 if (mHdmiManager != NULL) {
-                    {    AutoLock syncLock(mHdmiManager);
+                    {
+                        AutoLock syncLock(mHdmiManager);
                         if (mHdmiPlaybackClient != NULL) {
                             mHdmiCecSink = FALSE;
                             mHdmiPlaybackClient->QueryDisplayStatus(mHdmiDisplayStatusCallback);
@@ -7026,7 +7104,8 @@ void CAudioService::OnSetWiredDeviceConnectionState(
         else {
             if (IsPlatformTelevision() && ((device & IAudioSystem::DEVICE_OUT_HDMI) != 0)) {
                 if (mHdmiManager != NULL) {
-                    {    AutoLock syncLock(mHdmiManager);
+                    {
+                        AutoLock syncLock(mHdmiManager);
                         mHdmiCecSink = FALSE;
                     }
                 }
@@ -7140,8 +7219,10 @@ void CAudioService::HandleConfigurationChanged(
 
     Boolean cameraSoundForced;
     res->GetBoolean(R::bool_::config_camera_sound_forced, &cameraSoundForced);
-    {    AutoLock syncLock(mSettingsLock);
-        {    AutoLock syncLock(mCameraSoundForced);
+    {
+        AutoLock syncLock(mSettingsLock);
+        {
+            AutoLock syncLock(mCameraSoundForced);
             Boolean b;
             mCameraSoundForced->GetValue(&b);
             if (cameraSoundForced != b) {
@@ -7239,7 +7320,8 @@ void CAudioService::SetRotationForAudioSystem()
 void CAudioService::SetSafeMediaVolumeEnabled(
     /* [in] */ Boolean on)
 {
-    {    AutoLock syncLock(mSafeMediaVolumeStateLock);
+    {
+        AutoLock syncLock(mSafeMediaVolumeStateLock);
         Int32 value;
         mSafeMediaVolumeState->GetValue(&value);
         if ((value != SAFE_MEDIA_VOLUME_NOT_CONFIGURED) &&
@@ -7299,7 +7381,8 @@ Boolean CAudioService::CheckSafeMediaVolume(
     /* [in] */ Int32 index,
     /* [in] */ Int32 device)
 {
-    {    AutoLock syncLock(mSafeMediaVolumeStateLock);
+    {
+        AutoLock syncLock(mSafeMediaVolumeStateLock);
         Int32 value;
         mSafeMediaVolumeState->GetValue(&value);
         if ((value == SAFE_MEDIA_VOLUME_ACTIVE) &&

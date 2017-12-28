@@ -19,7 +19,6 @@
 #include "elastos/droid/media/audiofx/CPresetReverbSettings.h"
 #include <elastos/core/AutoLock.h>
 
-#include <elastos/core/AutoLock.h>
 using Elastos::Core::AutoLock;
 using Elastos::Utility::IUUIDHelper;
 using Elastos::Utility::CUUIDHelper;

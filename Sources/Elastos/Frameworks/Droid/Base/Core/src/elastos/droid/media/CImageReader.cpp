@@ -712,7 +712,8 @@ ECode CImageReader::ListenerHandler::HandleMessage(
 {
     AutoPtr<IImageReaderOnImageAvailableListener> listener;
     Object& lock = mHost->mListenerLock;
-    {    AutoLock syncLock(lock);
+    {
+        AutoLock syncLock(lock);
         listener = mHost->mListener;
     }
     if (listener != NULL) {
@@ -1209,7 +1210,8 @@ ECode CImageReader::SetOnImageAvailableListener(
     /* [in] */ IImageReaderOnImageAvailableListener* listener,
     /* [in] */ IHandler* handler)
 {
-    {    AutoLock syncLock(mListenerLock);
+    {
+        AutoLock syncLock(mListenerLock);
         if (listener != NULL) {
             AutoPtr<ILooper> looper;
             if (handler != NULL) {
@@ -1272,7 +1274,7 @@ ECode CImageReader::AcquireNextSurfaceImage(
         case ACQUIRE_MAX_IMAGES:
             break;
         default:
-            Logger::E(TAG, "Unknown nativeImageSetup return code " + status);
+            Logger::E(TAG, "Unknown nativeImageSetup return code %d", status);
             return E_ASSERTION_ERROR;
     }
     *result = status;
@@ -1341,7 +1343,8 @@ void CImageReader::PostEventFromNative(
 
     AutoPtr<IHandler> handler;
     Object& lock = cir->mListenerLock;
-    {    AutoLock syncLock(lock);
+    {
+        AutoLock syncLock(lock);
         handler = cir->mListenerHandler;
     }
     if (handler != NULL) {

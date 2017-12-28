@@ -48,7 +48,8 @@ ECode SSLServerSocketFactory::GetDefault(
 {
     VALIDATE_NOT_NULL(factory)
 
-    {    AutoLock syncLock(sLock);
+    {
+        AutoLock syncLock(sLock);
         Int32 newCacheVersion;
         Services::GetCacheVersion(&newCacheVersion);
         if (sLastCacheVersion != newCacheVersion) {

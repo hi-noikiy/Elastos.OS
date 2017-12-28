@@ -30,14 +30,13 @@
 #include <elastos/core/AutoLock.h>
 #include <elastos/utility/logging/Slogger.h>
 
-#include <elastos/core/AutoLock.h>
-using Elastos::Core::AutoLock;
 using Elastos::Droid::App::IActivity;
 using Elastos::Droid::App::IService;
 using Elastos::Droid::Content::Res::IResources;
 using Elastos::Droid::Graphics::IPixelFormat;
 using Elastos::Droid::Os::SystemProperties;
 using Elastos::Droid::R;
+using Elastos::Core::AutoLock;
 using Elastos::Core::StringUtils;
 using Elastos::Core::CString;
 using Elastos::Utility::Logging::Slogger;

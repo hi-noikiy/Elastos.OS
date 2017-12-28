@@ -21,7 +21,6 @@
 #include <elastos/core/AutoLock.h>
 #include <elastos/utility/logging/Slogger.h>
 
-#include <elastos/core/AutoLock.h>
 using Elastos::Core::AutoLock;
 using Elastos::IO::IOutputStream;
 using Elastos::IO::IInputStream;
@@ -135,7 +134,8 @@ ECode CInputMethodSubtypeArray::Get(
     }
     AutoPtr<ArrayOf<IInputMethodSubtype*> > instance = mInstance;
     if (instance == NULL) {
-        {    AutoLock syncLock(mLockObject);
+        {
+            AutoLock syncLock(mLockObject);
             instance = mInstance;
             if (instance == NULL) {
                 AutoPtr<ArrayOf<Byte> > decompressedData =

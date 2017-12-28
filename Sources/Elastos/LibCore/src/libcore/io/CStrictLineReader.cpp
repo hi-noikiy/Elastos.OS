@@ -19,7 +19,6 @@
 #include "StringUtils.h"
 #include "AutoLock.h"
 
-#include <elastos/core/AutoLock.h>
 using Elastos::Core::AutoLock;
 using Elastos::Core::StringUtils;
 using Elastos::IO::Charset::Charset;

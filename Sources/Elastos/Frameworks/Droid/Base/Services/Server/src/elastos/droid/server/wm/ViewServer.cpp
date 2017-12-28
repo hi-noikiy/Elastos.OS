@@ -17,11 +17,11 @@
 #include "elastos/droid/server/wm/ViewServer.h"
 #include "elastos/droid/server/wm/CWindowManagerService.h"
 #include <Elastos.CoreLibrary.IO.h>
+#include <elastos/core/AutoLock.h>
 #include <elastos/core/Thread.h>
 #include <elastos/core/StringUtils.h>
 #include <elastos/utility/logging/Slogger.h>
 
-#include <elastos/core/AutoLock.h>
 using Elastos::Core::AutoLock;
 using Elastos::Core::CThread;
 using Elastos::Core::StringUtils;
@@ -153,7 +153,8 @@ ECode ViewServer::ViewServerWorker::Run()
 
 ECode ViewServer::ViewServerWorker::WindowsChanged()
 {
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         mNeedWindowListUpdate = TRUE;
         mLock.NotifyAll();
     }
@@ -162,7 +163,8 @@ ECode ViewServer::ViewServerWorker::WindowsChanged()
 
 ECode ViewServer::ViewServerWorker::FocusChanged()
 {
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         mNeedFocusedWindowUpdate = TRUE;
         mLock.NotifyAll();
     }
@@ -192,7 +194,8 @@ Boolean ViewServer::ViewServerWorker::WindowManagerAutolistLoop()
         Boolean needWindowListUpdate = FALSE;
         Boolean needFocusedWindowUpdate = FALSE;
 
-        {    AutoLock syncLock(mLock);
+        {
+            AutoLock syncLock(mLock);
             while (!mNeedWindowListUpdate && !mNeedFocusedWindowUpdate) {
                 mLock.Wait();
             }

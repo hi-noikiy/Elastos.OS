@@ -19,7 +19,6 @@
 #include <elastos/droid/app/LoadedPkg.h>
 #include <elastos/core/AutoLock.h>
 
-#include <elastos/core/AutoLock.h>
 using Elastos::Core::AutoLock;
 using Elastos::Droid::Content::EIID_IComponentCallbacks;
 using Elastos::Droid::Content::EIID_IComponentCallbacks2;
@@ -134,7 +133,8 @@ ECode Application::UnregisterActivityLifecycleCallbacks(
 ECode Application::RegisterOnProvideAssistDataListener(
     /* [in] */ IOnProvideAssistDataListener* callback)
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         if (mAssistCallbacks == NULL) {
             mAssistCallbacks = new List<AutoPtr<IOnProvideAssistDataListener> >();
         }
@@ -146,7 +146,8 @@ ECode Application::RegisterOnProvideAssistDataListener(
 ECode Application::UnregisterOnProvideAssistDataListener(
     /* [in] */ IOnProvideAssistDataListener* callback)
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         if (mAssistCallbacks != NULL) {
             mAssistCallbacks->Remove(callback);
         }
@@ -254,7 +255,8 @@ ECode Application::DispatchOnProvideAssistData(
     /* [in] */ IBundle* data)
 {
     AutoPtr<ArrayOf<IOnProvideAssistDataListener*> > callbacks;
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         if (mAssistCallbacks == NULL) {
             return NOERROR;
         }

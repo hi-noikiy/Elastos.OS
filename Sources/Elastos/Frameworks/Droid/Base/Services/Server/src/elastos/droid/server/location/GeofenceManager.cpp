@@ -24,8 +24,6 @@
 #include <elastos/core/Math.h>
 #include <elastos/utility/logging/Slogger.h>
 
-#include <elastos/core/AutoLock.h>
-using Elastos::Core::AutoLock;
 using Elastos::Droid::App::EIID_IPendingIntentOnFinished;
 using Elastos::Droid::Content::CIntent;
 using Elastos::Droid::Location::CLocationRequest;
@@ -132,7 +130,8 @@ ECode GeofenceManager::AddFence(
     request->GetExpireAt(&expireAt);
     AutoPtr<GeofenceState> state = new GeofenceState(geofence, expireAt,
         allowedResolutionLevel, uid, packageName, intent);
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         Int32 size;
         mFences->GetSize(&size);
         // first make sure it doesn't already exist
@@ -166,7 +165,8 @@ ECode GeofenceManager::RemoveFence(
         IObject::Probe(intent)->ToString(&i);
         Slogger::D(TAG, "removeFence: fence=%s, intent=%s", f.string(), i.string());
     }
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         AutoPtr<IIterator> iter;
         IIterable::Probe(mFences)->GetIterator((IIterator**)&iter);
         Boolean hasNext;
@@ -201,7 +201,8 @@ ECode GeofenceManager::RemoveFence(
     if (D) {
         Slogger::D(TAG, "removeFence: packageName=%s", packageName.string());
     }
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         AutoPtr<IIterator> iter;
         IIterable::Probe(mFences)->GetIterator((IIterator**)&iter);
         Boolean hasNext;
@@ -274,7 +275,8 @@ ECode GeofenceManager::UpdateFences()
 {
     AutoPtr<IList> enterIntents;
     AutoPtr<IList> exitIntents;
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         mPendingUpdate = FALSE;
 
         // Remove expired fences.
@@ -464,7 +466,8 @@ ECode GeofenceManager::SendIntent(
 ECode GeofenceManager::OnLocationChanged(
     /* [in] */ ILocation* location)
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         if (mReceivingLocationUpdates) {
             mLastLocationUpdate = location;
         }

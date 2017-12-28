@@ -485,7 +485,8 @@ ECode ComprehensiveCountryDetector::IsGeoCoderImplemented(
     /* [out] */ Boolean* isGeoCoderImplemented)
 {
     VALIDATE_NOT_NULL(isGeoCoderImplemented)
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         AutoPtr<IGeocoderHelper> gh;
         CGeocoderHelper::AcquireSingleton((IGeocoderHelper**)&gh);
         gh->IsPresent(isGeoCoderImplemented);

@@ -22,11 +22,7 @@
 #include <elastos/core/Math.h>
 #include <elastos/utility/logging/Logger.h>
 
-#include <elastos/core/AutoLock.h>
 using Elastos::Core::AutoLock;
-using Elastos::Utility::IUUIDHelper;
-using Elastos::Utility::CUUIDHelper;
-using Elastos::Utility::Logging::Logger;
 using Elastos::Core::Math;
 using Elastos::IO::ByteOrder;
 using Elastos::IO::IByteBuffer;
@@ -34,6 +30,9 @@ using Elastos::IO::IByteBufferHelper;
 using Elastos::IO::CByteBufferHelper;
 using Elastos::IO::IByteOrderHelper;
 using Elastos::IO::CByteOrderHelper;
+using Elastos::Utility::IUUIDHelper;
+using Elastos::Utility::CUUIDHelper;
+using Elastos::Utility::Logging::Logger;
 
 namespace Elastos {
 namespace Droid {
@@ -142,7 +141,8 @@ ECode CLoudnessEnhancer::GetTargetGain(
 ECode CLoudnessEnhancer::SetParameterListener(
     /* [in] */ ILoudnessEnhancerOnParameterChangeListener * listener)
 {
-    {    AutoLock syncLock(mParamListenerLock);
+    {
+        AutoLock syncLock(mParamListenerLock);
         if (mParamListener == NULL) {
             mBaseParamListener = new BaseParameterListener(this);
             AudioEffect::SetParameterListener(mBaseParamListener);

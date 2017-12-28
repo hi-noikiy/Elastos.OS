@@ -29,7 +29,6 @@
 #include <elastos/core/CoreUtils.h>
 #include <elastos/utility/logging/Logger.h>
 
-#include <elastos/core/AutoLock.h>
 using Elastos::Core::AutoLock;
 using Elastos::Droid::Os::CHandler;
 using Elastos::Droid::Os::IHandler;
@@ -582,7 +581,8 @@ ECode CMediaController::RegisterCallback(
     if (handler == NULL) {
         CHandler::New((IHandler**)&handler);
     }
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         AddCallbackLocked(callback, handler);
     }
     return NOERROR;
@@ -595,7 +595,8 @@ ECode CMediaController::UnregisterCallback(
         // throw new IllegalArgumentException("callback must not be null");
         return E_ILLEGAL_ARGUMENT_EXCEPTION;
     }
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         RemoveCallbackLocked(callback);
     }
     return NOERROR;
@@ -753,7 +754,8 @@ void CMediaController::PostMessage(
     /* [in] */ IInterface * obj,
     /* [in] */ IBundle * data)
 {
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         Int32 size;
         mCallbacks->GetSize(&size);
         for (Int32 i = size - 1; i >= 0; i--) {

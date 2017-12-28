@@ -23,7 +23,6 @@
 #include <elastos/core/AutoLock.h>
 #include <elastos/utility/logging/Logger.h>
 
-#include <elastos/core/AutoLock.h>
 using Elastos::Core::AutoLock;
 using Elastos::Core::StringBuilder;
 using Elastos::Utility::Logging::Logger;
@@ -106,7 +105,8 @@ ECode SystemService::WaitForState(
 {
     Int64 endMillis = SystemClock::GetElapsedRealtime() + timeoutMillis;
     while (TRUE) {
-        {    AutoLock syncLock(sPropertyLock);
+        {
+            AutoLock syncLock(sPropertyLock);
             SystemServiceState currentState = GetState(service);
             if (state == currentState) {
                 return NOERROR;
@@ -131,7 +131,8 @@ ECode SystemService::WaitForAnyStopped(
     /* [in] */ ArrayOf<String>* services)
 {
     while (TRUE) {
-        {    AutoLock syncLock(sPropertyLock);
+        {
+            AutoLock syncLock(sPropertyLock);
             for (Int32 i = 0; i < services->GetLength(); ++i) {
                 if (SystemServiceState_STOPPED == GetState((*services)[i])) {
                     return NOERROR;

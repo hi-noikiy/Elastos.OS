@@ -103,7 +103,8 @@ ECode CPackageInstallerSession::MyHandlerCallBack::HandleMessage(
     VALIDATE_NOT_NULL(result)
 
     Object& lock = mHost->mLock;
-    {    AutoLock syncLock(lock);
+    {
+        AutoLock syncLock(lock);
         AutoPtr<IInterface> obj;
         msg->GetObj((IInterface**)&obj);
         if (obj != NULL) {
@@ -218,7 +219,8 @@ AutoPtr<IPackageInstallerSessionInfo> CPackageInstallerSession::GenerateInfo()
 {
     AutoPtr<IPackageInstallerSessionInfo> info;
     CPackageInstallerSessionInfo::New((IPackageInstallerSessionInfo**)&info);
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         info->SetSessionId(mSessionId);
         info->SetInstallerPackageName(mInstallerPackageName);
         String absolutePath(NULL);
@@ -268,7 +270,8 @@ Boolean CPackageInstallerSession::IsSealed()
 ECode CPackageInstallerSession::AssertPreparedAndNotSealed(
     /* [in] */ const String& cookie)
 {
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         if (!mPrepared) {
             Slogger::E(TAG, "%s before prepared", cookie.string());
             return E_ILLEGAL_STATE_EXCEPTION;
@@ -287,7 +290,8 @@ ECode CPackageInstallerSession::ResolveStageDir(
     VALIDATE_NOT_NULL(dir)
     *dir = NULL;
 
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         if (mResolvedStageDir == NULL) {
             if (mStageDir != NULL) {
                 mResolvedStageDir = mStageDir;
@@ -316,7 +320,8 @@ ECode CPackageInstallerSession::ResolveStageDir(
 ECode CPackageInstallerSession::SetClientProgress(
     /* [in] */ Float progress)
 {
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         // Always publish first staging movement
         Boolean forcePublish = (mClientProgress == 0);
         mClientProgress = progress;
@@ -328,7 +333,9 @@ ECode CPackageInstallerSession::SetClientProgress(
 ECode CPackageInstallerSession::AddClientProgress(
     /* [in] */ Float progress)
 {
-    {    AutoLock syncLock(mLock);
+    {
+
+        AutoLock syncLock(mLock);
         SetClientProgress(mClientProgress + progress);
     }
     return NOERROR;
@@ -337,8 +344,8 @@ ECode CPackageInstallerSession::AddClientProgress(
 void CPackageInstallerSession::ComputeProgressLocked(
     /* [in] */ Boolean forcePublish)
 {
-    mProgress = MathUtils::Constrain(mClientProgress * 0.8, 0, 0.8)
-            + MathUtils::Constrain(mInternalProgress * 0.2, 0, 0.2);
+    mProgress = MathUtils::Constrain(mClientProgress * 0.8, 0.0, 0.8)
+            + MathUtils::Constrain(mInternalProgress * 0.2, 0.0, 0.2);
 
     // Only publish when meaningful change
     if (forcePublish || Elastos::Core::Math::Abs(mProgress - mReportedProgress) >= 0.01) {
@@ -389,7 +396,8 @@ ECode CPackageInstallerSession::OpenWriteInternal(
     // then do heavy disk allocation outside the lock, but this open pipe
     // will block any attempted install transitions.
     AutoPtr<IFileBridge> bridge;
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         FAIL_RETURN(AssertPreparedAndNotSealed(String("openWrite")))
 
         CFileBridge::New((IFileBridge**)&bridge);
@@ -524,7 +532,8 @@ ECode CPackageInstallerSession::Commit(
     }
 
     Boolean wasSealed;
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         wasSealed = mSealed;
         if (!mSealed) {
             // Verify that all writers are hands-off
@@ -1187,7 +1196,8 @@ ECode CPackageInstallerSession::Open()
         mCallback->OnSessionActiveChanged(this, TRUE);
     }
 
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         if (!mPrepared) {
             if (mStageDir != NULL) {
                 FAIL_RETURN(CPackageInstallerService::PrepareInternalStageDir(mStageDir))
@@ -1250,7 +1260,8 @@ void CPackageInstallerSession::DispatchSessionFinished(
 
 void CPackageInstallerSession::DestroyInternal()
 {
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         mSealed = TRUE;
         mDestroyed = TRUE;
 

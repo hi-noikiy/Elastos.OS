@@ -26,7 +26,6 @@
 #include "CStreams.h"
 #include "CCloseGuard.h"
 
-#include <elastos/core/AutoLock.h>
 using Elastos::Core::AutoLock;
 using Elastos::Core::CCloseGuard;
 using Elastos::Droid::System::OsConstants;

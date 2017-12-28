@@ -101,14 +101,16 @@ ECode TaskPersister::LazyTaskWriterThread::Run()
         // call RemoveObsoleteFiles every time through the loop, only the last time before
         // going to sleep. The risk is that we call RemoveObsoleteFiles() successively.
         Boolean probablyDone = FALSE;
-        {    AutoLock syncLock(mHost);
+        {
+            AutoLock syncLock(mHost);
             probablyDone = mHost->mWriteQueue.IsEmpty();
         }
         CActivityManagerService* service = mHost->mService;
         if (probablyDone) {
             if (DEBUG) Slogger::D(TAG, "Looking for obsolete files.");
             persistentTaskIds->Clear();
-            {    AutoLock syncLock(service);
+            {
+                AutoLock syncLock(service);
                 AutoPtr<List<AutoPtr<TaskRecord> > > tasks = service->mRecentTasks;
                 // if (DEBUG) Slogger::D(TAG, "mRecents=" + tasks);
                 List<AutoPtr<TaskRecord> >::ReverseIterator riter;
@@ -132,7 +134,8 @@ ECode TaskPersister::LazyTaskWriterThread::Run()
 
         // If mNextWriteTime, then don't delay between each call to saveToXml().
         AutoPtr<WriteQueueItem> item;
-        {    AutoLock syncLock(mHost);
+        {
+            AutoLock syncLock(mHost);
             if (mHost->mNextWriteTime != FLUSH_QUEUE) {
                 // The next write we don't have to wait so Int64.
                 mHost->mNextWriteTime = SystemClock::GetUptimeMillis() + INTER_WRITE_DELAY_MS;
@@ -200,7 +203,8 @@ ECode TaskPersister::LazyTaskWriterThread::Run()
             AutoPtr<IStringWriter> stringWriter;
             TaskRecord* task = ((TaskWriteQueueItem*)item.Get())->mTask;
             if (DEBUG) Slogger::D(TAG, "Writing task=%s", task->ToString().string());
-            {    AutoLock syncLock(service);
+            {
+                AutoLock syncLock(service);
                 if (task->mInRecents) {
                     // Still there.
                     if (DEBUG) Slogger::D(TAG, "Saving task=%s", task->ToString().string());
@@ -316,7 +320,8 @@ void TaskPersister::RemoveThumbnails(
 void TaskPersister::YieldIfQueueTooDeep()
 {
     Boolean stall = FALSE;
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         if (mNextWriteTime == FLUSH_QUEUE) {
             stall = TRUE;
         }
@@ -702,7 +707,7 @@ AutoPtr<IBitmap> TaskPersister::RestoreImage(
     sb += filename;
     AutoPtr<IBitmap> bitmap;
     factory->DecodeFile(sb.ToString(), (IBitmap**)&bitmap);
-    return NOERROR;
+    return bitmap;
 }
 
 } // namespace Am

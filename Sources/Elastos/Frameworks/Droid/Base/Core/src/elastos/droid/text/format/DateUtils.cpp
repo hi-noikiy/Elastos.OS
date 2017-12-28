@@ -767,7 +767,8 @@ AutoPtr<ICharSequence> DateUtils::GetRelativeTimeSpanString(
     system->GetCurrentTimeMillis(&now);
     Int64 span = Elastos::Core::Math::Abs(now - millis);
 
-    {    AutoLock syncLock(sLockDateUtilsClass);
+    {
+        AutoLock syncLock(sLockDateUtilsClass);
         if (sNowTime == NULL) {
             CTime::New((ITime**)&sNowTime);
         }

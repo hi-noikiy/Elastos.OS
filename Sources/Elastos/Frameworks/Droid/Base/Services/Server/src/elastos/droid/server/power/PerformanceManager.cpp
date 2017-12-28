@@ -131,7 +131,8 @@ Boolean PerformanceManager::SetPowerProfile(
     if (profile.IsNull() || profile.Equals(GetPowerProfile())) {
         return FALSE;
     }
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         mProfileSetByUser = !profile.Equals(mPerfProfileDefault);
         SetPowerProfileLocked(profile);
     }
@@ -180,7 +181,8 @@ void PerformanceManager::ActivityResumed(
         return;
     }
 
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         // Don't mess with it if the user has manually set a profile
         if (mProfileSetByUser) {
             return;

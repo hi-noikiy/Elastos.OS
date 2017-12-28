@@ -434,7 +434,8 @@ ECode CMac::GetSpi(
 {
     VALIDATE_NOT_NULL(spi)
     *spi = NULL;
-    {    AutoLock syncLock(mInitLock);
+    {
+        AutoLock syncLock(mInitLock);
         if (mSpiImpl != NULL && mProvider != NULL && key == NULL) {
             *spi = mSpiImpl;
             REFCOUNT_ADD(*spi)

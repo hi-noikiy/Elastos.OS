@@ -35,8 +35,6 @@
 #include <elastos/core/Thread.h>
 #include <elastos/utility/logging/Slogger.h>
 
-#include <elastos/core/AutoLock.h>
-using Elastos::Core::AutoLock;
 using Elastos::Droid::Graphics::CPoint;
 using Elastos::Droid::Os::CMessage;
 using Elastos::Droid::Os::Build;
@@ -47,6 +45,7 @@ using Elastos::Droid::Os::IHandler;
 using Elastos::Droid::Utility::CSparseArray;
 using Elastos::Droid::Utility::CInt64SparseArray;
 using Elastos::Droid::View::Accessibility::IAccessibilityNodeInfo;
+using Elastos::Core::AutoLock;
 using Elastos::Core::Thread;
 using Elastos::Utility::Logging::Slogger;
 using Elastos::Utility::Concurrent::Atomic::CAtomicInteger32;
@@ -137,7 +136,8 @@ AutoPtr<IAccessibilityInteractionClient> CAccessibilityInteractionClient::GetIns
     /* [in] */ Int64 threadId)
 {
     AutoPtr<IAccessibilityInteractionClient> client;
-    {    AutoLock syncLock(sStaticLock);
+    {
+        AutoLock syncLock(sStaticLock);
         AutoPtr<IInterface> obj;
         sClients->Get(threadId, (IInterface**)&obj);
         client = IAccessibilityInteractionClient::Probe(obj);
@@ -152,7 +152,8 @@ AutoPtr<IAccessibilityInteractionClient> CAccessibilityInteractionClient::GetIns
 ECode CAccessibilityInteractionClient::SetSameThreadMessage(
     /* [in] */ IMessage* message)
 {
-    {    AutoLock syncLock(mInstanceLock);
+    {
+        AutoLock syncLock(mInstanceLock);
         mSameThreadMessage = message;
         mInstanceLock.NotifyAll();
     }
@@ -653,7 +654,8 @@ AutoPtr<IAccessibilityNodeInfo> CAccessibilityInteractionClient::GetFindAccessib
     /* [in] */ Int32 interactionId)
 {
     AutoPtr<IAccessibilityNodeInfo> result;
-    {    AutoLock syncLock(mInstanceLock);
+    {
+        AutoLock syncLock(mInstanceLock);
         Boolean success = WaitForResultTimedLocked(interactionId);
         result = success ? mFindAccessibilityNodeInfoResult : NULL;
         ClearResultLocked();
@@ -665,7 +667,8 @@ ECode CAccessibilityInteractionClient::SetFindAccessibilityNodeInfoResult(
     /* [in] */ IAccessibilityNodeInfo* info,
     /* [in] */ Int32 interactionId)
 {
-    {    AutoLock syncLock(mInstanceLock);
+    {
+        AutoLock syncLock(mInstanceLock);
         if (interactionId > mInteractionId) {
             mFindAccessibilityNodeInfoResult = info;
             mInteractionId = interactionId;
@@ -679,7 +682,8 @@ AutoPtr<IList> CAccessibilityInteractionClient::GetFindAccessibilityNodeInfosRes
     /* [in] */ Int32 interactionId)
 {
     AutoPtr<IList> result;
-    {    AutoLock syncLock(mInstanceLock);
+    {
+        AutoLock syncLock(mInstanceLock);
         Boolean success = WaitForResultTimedLocked(interactionId);
         if (success) {
             result = mFindAccessibilityNodeInfosResult;
@@ -702,7 +706,8 @@ ECode CAccessibilityInteractionClient::SetFindAccessibilityNodeInfosResult(
     /* [in] */ IList* infos,
     /* [in] */ Int32 interactionId)
 {
-    {    AutoLock syncLock(mInstanceLock);
+    {
+        AutoLock syncLock(mInstanceLock);
         if (interactionId > mInteractionId) {
             if (infos != NULL) {
                 // If the call is not an IPC, i.e. it is made from the same process, we need to
@@ -733,7 +738,8 @@ Boolean CAccessibilityInteractionClient::GetPerformAccessibilityActionResultAndC
     /* [in] */ Int32 interactionId)
 {
     Boolean result = FALSE;
-    {    AutoLock syncLock(mInstanceLock);
+    {
+        AutoLock syncLock(mInstanceLock);
         Boolean success = WaitForResultTimedLocked(interactionId);
         result = success ? mPerformAccessibilityActionResult : FALSE;
         ClearResultLocked();
@@ -745,7 +751,8 @@ ECode CAccessibilityInteractionClient::SetPerformAccessibilityActionResult(
     /* [in] */ Boolean succeeded,
     /* [in] */ Int32 interactionId)
 {
-    {    AutoLock syncLock(mInstanceLock);
+    {
+        AutoLock syncLock(mInstanceLock);
         if (interactionId > mInteractionId) {
             mPerformAccessibilityActionResult = succeeded;
             mInteractionId = interactionId;
@@ -759,7 +766,8 @@ AutoPtr<IPoint> CAccessibilityInteractionClient::GetComputeClickPointInScreenRes
     /* [in] */ Int32 interactionId)
 {
     AutoPtr<IPoint> result;
-    {    AutoLock syncLock(mInstanceLock);
+    {
+        AutoLock syncLock(mInstanceLock);
         Boolean success = WaitForResultTimedLocked(interactionId);
         result = success ? mComputeClickPointResult : NULL;
         ClearResultLocked();
@@ -771,7 +779,8 @@ ECode CAccessibilityInteractionClient::SetComputeClickPointInScreenActionResult(
     /* [in] */ IPoint* point,
     /* [in] */ Int32 interactionId)
 {
-    {    AutoLock syncLock(mInstanceLock);
+    {
+        AutoLock syncLock(mInstanceLock);
         if (interactionId > mInteractionId) {
             mComputeClickPointResult = point;
             mInteractionId = interactionId;
@@ -853,7 +862,8 @@ void CAccessibilityInteractionClient::FinalizeAndCacheAccessibilityNodeInfos(
 AutoPtr<IMessage> CAccessibilityInteractionClient::GetSameProcessMessageAndClear()
 {
     AutoPtr<IMessage> result;
-    {    AutoLock syncLock(mInstanceLock);
+    {
+        AutoLock syncLock(mInstanceLock);
         result = mSameThreadMessage;
         mSameThreadMessage = NULL;
     }
@@ -867,7 +877,8 @@ ECode CAccessibilityInteractionClient::GetConnection(
     VALIDATE_NOT_NULL(connection);
     *connection = NULL;
 
-    {    AutoLock syncLock(sConnectionCache);
+    {
+        AutoLock syncLock(sConnectionCache);
         AutoPtr<IInterface> obj;
         sConnectionCache->Get(connectionId, (IInterface**)&obj);
         *connection = IIAccessibilityServiceConnection::Probe(obj);
@@ -880,7 +891,8 @@ ECode CAccessibilityInteractionClient::AddConnection(
     /* [in] */ Int32 connectionId,
     /* [in] */ IIAccessibilityServiceConnection* connection)
 {
-    {    AutoLock syncLock(sConnectionCache);
+    {
+        AutoLock syncLock(sConnectionCache);
         sConnectionCache->Put(connectionId, connection);
     }
     return NOERROR;
@@ -889,7 +901,8 @@ ECode CAccessibilityInteractionClient::AddConnection(
 ECode CAccessibilityInteractionClient::RemoveConnection(
     /* [in] */ Int32 connectionId)
 {
-    {    AutoLock syncLock(sConnectionCache);
+    {
+        AutoLock syncLock(sConnectionCache);
         sConnectionCache->Remove(connectionId);
     }
     return NOERROR;

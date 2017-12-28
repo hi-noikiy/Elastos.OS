@@ -23,7 +23,6 @@
 #include <elastos/utility/Arrays.h>
 #include <elastos/utility/logging/Logger.h>
 
-#include <elastos/core/AutoLock.h>
 using Elastos::Core::AutoLock;
 using Elastos::Droid::Content::CComponentName;
 using Elastos::Droid::Os::EIID_IBinder;
@@ -169,12 +168,12 @@ CLauncherApps::MyOnAppsChangedListener::MyOnAppsChangedListener()
 {
 }
 
-CLauncherApps::MyOnAppsChangedListener::constructor()
+ECode CLauncherApps::MyOnAppsChangedListener::constructor()
 {
     return NOERROR;
 }
 
-CLauncherApps::MyOnAppsChangedListener::constructor(
+ECode CLauncherApps::MyOnAppsChangedListener::constructor(
     /* [in] */ IWeakReference* weakHost)
 {
     mWeakHost = weakHost;
@@ -198,7 +197,8 @@ ECode CLauncherApps::MyOnAppsChangedListener::OnPackageRemoved(
 
     CLauncherApps* cla = (CLauncherApps*)la.Get();
     ISynchronize* sync = ISynchronize::Probe(la);
-    {    AutoLock syncLock(sync);
+    {
+        AutoLock syncLock(sync);
         AutoPtr<IIterator> it;
         cla->mCallbacks->GetIterator((IIterator**)&it);
         Boolean hasNext;
@@ -229,7 +229,8 @@ ECode CLauncherApps::MyOnAppsChangedListener::OnPackageAdded(
 
     CLauncherApps* cla = (CLauncherApps*)la.Get();
     ISynchronize* sync = ISynchronize::Probe(la);
-    {    AutoLock syncLock(sync);
+    {
+        AutoLock syncLock(sync);
         AutoPtr<IIterator> it;
         cla->mCallbacks->GetIterator((IIterator**)&it);
         Boolean hasNext;
@@ -260,7 +261,8 @@ ECode CLauncherApps::MyOnAppsChangedListener::OnPackageChanged(
 
     CLauncherApps* cla = (CLauncherApps*)la.Get();
     ISynchronize* sync = ISynchronize::Probe(la);
-    {    AutoLock syncLock(sync);
+    {
+        AutoLock syncLock(sync);
         AutoPtr<IIterator> it;
         cla->mCallbacks->GetIterator((IIterator**)&it);
         Boolean hasNext;
@@ -292,7 +294,8 @@ ECode CLauncherApps::MyOnAppsChangedListener::OnPackagesAvailable(
 
     CLauncherApps* cla = (CLauncherApps*)la.Get();
     ISynchronize* sync = ISynchronize::Probe(la);
-    {    AutoLock syncLock(sync);
+    {
+        AutoLock syncLock(sync);
         AutoPtr<IIterator> it;
         cla->mCallbacks->GetIterator((IIterator**)&it);
         Boolean hasNext;
@@ -324,7 +327,8 @@ ECode CLauncherApps::MyOnAppsChangedListener::OnPackagesUnavailable(
 
     CLauncherApps* cla = (CLauncherApps*)la.Get();
     ISynchronize* sync = ISynchronize::Probe(la);
-    {    AutoLock syncLock(sync);
+    {
+        AutoLock syncLock(sync);
         AutoPtr<IIterator> it;
         cla->mCallbacks->GetIterator((IIterator**)&it);
         Boolean hasNext;
@@ -545,7 +549,8 @@ ECode CLauncherApps::RegisterCallback(
     /* [in] */ ILauncherAppsCallback* callback,
     /* [in] */ IHandler* handler)
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         Boolean contains;
         if (callback != NULL && (mCallbacks->Contains(callback, &contains), !contains)) {
             Int32 size;
@@ -566,7 +571,8 @@ ECode CLauncherApps::RegisterCallback(
 ECode CLauncherApps::UnregisterCallback(
     /* [in] */ ILauncherAppsCallback* callback)
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         RemoveCallbackLocked(callback);
         Int32 size;
         mCallbacks->GetSize(&size);

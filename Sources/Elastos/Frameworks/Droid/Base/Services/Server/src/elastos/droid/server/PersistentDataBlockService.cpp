@@ -27,10 +27,6 @@
 #include <Elastos.CoreLibrary.IO.h>
 #include <Elastos.CoreLibrary.Libcore.h>
 
-#include <elastos/core/AutoLock.h>
-using Elastos::Core::AutoLock;
-using Elastos::Droid::R;
-using Elastos::Droid::Manifest;
 using Elastos::Droid::Os::EIID_IBinder;
 using Elastos::Droid::Os::Binder;
 using Elastos::Droid::Os::UserHandle;
@@ -40,7 +36,10 @@ using Elastos::Droid::Content::Res::IResources;
 using Elastos::Droid::App::IActivityManagerHelper;
 using Elastos::Droid::App::CActivityManagerHelper;
 using Elastos::Droid::Service::Persistentdata::EIID_IIPersistentDataBlockService;
+using Elastos::Droid::R;
+using Elastos::Droid::Manifest;
 
+using Elastos::Core::AutoLock;
 using Elastos::IO::ICloseable;
 using Elastos::IO::IByteBufferHelper;
 using Elastos::IO::CByteBufferHelper;
@@ -144,7 +143,8 @@ _CONTINUE_:
     headerAndData->PutInt32(data->GetLength());
     headerAndData->Put(data);
 
-    {    AutoLock syncLock(mHost->mLock);
+    {
+        AutoLock syncLock(mHost->mLock);
         headerAndData->GetArray((ArrayOf<Byte>**)&array);
         ec = IOutputStream::Probe(outputStream)->Write(array);
     }
@@ -200,7 +200,8 @@ _EXIT_:
 
 _CONTINUE_:
 
-    {    AutoLock syncLock(mHost->mLock);
+    {
+        AutoLock syncLock(mHost->mLock);
         ec = mHost->GetTotalDataSizeLocked(inputStream, &totalDataSize);
         FAIL_GOTO(ec, _EXIT2_)
 
@@ -244,7 +245,8 @@ ECode PersistentDataBlockService::BinderService::Wipe()
 {
     FAIL_RETURN(mHost->EnforceOemUnlockPermission())
 
-    {    AutoLock syncLock(mHost->mLock);
+    {
+        AutoLock syncLock(mHost->mLock);
         Int32 ret = mHost->NativeWipe(mHost->mDataBlockFile);
 
         if (ret < 0) {
@@ -315,7 +317,8 @@ _CONTINUE_:
     ec = IBuffer::Probe(data)->Flip();
     FAIL_GOTO(ec, _EXIT2_)
 
-    {    AutoLock syncLock(mHost->mOemLock);
+    {
+        AutoLock syncLock(mHost->mOemLock);
         ec = channel->Write(data, &number);
         FAIL_GOTO(ec, _EXIT2_)
     }
@@ -372,7 +375,8 @@ _CONTINUE_:
     ec = IInputStream::Probe(inputStream)->Skip(mHost->GetBlockDeviceSize() - 1, &number);
     FAIL_GOTO(ec, _EXIT2_)
 
-    {    AutoLock syncLock(mHost->mOemLock);
+    {
+        AutoLock syncLock(mHost->mOemLock);
         ec = IDataInput::Probe(inputStream)->ReadByte(&read);
         FAIL_GOTO(ec, _EXIT2_)
 
@@ -428,7 +432,8 @@ _EXIT_:
 
 _CONTINUE_:
 
-    {    AutoLock syncLock(mHost->mLock);
+    {
+        AutoLock syncLock(mHost->mLock);
         ec = mHost->GetTotalDataSizeLocked(inputStream, result);
     }
 
@@ -551,7 +556,8 @@ ECode PersistentDataBlockService::GetTotalDataSizeLocked(
 
 Int64 PersistentDataBlockService::GetBlockDeviceSize()
 {
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         if (mBlockDeviceSize == -1) {
             mBlockDeviceSize = NativeGetBlockDeviceSize(mDataBlockFile);
         }

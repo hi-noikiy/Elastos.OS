@@ -25,10 +25,9 @@
 #include <elastos/core/StringUtils.h>
 #include <elastos/utility/logging/Logger.h>
 
-#include <elastos/core/AutoLock.h>
-using Elastos::Core::AutoLock;
 using Elastos::Droid::Os::CBundle;
 using Elastos::Droid::Os::SystemClock;
+using Elastos::Core::AutoLock;
 using Elastos::Core::StringBuilder;
 using Elastos::Core::StringUtils;
 using Elastos::Core::ISystem;
@@ -165,12 +164,14 @@ ECode Location::Convert(
     CDecimalFormat::New(String("###.#####"), (IDecimalFormat**)&df);
     if (outputType == ILocation::FORMAT_MINUTES || outputType == ILocation::FORMAT_SECONDS) {
         Int32 degrees = (Int32) Elastos::Core::Math::Floor(coordinate);
-        sb += degrees + ":";
+        sb += degrees;
+        sb += ":";
         coordinate -= degrees;
         coordinate *= 60.0;
         if (outputType == ILocation::FORMAT_SECONDS) {
             Int32 minutes = (Int32) Elastos::Core::Math::Floor(coordinate);
-            sb += minutes + ":";
+            sb += minutes;
+            sb += ":";
             coordinate -= minutes;
             coordinate *= 60.0;
         }
@@ -389,7 +390,8 @@ ECode Location::DistanceTo(
 {
     VALIDATE_NOT_NULL(distance);
     // See if we already have the result
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         AutoPtr<Location> destLocation = (Location*)dest;
         if (mLatitude != mLat1 || mLongitude != mLon1 ||
             destLocation->mLatitude != mLat2 || destLocation->mLongitude != mLon2) {
@@ -413,7 +415,8 @@ ECode Location::BearingTo(
 {
     VALIDATE_NOT_NULL(initialBearing);
 
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         // See if we already have the result
         AutoPtr<Location> destLocation = (Location*)dest;
         if (mLatitude != mLat1 || mLongitude != mLon1 ||

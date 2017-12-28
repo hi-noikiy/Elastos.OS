@@ -22,7 +22,6 @@
 #include <elastos/core/StringBuilder.h>
 #include <elastos/utility/logging/Logger.h>
 
-#include <elastos/core/AutoLock.h>
 using Elastos::Core::AutoLock;
 using Elastos::Droid::Internal::Utility::Preconditions;
 using Elastos::Core::StringBuilder;
@@ -157,7 +156,8 @@ ECode TaskDrainer::TaskFinished(
 
 ECode TaskDrainer::BeginDrain()
 {
-    {    AutoLock syncLock(mLock);
+    {
+        AutoLock syncLock(mLock);
         if (!mDraining) {
             if (VERBOSE) {
                 StringBuilder sb;

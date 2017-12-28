@@ -22,10 +22,9 @@
 #include "elastos/droid/graphics/drawable/Drawable.h"
 #include "elastos/droid/view/CViewConfiguration.h"
 #include "elastos/droid/R.h"
+#include <elastos/core/AutoLock.h>
 #include <elastos/core/Math.h>
 
-#include <elastos/core/AutoLock.h>
-using Elastos::Core::AutoLock;
 using Elastos::Droid::Animation::IAnimator;
 using Elastos::Droid::Animation::ObjectAnimator;
 using Elastos::Droid::Graphics::CRect;
@@ -35,6 +34,7 @@ using Elastos::Droid::Graphics::Drawable::EIID_IDrawableCallback;
 using Elastos::Droid::View::Accessibility::IAccessibilityRecord;
 using Elastos::Droid::View::CViewConfiguration;
 using Elastos::Droid::R;
+using Elastos::Core::AutoLock;
 using Elastos::Core::CString;
 
 namespace Elastos {
@@ -319,7 +319,8 @@ ECode AbsSeekBar::GetKeyProgressIncrement(
 ECode AbsSeekBar::SetMax(
     /* [in] */ Int32 max)
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         ProgressBar::SetMax(max);
 
         Int32 max;
@@ -539,7 +540,8 @@ ECode AbsSeekBar::OnResolveDrawables(
 void AbsSeekBar::OnDraw(
     /* [in] */ ICanvas* canvas)
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         ProgressBar::OnDraw(canvas);
         DrawThumb(canvas);
     }
@@ -592,7 +594,8 @@ ECode AbsSeekBar::OnMeasure(
     /* [in] */ Int32 widthMeasureSpec,
     /* [in] */ Int32 heightMeasureSpec)
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         AutoPtr<IDrawable> d = GetCurrentDrawable();
 
         Int32 h;

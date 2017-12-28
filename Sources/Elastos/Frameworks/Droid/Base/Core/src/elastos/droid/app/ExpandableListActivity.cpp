@@ -19,7 +19,6 @@
 #include "elastos/core/AutoLock.h"
 #include <elastos/utility/logging/Logger.h>
 
-#include <elastos/core/AutoLock.h>
 using Elastos::Core::AutoLock;
 using Elastos::Droid::R;
 using Elastos::Droid::Widget::IAdapterView;
@@ -151,7 +150,8 @@ ECode ExpandableListActivity::OnContentChanged()
 ECode ExpandableListActivity::SetListAdapter(
     /* [in] */ IExpandableListAdapter* adapter)
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         FAIL_RETURN(EnsureList())
         mAdapter = adapter;
         mList->SetAdapter(adapter);

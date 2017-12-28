@@ -264,7 +264,8 @@ void ManagedServices::UserProfiles::UpdateCache(
         helper->GetCurrentUser(&currentUserId);
         AutoPtr<IList> profiles;
         userManager->GetProfiles(currentUserId, (IList**)&profiles);
-        {    AutoLock syncLock(mCurrentProfiles);
+        {
+            AutoLock syncLock(mCurrentProfiles);
             mCurrentProfiles->Clear();
             Int32 size;
             profiles->GetSize(&size);
@@ -282,7 +283,8 @@ void ManagedServices::UserProfiles::UpdateCache(
 
 AutoPtr< ArrayOf<Int32> > ManagedServices::UserProfiles::GetCurrentProfileIds()
 {
-    {    AutoLock syncLock(mCurrentProfiles);
+    {
+        AutoLock syncLock(mCurrentProfiles);
         Int32 N;
         mCurrentProfiles->GetSize(&N);
         AutoPtr< ArrayOf<Int32> > users = ArrayOf<Int32>::Alloc(N);
@@ -300,7 +302,8 @@ Boolean ManagedServices::UserProfiles::IsCurrentProfile(
     /* [in] */ Int32 userId)
 {
     AutoPtr<IInterface> obj;
-    {    AutoLock syncLock(mCurrentProfiles);
+    {
+        AutoLock syncLock(mCurrentProfiles);
         mCurrentProfiles->Get(userId, (IInterface**)&obj);
     }
     return obj != NULL;
@@ -382,7 +385,8 @@ ECode ManagedServices::MyServiceConnection::OnServiceConnected(
 {
     Boolean added = FALSE;
     AutoPtr<ManagedServiceInfo> info;
-    {    AutoLock syncLock(mHost->mMutex);
+    {
+        AutoLock syncLock(mHost->mMutex);
         mHost->mServicesBinding->Remove(CoreUtils::Convert(mServicesBindingTag));
         // try {
         mService = TO_IINTERFACE(binder);
@@ -759,7 +763,8 @@ ECode ManagedServices::RebindServices()
     AutoPtr<ISparseArray> toAdd;
     CSparseArray::New((ISparseArray**)&toAdd);
 
-    {    AutoLock syncLock(mMutex);
+    {
+        AutoLock syncLock(mMutex);
         // Unbind automatically bound services, retain system services.
         Int32 size;
         mServices->GetSize(&size);
@@ -853,7 +858,8 @@ ECode ManagedServices::RegisterService(
         Slogger::V(TAG, "registerService: %s u=%d", TO_CSTR(name), userid);
     }
 
-    {    AutoLock syncLock(mMutex);
+    {
+        AutoLock syncLock(mMutex);
         String str;
         name->ToString(&str);
         StringBuilder builder;
@@ -946,7 +952,8 @@ ECode ManagedServices::UnregisterService(
     /* [in] */ IComponentName* name,
     /* [in] */ Int32 userid)
 {
-    {    AutoLock syncLock(mMutex);
+    {
+        AutoLock syncLock(mMutex);
         Int32 N;
         mServices->GetSize(&N);
         for (Int32 i = N-1; i >= 0; i--) {

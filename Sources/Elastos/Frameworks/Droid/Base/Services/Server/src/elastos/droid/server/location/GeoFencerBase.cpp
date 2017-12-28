@@ -19,9 +19,8 @@
 #include "Elastos.CoreLibrary.IO.h"
 #include <elastos/core/AutoLock.h>
 
-#include <elastos/core/AutoLock.h>
-using Elastos::Core::AutoLock;
 using Elastos::Droid::Location::CGeoFenceParams;
+using Elastos::Core::AutoLock;
 using Elastos::Utility::CArrayList;
 using Elastos::Utility::IArrayList;
 using Elastos::Utility::CHashMap;
@@ -59,11 +58,13 @@ void GeoFencerBase::Add(
 {
     AutoPtr<IPendingIntent> intent;
     geoFence->GetIntent((IPendingIntent**)&intent);
-    {    AutoLock syncLock(mGeoFences);
+    {
+        AutoLock syncLock(mGeoFences);
         mGeoFences->Put(intent, geoFence);
     }
     if (!Start(geoFence)) {
-        {    AutoLock syncLock(mGeoFences);
+        {
+            AutoLock syncLock(mGeoFences);
             mGeoFences->Remove(intent);
         }
     }
@@ -81,7 +82,8 @@ void GeoFencerBase::Remove(
 {
     AutoPtr<IGeoFenceParams> geoFence;
 
-    {    AutoLock syncLock(mGeoFences);
+    {
+        AutoLock syncLock(mGeoFences);
         AutoPtr<IInterface> value;
         mGeoFences->Remove(intent, (IInterface**)&value);
         geoFence = IGeoFenceParams::Probe(value);
@@ -91,7 +93,8 @@ void GeoFencerBase::Remove(
         if (!localOnly && !Stop(intent)) {
             AutoPtr<IPendingIntent> intent;
             geoFence->GetIntent((IPendingIntent**)&intent);
-            {    AutoLock syncLock(mGeoFences);
+            {
+                AutoLock syncLock(mGeoFences);
                 mGeoFences->Put(intent, geoFence);
             }
         }

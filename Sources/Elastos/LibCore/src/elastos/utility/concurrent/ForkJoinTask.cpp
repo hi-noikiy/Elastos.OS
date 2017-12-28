@@ -22,7 +22,6 @@
 #include "CSystem.h"
 #include "AutoLock.h"
 
-#include <elastos/core/AutoLock.h>
 using Elastos::Core::AutoLock;
 using Elastos::IO::EIID_ISerializable;
 using Elastos::Core::ISystem;

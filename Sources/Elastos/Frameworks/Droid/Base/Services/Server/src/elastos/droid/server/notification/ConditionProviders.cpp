@@ -25,8 +25,6 @@
 #include <elastos/utility/logging/Slogger.h>
 #include <elastos/utility/Objects.h>
 
-#include <elastos/core/AutoLock.h>
-using Elastos::Core::AutoLock;
 using Elastos::Droid::Provider::ISettings;
 using Elastos::Droid::Provider::ISettingsGlobal;
 using Elastos::Droid::Provider::ISettingsSecure;
@@ -40,6 +38,7 @@ using Elastos::Droid::Service::Notification::CZenModeConfigHelper;
 using Elastos::Droid::Utility::CArrayMap;
 using Elastos::Droid::Utility::CArraySet;
 using Elastos::Droid::R;
+using Elastos::Core::AutoLock;
 using Elastos::Core::StringBuilder;
 using Elastos::Utility::Arrays;
 using Elastos::Utility::CArrayList;
@@ -600,7 +599,7 @@ ECode ConditionProviders::SubscribeLocked(
 {
     if (DEBUG) Slogger::D(TAG, "subscribeLocked %p", r);
     AutoPtr<IIConditionProvider> provider = Provider(r);
-    ECode ec;
+    ECode ec = NOERROR;
     if (provider != NULL) {
         // try {
         Slogger::D(TAG, "Subscribing to %p with %p", r->mId.Get(), provider.Get());
@@ -736,7 +735,7 @@ ECode ConditionProviders::UnsubscribeLocked(
 {
     if (DEBUG) Slogger::D(TAG, "unsubscribeLocked %p", r);
     AutoPtr<IIConditionProvider> provider = Provider(r);
-    ECode ec;
+    ECode ec = NOERROR;
     if (provider != NULL) {
         // try {
         ec = provider->OnUnsubscribe(r->mId);

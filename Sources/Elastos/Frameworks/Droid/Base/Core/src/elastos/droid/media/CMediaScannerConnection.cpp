@@ -21,13 +21,11 @@
 #include "elastos/droid/content/CIntent.h"
 #include <elastos/core/AutoLock.h>
 
-#include <elastos/core/AutoLock.h>
-using Elastos::Core::AutoLock;
 using Elastos::Droid::Content::IIntent;
 using Elastos::Droid::Content::CIntent;
 using Elastos::Droid::Content::CComponentName;
-using Elastos::Utility::Logging::Slogger;
 using Elastos::Core::AutoLock;
+using Elastos::Utility::Logging::Slogger;
 
 namespace Elastos {
 namespace Droid {
@@ -231,7 +229,8 @@ ECode CMediaScannerConnection::OnServiceConnected(
         Slogger::V(TAG, "Connected to Media Scanner");
     }
 
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         if (service != NULL) {
             mService = (IIMediaScannerService*)service->Probe(EIID_IIMediaScannerService);
             if (mService != NULL && mClient != NULL) {

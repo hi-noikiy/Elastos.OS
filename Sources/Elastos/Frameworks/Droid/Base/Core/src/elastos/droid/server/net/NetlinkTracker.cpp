@@ -23,8 +23,6 @@
 #include <elastos/utility/Arrays.h>
 #include <elastos/utility/logging/Logger.h>
 
-#include <elastos/core/AutoLock.h>
-using Elastos::Core::AutoLock;
 using Elastos::Droid::Net::CLinkProperties;
 using Elastos::Droid::Server::Net::CDnsServerRepository;
 using Elastos::Core::AutoLock;
@@ -92,7 +90,8 @@ ECode NetlinkTracker::AddressUpdated(
     if (mInterfaceName.Equals(iface)) {
         MaybeLog(String("addressUpdated"), iface, address);
         Boolean changed;
-        {    AutoLock syncLock(this);
+        {
+            AutoLock syncLock(this);
             mLinkProperties->AddLinkAddress(address, &changed);
         }
         if (changed) {
@@ -111,7 +110,8 @@ ECode NetlinkTracker::AddressRemoved(
     if (mInterfaceName.Equals(iface)) {
         MaybeLog(String("addressRemoved"), iface, address);
         Boolean changed;
-        {    AutoLock syncLock(this);
+        {
+            AutoLock syncLock(this);
             mLinkProperties->RemoveLinkAddress(address, &changed);
         }
         if (changed) {
@@ -131,7 +131,8 @@ ECode NetlinkTracker::RouteUpdated(
     if (mInterfaceName.Equals(result)) {
         MaybeLog(String("routeUpdated"), IInterface::Probe(route));
         Boolean changed;
-        {    AutoLock syncLock(this);
+        {
+            AutoLock syncLock(this);
             mLinkProperties->AddRoute(route, &changed);
         }
         if (changed) {
@@ -151,7 +152,8 @@ ECode NetlinkTracker::RouteRemoved(
     if (mInterfaceName.Equals(result)) {
         MaybeLog(String("routeRemoved"), IInterface::Probe(route));
         Boolean changed;
-        {    AutoLock syncLock(this);
+        {
+            AutoLock syncLock(this);
             mLinkProperties->RemoveRoute(route, &changed);
         }
         if (changed) {
@@ -176,7 +178,8 @@ ECode NetlinkTracker::InterfaceDnsServerInfo(
         Boolean changed;
         mDnsServerRepository->AddServers(lifetime, addresses, &changed);
         if (changed) {
-            {    AutoLock syncLock(this);
+            {
+                AutoLock syncLock(this);
                 mDnsServerRepository->SetDnsServersOn(mLinkProperties);
             }
             AutoPtr<ILinkProperties> lp;
@@ -191,7 +194,8 @@ ECode NetlinkTracker::GetLinkProperties(
     /* [out] */ ILinkProperties** lp)
 {
     VALIDATE_NOT_NULL(lp)
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         CLinkProperties::New(mLinkProperties.Get(), lp);
     }
     return NOERROR;
@@ -199,7 +203,8 @@ ECode NetlinkTracker::GetLinkProperties(
 
 ECode NetlinkTracker::ClearLinkProperties()
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         // Clear the repository before clearing mLinkProperties. That way, if a clear() happens
         // while interfaceDnsServerInfo() is being called, we'll end up with no DNS servers in
         // mLinkProperties, as desired.

@@ -19,7 +19,6 @@
 #include <elastos/utility/etl/Algorithm.h>
 #include <elastos/core/AutoLock.h>
 
-#include <elastos/core/AutoLock.h>
 using Elastos::Core::AutoLock;
 using Elastos::Utility::Logging::Slogger;
 

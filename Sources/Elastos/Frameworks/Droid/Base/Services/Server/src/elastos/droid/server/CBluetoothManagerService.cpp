@@ -33,8 +33,6 @@
 #include <Elastos.Droid.Bluetooth.h>
 #include <Elastos.CoreLibrary.Utility.h>
 
-#include <elastos/core/AutoLock.h>
-using Elastos::Core::AutoLock;
 using Elastos::Droid::R;
 using Elastos::Droid::Os::Binder;
 using Elastos::Droid::Os::Looper;
@@ -62,6 +60,7 @@ using Elastos::Droid::Bluetooth::IIBluetoothCallback;
 using Elastos::Droid::Provider::Settings;
 using Elastos::Droid::Provider::ISettingsGlobal;
 using Elastos::Droid::Provider::ISettingsSecure;
+using Elastos::Core::AutoLock;
 using Elastos::Core::StringBuilder;
 using Elastos::Utility::Logging::Slogger;
 
@@ -1638,7 +1637,8 @@ ECode CBluetoothManagerService::GetQBluetooth(
 void CBluetoothManagerService::RecoverBluetoothServiceFromError()
 {
     Slogger::E(TAG,"RecoverBluetoothServiceFromError");
-    {    AutoLock syncLock(mConnection);
+    {
+        AutoLock syncLock(mConnection);
         if (mBluetooth != NULL) {
             //Unregister callback object
             ECode ec = mBluetooth->UnregisterCallback(mBluetoothCallback);
@@ -1657,7 +1657,8 @@ void CBluetoothManagerService::RecoverBluetoothServiceFromError()
 
     SendBluetoothServiceDownCallback();
     SendQBluetoothServiceDownCallback();
-    {    AutoLock syncLock(mConnection);
+    {
+        AutoLock syncLock(mConnection);
         if (mBluetooth != NULL) {
             mBluetooth = NULL;
             if(mQBluetooth != NULL) {

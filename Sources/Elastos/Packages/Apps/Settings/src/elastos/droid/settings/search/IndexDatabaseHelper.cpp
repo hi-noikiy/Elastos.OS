@@ -23,7 +23,6 @@
 #include <elastos/utility/logging/Logger.h>
 #include "_Elastos.Droid.Settings.h"
 
-#include <elastos/core/AutoLock.h>
 using Elastos::Core::AutoLock;
 using Elastos::Droid::Database::ICursor;
 using Elastos::Droid::Os::Build;
@@ -172,7 +171,8 @@ ECode IndexDatabaseHelper::constructor(
 AutoPtr<IndexDatabaseHelper> IndexDatabaseHelper::GetInstance(
     /* [in] */ IContext* context)
 {
-    {    AutoLock syncLock(sLock);
+    {
+        AutoLock syncLock(sLock);
         if (sSingleton == NULL) {
             sSingleton = new IndexDatabaseHelper();
             sSingleton->constructor(context);

@@ -20,8 +20,6 @@
 #include <elastos/core/StringBuilder.h>
 #include <elastos/utility/logging/Logger.h>
 
-#include <elastos/core/AutoLock.h>
-using Elastos::Core::AutoLock;
 using Elastos::Droid::Location::ILocationProvider;
 using Elastos::Droid::Os::CWorkSource;
 using Elastos::Droid::Os::IBinder;
@@ -56,7 +54,8 @@ ECode LocationProviderProxy::NewServiceWorkRunnable::Run()
     AutoPtr<IProviderRequest> request;
     AutoPtr<IWorkSource> source;
     AutoPtr<IILocationProvider> service;
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         enabled = mHost->mEnabled;
         request = mHost->mRequest;
         source = mHost->mWorksource;
@@ -84,7 +83,8 @@ ECode LocationProviderProxy::NewServiceWorkRunnable::Run()
         }
     }
 
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         mHost->mProperties = properties;
     }
     return NOERROR;
@@ -169,7 +169,8 @@ ECode LocationProviderProxy::GetProperties(
     /* [out] */ IProviderProperties** properties)
 {
     VALIDATE_NOT_NULL(properties)
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         *properties = mProperties;
         REFCOUNT_ADD(*properties);
     }
@@ -178,7 +179,8 @@ ECode LocationProviderProxy::GetProperties(
 
 ECode LocationProviderProxy::Enable()
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         mEnabled = TRUE;
     }
     AutoPtr<IILocationProvider> service = GetService();
@@ -199,7 +201,8 @@ ECode LocationProviderProxy::Enable()
 
 ECode LocationProviderProxy::Disable()
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         mEnabled = FALSE;
     }
 
@@ -223,7 +226,8 @@ ECode LocationProviderProxy::IsEnabled(
     /* [out] */ Boolean* enable)
 {
     VALIDATE_NOT_NULL(enable);
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         *enable = mEnabled;
     }
     return NOERROR;
@@ -233,7 +237,8 @@ ECode LocationProviderProxy::SetRequest(
     /* [in] */ IProviderRequest* request,
     /* [in] */ IWorkSource* source)
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         mRequest = request;
         mWorksource = source;
     }

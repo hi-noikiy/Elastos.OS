@@ -37,7 +37,6 @@
 #include "elastos/droid/content/res/CResources.h"
 #include "elastos/droid/R.h"
 
-#include <elastos/core/AutoLock.h>
 using Elastos::Core::AutoLock;
 using Libcore::Utility::IZoneInfoDB;
 using Libcore::Utility::CZoneInfoDB;
@@ -156,7 +155,8 @@ AutoPtr<ITimeZone> TimeUtils::GetTimeZone(
 AutoPtr<ArrayOf<ITimeZone *> > TimeUtils::GetTimeZonesWithUniqueOffsets(
     /* [in] */ const String& country)
 {
-    {    AutoLock syncLock(sLastUniqueLockObj);
+    {
+        AutoLock syncLock(sLastUniqueLockObj);
         if ((!country.IsNull()) && country.Equals(sLastUniqueCountry)) {
             if (DBG) {
                 Logger::D(TAG, "getTimeZonesWithUniqueOffsets(%s): return cached version", country.string());
@@ -214,7 +214,8 @@ AutoPtr<ArrayOf<ITimeZone *> > TimeUtils::GetTimeZonesWithUniqueOffsets(
             uniqueTimeZones2->Set(index++, ttz);
         }
     }
-    {    AutoLock syncLock(sLastUniqueLockObj);
+    {
+        AutoLock syncLock(sLastUniqueLockObj);
         // Cache the last result
         sLastUniqueZoneOffsets = uniqueTimeZones2;
         sLastUniqueCountry = country;
@@ -226,7 +227,8 @@ AutoPtr<ArrayOf<ITimeZone *> > TimeUtils::GetTimeZonesWithUniqueOffsets(
 AutoPtr<ArrayOf<ITimeZone *> > TimeUtils::GetTimeZones(
     /* [in] */ const String& country)
 {
-    {    AutoLock syncLock(sLastLockObj);
+    {
+        AutoLock syncLock(sLastLockObj);
         if (!country.IsNull() && country.Equals(sLastCountry)) {
             if (DBG) Logger::D(TAG, "getTimeZones(): return cached version", country.string());
             return sLastZones;
@@ -303,7 +305,8 @@ AutoPtr<ArrayOf<ITimeZone *> > TimeUtils::GetTimeZones(
 
     ICloseable::Probe(parser)->Close();
 
-    {    AutoLock syncLock(sLastLockObj);
+    {
+        AutoLock syncLock(sLastLockObj);
 
         // Cache the last result;
         sLastZones = ArrayOf<ITimeZone*>::Alloc(list.GetSize());

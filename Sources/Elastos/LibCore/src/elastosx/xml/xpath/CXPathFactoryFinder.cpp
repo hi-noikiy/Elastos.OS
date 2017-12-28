@@ -29,16 +29,12 @@
 #include "CInputStreamReader.h"
 #include "IoUtils.h"
 
-#include <elastos/core/AutoLock.h>
 using Elastos::Core::AutoLock;
-using Elastos::Utility::CProperties;
-using Elastos::Utility::Logging::Logger;
 using Elastos::Core::StringBuilder;
 using Elastos::Core::IThread;
 using Elastos::Core::Thread;
 using Elastos::Core::ISystem;
 using Elastos::Core::CSystem;
-using Elastos::Core::AutoLock;
 using Elastos::IO::File;
 using Elastos::IO::IFile;
 using Elastos::IO::CFile;
@@ -49,6 +45,8 @@ using Elastos::IO::IInputStreamReader;
 using Elastos::IO::CBufferedReader;
 using Elastos::IO::CInputStreamReader;
 using Elastos::IO::ICloseable;
+using Elastos::Utility::CProperties;
+using Elastos::Utility::Logging::Logger;
 using Libcore::IO::IoUtils;
 
 namespace Elastosx {

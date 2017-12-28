@@ -30,8 +30,6 @@ namespace Droid {
 namespace View {
 namespace Accessibility {
 
-extern const InterfaceID EIID_AccessibilityRecord;
-
 class CAccessibilityRecord;
 
 class AccessibilityRecord
@@ -563,6 +561,8 @@ public:
      * Clears the state of this instance.
      */
     CARAPI_(void) Clear();
+
+    using Object::ToString;
 
     CARAPI_(String) ToString();
 

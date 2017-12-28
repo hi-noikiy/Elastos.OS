@@ -23,8 +23,6 @@
 #include <elastos/core/AutoLock.h>
 #include <elastos/utility/logging/Logger.h>
 
-#include <elastos/core/AutoLock.h>
-using Elastos::Core::AutoLock;
 using Elastos::Droid::App::CNotification;
 using Elastos::Droid::App::CPendingIntentHelper;
 using Elastos::Droid::App::INotificationManager;
@@ -393,7 +391,8 @@ void StorageNotification::SetUsbStorageNotification(
     /* [in] */ Boolean visible,
     /* [in] */ IPendingIntent* pi)
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         if (!visible && mUsbStorageNotification == NULL) {
             return;
         }
@@ -496,7 +495,8 @@ void StorageNotification::SetUsbStorageNotification(
 
 Boolean StorageNotification::GetMediaStorageNotificationDismissable()
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         Int32 flags;
         mMediaStorageNotification->GetFlags(&flags);
 
@@ -515,7 +515,8 @@ void StorageNotification::SetMediaStorageNotification(
     /* [in] */ Boolean dismissable,
     /* [in] */ IPendingIntent* pi)
 {
-    {    AutoLock syncLock(this);
+    {
+        AutoLock syncLock(this);
         if (!visible && mMediaStorageNotification == NULL) {
             return;
         }

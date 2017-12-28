@@ -17,11 +17,10 @@
 #include "elastos/droid/server/DisplayThread.h"
 #include <elastos/core/AutoLock.h>
 
-#include <elastos/core/AutoLock.h>
-using Elastos::Core::AutoLock;
 using Elastos::Droid::Os::ILooper;
 using Elastos::Droid::Os::IProcess;
 using Elastos::Droid::Os::CHandler;
+using Elastos::Core::AutoLock;
 
 namespace Elastos {
 namespace Droid {
@@ -49,7 +48,8 @@ void DisplayThread::EnsureThreadLocked()
 
 AutoPtr<DisplayThread> DisplayThread::Get()
 {
-    {    AutoLock syncLock(sLock);
+    {
+        AutoLock syncLock(sLock);
         EnsureThreadLocked();
     }
     return sInstance;
@@ -57,7 +57,8 @@ AutoPtr<DisplayThread> DisplayThread::Get()
 
 AutoPtr<IHandler> DisplayThread::GetHandler()
 {
-    {    AutoLock syncLock(sLock);
+    {
+        AutoLock syncLock(sLock);
         EnsureThreadLocked();
     }
     return sHandler;

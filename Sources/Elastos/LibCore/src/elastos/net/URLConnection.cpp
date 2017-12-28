@@ -25,7 +25,6 @@
 #include "Collections.h"
 #include "AutoLock.h"
 
-#include <elastos/core/AutoLock.h>
 using Elastos::Core::AutoLock;
 using Elastos::Core::StringBuffer;
 using Elastos::Core::StringUtils;
@@ -339,7 +338,8 @@ ECode URLConnection::GetExpiration(
 
 AutoPtr<IFileNameMap> URLConnection::GetFileNameMap()
 {
-    {    AutoLock syncLock(sLock);
+    {
+        AutoLock syncLock(sLock);
         if (sFileNameMap == NULL) {
             sFileNameMap = new DefaultFileNameMap();
         }
@@ -675,7 +675,8 @@ ECode URLConnection::SetAllowUserInteraction(
 ECode URLConnection::SetContentHandlerFactory(
     /* [in] */ IContentHandlerFactory* contentFactory)
 {
-    {    AutoLock syncLock(sLock);
+    {
+        AutoLock syncLock(sLock);
         if (sContentHandlerFactory != NULL) {
             //throw new Error("Factory already set");
             return NOERROR;
@@ -729,7 +730,8 @@ ECode URLConnection::SetDoOutput(
 void URLConnection::SetFileNameMap(
     /* [in] */ IFileNameMap* map)
 {
-    {    AutoLock syncLock(sLock);
+    {
+        AutoLock syncLock(sLock);
         sFileNameMap = map;
     }
     return;

@@ -442,7 +442,8 @@ AutoPtr<IComponentName> ActiveServices::StartServiceInnerLocked(
     if (r->mStats != NULL) {
         AutoPtr<IBatteryStatsImpl> stats;
         r->mStats->GetBatteryStats((IBatteryStatsImpl**)&stats);
-        {    AutoLock syncLock(stats);
+        {
+            AutoLock syncLock(stats);
             r->mStats->StartRunningLocked();
         }
     }
@@ -495,7 +496,8 @@ ECode ActiveServices::StopServiceLocked(
     if (service->mStats != NULL) {
         AutoPtr<IBatteryStatsImpl> stats;
         service->mStats->GetBatteryStats((IBatteryStatsImpl**)&stats);
-        {    AutoLock syncLock(stats);
+        {
+            AutoLock syncLock(stats);
             service->mStats->StopRunningLocked();
         }
     }
@@ -629,7 +631,8 @@ ECode ActiveServices::StopServiceTokenLocked(
         if (r->mStats != NULL) {
             AutoPtr<IBatteryStatsImpl> stats;
             r->mStats->GetBatteryStats((IBatteryStatsImpl**)&stats);
-            {    AutoLock syncLock(stats);
+            {
+                AutoLock syncLock(stats);
                 r->mStats->StopRunningLocked();
             }
         }
@@ -1767,7 +1770,8 @@ ECode ActiveServices::RealStartServiceLocked(
     if (r->mStats != NULL) {
         AutoPtr<IBatteryStatsImpl> stats;
         r->mStats->GetBatteryStats((IBatteryStatsImpl**)&stats);
-        {    AutoLock syncLock(stats);
+        {
+            AutoLock syncLock(stats);
             r->mStats->StartLaunchedLocked();
         }
     }
@@ -2013,7 +2017,8 @@ ECode ActiveServices::BringDownServiceLocked(
         if (r->mStats != NULL) {
             AutoPtr<IBatteryStatsImpl> stats;
             r->mStats->GetBatteryStats((IBatteryStatsImpl**)&stats);
-            {    AutoLock syncLock(stats);
+            {
+                AutoLock syncLock(stats);
                 r->mStats->StopLaunchedLocked();
             }
         }
