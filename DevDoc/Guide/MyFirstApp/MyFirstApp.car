@@ -5,16 +5,16 @@ module {
     using interface Elastos.Droid.App.IActivity;
 
     namespace Elastos {
-    namespace Droid {
-    namespace DevSamples {
-    namespace MyFirstApp {
+        namespace Droid {
+            namespace DevSamples {
+                namespace MyFirstApp {
 
-    class CMainActivity {
-        interface IActivity;
-    }
+                    class CMainActivity {
+                        interface IActivity;
+                    }
 
-    } //namespace MyfirstApp
-    } //namespace DevSamples
-    } //namespace Droid
+                } //namespace MyfirstApp
+            } //namespace DevSamples
+        } //namespace Droid
     } //namespace Elastos
 }
